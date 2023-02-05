@@ -51,15 +51,14 @@ class AuthService {
                         if let err = error {
                             print("DEBUG: \(err.localizedDescription)")
                         } else {
-                            let id = authResult?.user.uid
-                            print("DEBUG: \(id ?? "123")")
+                            guard let id = authResult?.user.uid else {return}
                             let data = ["email": email,
                                         "password": password,
                                         "userName": userName,
                                         "fullName": fullName,
                                         "profileImageURL" : profileImageURL]
                             
-                            self.db.collection("users").document().setData(data, completion: completion)
+                            self.db.collection("users").document(id).setData(data, completion: completion)
                         }
                     }
                 }

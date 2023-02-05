@@ -16,16 +16,25 @@ class MainTabBarController: UITabBarController {
     
     // MARK: - Selectors
 
-    
-    
+
     @objc func actionButtonTapped() {
-        print("123456")
+        guard let user = user else {return}
+        let nav = UINavigationController(rootViewController: UploadTwitterController(user: user))
+        nav.modalPresentationStyle = .fullScreen
+        present(nav, animated: true, completion: nil)
     }
     
     
     
     // MARK: - Properties
-    
+    var user: User? {
+        didSet {
+            guard let nav = viewControllers?[0] as? UINavigationController else {return}
+            guard let feed = nav.viewControllers.first as? FeedController else {return}
+            
+            feed.user = user
+        }
+    }
 
     
     var actionButton: UIButton = {
@@ -46,7 +55,6 @@ class MainTabBarController: UITabBarController {
         
         view.backgroundColor = .red
         checkStateUserLogin()
-        
     }
     
     func configureUI() {
@@ -59,11 +67,11 @@ class MainTabBarController: UITabBarController {
     //MARK: - Helpers
     func configureViewController() {
 
-        let feed = templateNavigationController(image: UIImage(named: "home_unselected"), rootViewController: FeedController())
+        let feed = templateNavigationController(image: UIImage(named: "home_unselected"), rootViewController: FeedController(collectionViewLayout: UICollectionViewFlowLayout()))
 
         let explore = templateNavigationController(image: UIImage(named: "search_unselected"), rootViewController: ExploreController())
         
-        let notifications = templateNavigationController(image: UIImage(named: "like_unselected"), rootViewController: NotificationController())
+        let notifications = templateNavigationController(image: UIImage(named: "like_unselected"), rootViewController: NotificationController())			
         
         let conversations = templateNavigationController(image: UIImage(named: "mail"), rootViewController: ConversationController())
         
@@ -88,11 +96,18 @@ class MainTabBarController: UITabBarController {
         } else {
             configureViewController()
             configureUI()
+            fetchUser()
+        }
+    }
+    
+    func fetchUser() {
+        guard let uid = Auth.auth().currentUser?.uid else {return}
+        UserService.shared.fetchUser(uid: uid) { user in
+            self.user = user
         }
     }
     
     
-    //Catch Error hay vậy ?? Ảo
     func logUserOut() {
         do {
             try Auth.auth().signOut()
@@ -102,5 +117,5 @@ class MainTabBarController: UITabBarController {
         }
     }
     
-
+    
 }

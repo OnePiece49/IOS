@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="fI5-Hi-gkS">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Viet Controller-->
+        <scene sceneID="BEt-nJ-Hf2">
+            <objects>
+                <viewController id="fI5-Hi-gkS" customClass="VietController" customModule="InstrictContentSize_AutoLayout" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="I5W-V0-e2b">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="Hh6-3m-dFj"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="jKe-mS-RJo" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-872" y="74"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="InstrictContentSize_AutoLayout" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" horizontalCompressionResistancePriority="751" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="vc" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="fzK-wT-TzV">
+                                <rect key="frame" x="99.5" y="46" width="254.5" height="34"/>
+                                <color key="backgroundColor" red="1" green="0.11616863080000001" blue="0.38596200190000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Hello ae" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZCT-Ud-qw5">
+                                <rect key="frame" x="8" y="52" width="61.5" height="21"/>
+                                <color key="backgroundColor" red="0.072667958790000001" green="0.83161729049999999" blue="0.41371664619999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" image="luffy" translatesAutoresizingMaskIntoConstraints="NO" id="bRe-Fx-YgD">
+                                <rect key="frame" x="0.0" y="103" width="414" height="174"/>
+                                <color key="backgroundColor" red="0.072667958790000001" green="0.83161729049999999" blue="0.41371664619999998" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </imageView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="ZCT-Ud-qw5" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="8" id="1cF-aK-QKw"/>
+                            <constraint firstItem="fzK-wT-TzV" firstAttribute="firstBaseline" secondItem="ZCT-Ud-qw5" secondAttribute="firstBaseline" id="BbJ-gM-q8U"/>
+                            <constraint firstItem="bRe-Fx-YgD" firstAttribute="top" secondItem="fzK-wT-TzV" secondAttribute="bottom" constant="30" id="D2b-HD-mwx"/>
+                            <constraint firstAttribute="trailing" secondItem="bRe-Fx-YgD" secondAttribute="trailing" id="FYN-3R-khs"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="fzK-wT-TzV" secondAttribute="trailing" constant="60" id="Pnp-sR-1oL"/>
+                            <constraint firstItem="ZCT-Ud-qw5" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="8" id="bhF-Oc-cYJ"/>
+                            <constraint firstItem="fzK-wT-TzV" firstAttribute="leading" secondItem="ZCT-Ud-qw5" secondAttribute="trailing" constant="30" id="wLz-dd-rxf"/>
+                            <constraint firstItem="bRe-Fx-YgD" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="zbw-Y3-TB6"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="131.8840579710145" y="73.660714285714278"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="luffy" width="300" height="168"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

@@ -43,13 +43,14 @@ class LoginController: UIViewController {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
         imageView.image = UIImage(named: "TwitterLogo")
-        //imageView.clipsToBounds = true                    //Cái này để làm gì
+        imageView.clipsToBounds = true
         return imageView
     }()
     
     //Email
     private lazy var emailTextFiled : UITextField = {
         let textFiled = Utilities().configureTextField(withPlaceholder: "Email")
+        textFiled.text = "Viet@gmail.com"
         return textFiled
     }()
     
@@ -62,6 +63,8 @@ class LoginController: UIViewController {
     //Password
     private lazy var passwordTextFiled : UITextField = {
         let textFiled = Utilities().configureTextField(withPlaceholder: "Password")
+        textFiled.text = "123456"
+        textFiled.isSecureTextEntry = true
         return textFiled
     }()
     

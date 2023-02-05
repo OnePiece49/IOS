@@ -27,7 +27,7 @@ class RegistrationController: UIViewController {
     @objc func handleShowSignUp() {
         guard let email = emailTextFiled.text else {return}
         guard let password = passwordTextFiled.text else {return}
-        guard let userName = userNameTextFiled.text else {return}
+        guard let userName = userNameTextFiled.text?.lowercased() else {return}
         guard let fullName = fullNameTextFiled.text else {return}
 
         let authCredial = AuthCrentials(email: email, password: password, fullName: fullName, userName: userName, imageProfile: imageProfile)

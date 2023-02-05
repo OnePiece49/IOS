@@ -9,5 +9,6 @@ target 'Twitter' do
 	pod 'FirebaseFirestore'
 	pod 'FirebaseCore'
   pod 'FirebaseStorage'
+  pod 'SDWebImage', '~> 5.0'
 
 end
