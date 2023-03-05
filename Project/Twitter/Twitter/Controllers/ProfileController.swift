@@ -12,20 +12,45 @@ let reuableProfilIdentifierCell = "ProfileCell"
 let headerProfileCell = "ProfileCell"
 
 class ProfilelController: UICollectionViewController {
-    
     //MARK: - Properties
-    private var user: User
-    
-    private var tweets = [Tweet]() {
+    private var user: User {
         didSet {
-            collectionView.reloadData()
+            self.collectionView.reloadData()
         }
     }
+    
+    private var firstFetchData = 1
+    private var selectedFilter: ProfileFilterOption = .tweets {
+        didSet {collectionView.reloadData()}
+    }
+    
+    private var tweets = [Tweet]()
+    private var likedTweet = [Tweet]()
+    private var repliesTweet = [Tweet]()
+    
+    private var currentDataSource: [Tweet] {
+        get {
+            switch selectedFilter {
+            case .tweets:
+                return tweets
+            case .replies:
+                return repliesTweet
+            case .likes:
+                return likedTweet
+            }
+        }
+    }
+ 
     
     //MARK: - LifeCycle
     init(user: User) {
         self.user = user
         super.init(collectionViewLayout: UICollectionViewFlowLayout())
+        print("DEBUG: ProfileController Init")
+    }
+    
+    deinit {
+        print("DEBUG: ProfileController Deinit")
     }
     
     required init?(coder: NSCoder) {
@@ -34,14 +59,20 @@ class ProfilelController: UICollectionViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureConllectionView()
+
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.navigationBar.barStyle = .black
         navigationController?.navigationBar.isHidden = true
+        
         fetchTweet()
+        checkIfUserIsfollowed()
+        fetchTweetLiked()
+        fetchTweetReplies()
+        fetchUserStats()
+        configureCollectionView()
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -49,26 +80,58 @@ class ProfilelController: UICollectionViewController {
     }
     
     //MARK: - Helper
-    func configureConllectionView() {
+    func configureCollectionView() {
         collectionView.backgroundColor = .white
         collectionView.contentInsetAdjustmentBehavior = .never
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.register(TweetCell.self, forCellWithReuseIdentifier: reuableProfilIdentifierCell)
         collectionView.register(ProfileHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: headerProfileCell)
+        
+        guard let tabBarHeight = tabBarController?.tabBar.frame.height else {return}
+        collectionView.contentInset.bottom = tabBarHeight
     }
     
     func fetchTweet() {
-        let uid = user.uid
-        TweetService.shared.fetchTweets(uid: uid) { tweets in
+        TweetService.shared.fetchTweetsForUid(userID: user.uid) { tweets in
             self.tweets = tweets
+            self.collectionView.reloadData()
+        }
+    }
+    
+    func checkIfUserIsfollowed() {
+        UserService.shared.checkIfUserIsFollowing(uid: user.uid) { [weak self] isFollowed in
+            guard let strongSelf = self else {return}
+            strongSelf.user.isFollowed = isFollowed
+            
+            self?.collectionView.reloadData()
+        }
+    }
+    
+    func fetchTweetLiked() {
+        TweetService.shared.fetchLikesForUser(user: user) { tweets in
+            self.likedTweet = tweets
+        }
+    }
+    
+    func fetchTweetReplies() {
+        TweetService.shared.fetchRepliesTweetForUid(user: user) { tweets in
+            self.repliesTweet = tweets
+        }
+    }
+    
+    func fetchUserStats() {
+        UserService.shared.fetchUserStats(uid: user.uid) { userRelation in
+            guard let userRelation = userRelation else {
+                return
+            }
+            self.user.stats = userRelation
+            self.collectionView.reloadData()
         }
     }
     
     //MARK: - Selectors
-    
-    
+  
 }
-
 
 // MARK: - UICollectionViewDataSource
 extension ProfilelController {
@@ -88,15 +151,12 @@ extension ProfilelController {
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return tweets.count
+        return currentDataSource.count
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuableProfilIdentifierCell, for: indexPath) as! TweetCell
-        cell.captionLabel.text = tweets[indexPath.row].caption
-        guard let imageURL = URL(string: tweets[indexPath.row].user.profileImageURL) else {return cell}
-        cell.profileImageView.sd_setImage(with: imageURL, completed: nil)
-        cell.infoLabel.text = tweets[indexPath.row].user.fullName
+        cell.tweet = currentDataSource[indexPath.row]
         return cell
     }
 }
@@ -104,14 +164,71 @@ extension ProfilelController {
 // MARK: - UICollectionViewFlowLayout
 extension ProfilelController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        return CGSize(width: view.frame.width, height: 120)
+        let viewModel = TweetViewModel(tweet: currentDataSource[indexPath.row])
+        let height = viewModel.sizeForCaptionLabel(forWidth: view.frame.width - leftConstraintLabel - rightConstraintLabel - leftConstraintsizeProfileImageView - sizeProfileImageView).height
+        return CGSize(width: view.frame.width, height: 60 + height + 10 + 20)
+    }
+    
+    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let tweet = currentDataSource[indexPath.row]
+        let controller = TweetController(tweet: tweet)
+        navigationController?.pushViewController(controller, animated: true)
     }
 }
 
-// MARK: - UICollectionViewFlowLayout
+// MARK: - ProfileHeaderDelegate
 extension ProfilelController: ProfileHeaderDelegate {
+    func didSelect(filter: ProfileFilterOption) {
+        self.selectedFilter = filter
+    }
+    
+    func handleButtonTapped(_ header: ProfileHeader) {
+        if user.isCurrentUser {
+            let controller = EditProfileController(user: user)
+            let nav = UINavigationController(rootViewController: controller)
+            nav.modalPresentationStyle = .fullScreen
+            controller.delegate = self
+            present(nav, animated: true, completion: .none)
+            return
+        }
+        
+        if user.isFollowed {
+            UserService.shared.unfollowUser(uid: user.uid) {  error in
+                header.editButton.setTitle("Follow", for: .normal)
+                self.user.isFollowed = false
+                self.collectionView.reloadData()
+                NotificationCenter.default.post(name: NSNotification.Name("FollowButtonChanged"), object: nil, userInfo: ["user": self.user])
+            }
+        } else {    
+            UserService.shared.followUser(uid: user.uid) { [self] error in
+                header.editButton.setTitle("Following", for: .normal)
+                self.user.isFollowed = true
+                self.collectionView.reloadData()
+                NotificationService.shared.uploadNotification(user: self.user, type: .follow)
+                NotificationCenter.default.post(name: NSNotification.Name("FollowButtonChanged"), object: nil, userInfo: ["user": user])
+            }
+        }
+    }
+    
     func handleDissmiss() {
         navigationController?.popViewController(animated: true)
     }
 }
 
+
+// Delegate EditProfileControllerDelegate
+extension ProfilelController: EditProfileControllerDelegate {
+    func didUpdateUserInfor() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            UserService.shared.fetchUser(uid: self.user.uid) { user in
+                self.user = user
+            }
+            
+            self.fetchTweet()
+            self.checkIfUserIsfollowed()
+            self.fetchTweetLiked()
+            self.fetchTweetReplies()
+            self.fetchUserStats()
+        }
+    }
+}

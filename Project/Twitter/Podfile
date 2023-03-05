@@ -10,5 +10,6 @@ target 'Twitter' do
 	pod 'FirebaseCore'
   pod 'FirebaseStorage'
   pod 'SDWebImage', '~> 5.0'
+  pod 'ActiveLabel'
 
 end

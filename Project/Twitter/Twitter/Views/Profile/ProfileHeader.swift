@@ -10,6 +10,8 @@ import SDWebImage
 
 protocol ProfileHeaderDelegate: AnyObject {
     func handleDissmiss()
+    func handleButtonTapped(_ header: ProfileHeader)
+    func didSelect(filter: ProfileFilterOption)
 }
 
 class ProfileHeader: UICollectionReusableView {
@@ -59,7 +61,7 @@ class ProfileHeader: UICollectionReusableView {
         button.layer.borderWidth = 1.25
         button.setTitleColor(.twitterBlue, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
-        button.addTarget(self, action: #selector(handleEditTapped), for: .touchUpInside)
+        button.addTarget(self, action: #selector(handleEditProfileFollow), for: .touchUpInside)
         button.setTitle("Follow", for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -90,13 +92,7 @@ class ProfileHeader: UICollectionReusableView {
         label.text = "This is a user bio will span more than one line for test purpuse"
         return label
     }()
-    
-    lazy var underlineView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .twitterBlue
-        return view
-    }()
+
     
     lazy var followingLabel: UILabel = {
         let label = UILabel()
@@ -120,12 +116,23 @@ class ProfileHeader: UICollectionReusableView {
         return label
     }()
 
+    private let replyLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .lightGray
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.systemFont(ofSize: 12)
+        return label
+    }()
     
     //MARK: - LifeCycle
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
+        print("DEBUG: ProfileHeader Init")
         configureUI()
+    }
+    
+    deinit {
+        print("DEBUG: ProfileHeader Deinit")
     }
     
     required init?(coder: NSCoder) {
@@ -140,6 +147,7 @@ class ProfileHeader: UICollectionReusableView {
     //MARK: - Helpers
     func configureUI() {
         backgroundColor = .white
+        addSubview(replyLabel)
         addSubview(containterView)
         addSubview(profileImageView)
         addSubview(editButton)
@@ -184,12 +192,6 @@ class ProfileHeader: UICollectionReusableView {
         filterBar.heightAnchor.constraint(equalToConstant: 40).isActive = true
         filterBar.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         filterBar.delegate = self
-        
-        addSubview(underlineView)
-        underlineView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 1 / 3).isActive = true
-        underlineView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        underlineView.heightAnchor.constraint(equalToConstant: 2).isActive = true
-        underlineView.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
     }
     
     func configureFollowLabel() {
@@ -203,6 +205,10 @@ class ProfileHeader: UICollectionReusableView {
         let viewmodel = ProfileHeaderViewModel(user: user)
         followersLabel.attributedText = viewmodel.followersString
         followingLabel.attributedText = viewmodel.followingString
+        editButton.setTitle(viewmodel.actionButtonTitle, for: .normal)
+        self.fullNameLabel.text = user.fullName
+        self.userNameLabel.text = "@" + user.userName
+        self.bioLabel.text = viewModel.bioString
     }
     
     //MARK: - Selectors
@@ -210,8 +216,8 @@ class ProfileHeader: UICollectionReusableView {
         delegate?.handleDissmiss()
     }
     
-    @objc func handleEditTapped() {
-        
+    @objc func handleEditProfileFollow() {
+        delegate?.handleButtonTapped(self)
     }
     
     @objc func handleFollowingTapped() {
@@ -227,10 +233,9 @@ class ProfileHeader: UICollectionReusableView {
 //MARK: - Properties
 extension ProfileHeader: ProfileFilterViewDelegate {
     func didSelectFilter(indexPath: IndexPath, view: ProfileFilterView) {
-        guard let cell = view.collectionView.cellForItem(at: indexPath) as? ProfileFilterCell else {return}
-        let xPosition = cell.frame.origin.x
-        UIView.animate(withDuration: 0.3) {
-            self.underlineView.frame.origin.x = xPosition
-        }
+        guard let filter = ProfileFilterOption(rawValue: indexPath.row) else {return}
+        
+        delegate?.didSelect(filter: filter)
     }
+
 }

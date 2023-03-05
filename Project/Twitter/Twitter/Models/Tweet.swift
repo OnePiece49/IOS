@@ -9,12 +9,15 @@ import Foundation
 
 struct Tweet {
     let caption: String
-    let user: User
+    var user: User
     let tweetID: String
     let uid: String
-    let likes: Int
-    var timestamp: Date?        //DDel hiểu sao biến var thì trong hàm init có thể không cần assign value luôn mà biến let thì bắt buộc phải gán
+    var likes: Int
+    var timestamp: Date!
     let retweets: Int
+    var didLike = false
+    var replyingTo: String?
+    var isReply: Bool {return replyingTo != nil}
     
     init(user: User ,tweedID: String, dictionary: [String: Any]) {
         self.user = user
@@ -24,9 +27,15 @@ struct Tweet {
         self.likes = dictionary["likes"] as? Int ?? 0
         self.retweets = dictionary["retweets"] as? Int ?? 0
         
+        if let replyingTo = dictionary["replyingTo"] as? String {
+            self.replyingTo = replyingTo
+        }
+        
         if let timestamp = dictionary["timestamp"] as? Double {
             self.timestamp = Date(timeIntervalSince1970: timestamp)
         }
+        
+
         
     }
 }

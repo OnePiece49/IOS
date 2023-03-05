@@ -30,14 +30,34 @@ class ProfileFilterView: UIView {
         return cv
     }()
     
+    lazy var underlineView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .twitterBlue
+        return view
+    }()
+    
     //MARK: - LifeCycle
     override init(frame: CGRect) {
         super.init(frame: frame)
+        print("DEBUG: ProfileFilterView Init")
         configureUI()
+    }
+    
+    deinit {
+        print("DEBUG: ProfileFilterView Deinit")
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func layoutSubviews() {
+        addSubview(underlineView)
+        underlineView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 1 / 3).isActive = true
+        underlineView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        underlineView.heightAnchor.constraint(equalToConstant: 2).isActive = true
+        underlineView.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
     }
     
     //MARK: - Helpers
@@ -49,7 +69,6 @@ class ProfileFilterView: UIView {
         collectionView.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
         collectionView.rightAnchor.constraint(equalTo: rightAnchor).isActive = true
         collectionView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        
     }
     
     //MARK: - Selectors
@@ -67,12 +86,17 @@ extension ProfileFilterView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return 3
     }
-
 }
 
 //MARK: - UICollectionViewDelegate
 extension ProfileFilterView: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let cell = collectionView.cellForItem(at: indexPath) as? ProfileFilterCell else {return}
+        let xPosition = cell.frame.origin.x
+        UIView.animate(withDuration: 0.3) {
+            self.underlineView.frame.origin.x = xPosition
+        }
+    
         delegate?.didSelectFilter(indexPath: indexPath, view: self)
     }
 }

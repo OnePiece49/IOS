@@ -31,7 +31,7 @@ class AuthService {
         let email = authCretical.email
         let password = authCretical.password
         let fullName = authCretical.fullName
-        let userName = authCretical.userName
+        let userName = authCretical.userName.lowercased()
         let imageProfile = authCretical.imageProfile
         
         guard let imageData = imageProfile.jpegData(compressionQuality: 0.3) else {return}   //nén ảnh
@@ -64,5 +64,15 @@ class AuthService {
                 }
             }
         }
+    }
+    
+    
+    func logOut() {
+        do {
+          try Auth.auth().signOut()
+        } catch {
+            print("DEBUG: Cannot LogOut")
+        }
+        
     }
 }
