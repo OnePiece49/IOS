@@ -19,7 +19,9 @@ class EditProfileController: UITableViewController {
     private lazy var headerView = EditProfileHeader(user: user)
     private lazy var footerView = EditProfileFooter()
     weak var delegate: EditProfileControllerDelegate?
+    
     private let imagePicker = UIImagePickerController()
+    
     private var isChangedInforUser: Bool = false
     private var isChangeProfileImageUser: Bool = false
     private var selectedImage: UIImage? {

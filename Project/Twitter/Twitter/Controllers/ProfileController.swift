@@ -82,13 +82,17 @@ class ProfilelController: UICollectionViewController {
     //MARK: - Helper
     func configureCollectionView() {
         collectionView.backgroundColor = .white
-        collectionView.contentInsetAdjustmentBehavior = .never
+        //collectionView.contentInsetAdjustmentBehavior = .never
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.register(TweetCell.self, forCellWithReuseIdentifier: reuableProfilIdentifierCell)
         collectionView.register(ProfileHeader.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: headerProfileCell)
+        collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+        collectionView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
+        collectionView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
+        collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         
         guard let tabBarHeight = tabBarController?.tabBar.frame.height else {return}
-        collectionView.contentInset.bottom = tabBarHeight
+        collectionView.contentInset.bottom = tabBarHeight + 5
     }
     
     func fetchTweet() {
@@ -127,6 +131,12 @@ class ProfilelController: UICollectionViewController {
             self.user.stats = userRelation
             self.collectionView.reloadData()
         }
+    }
+    
+    override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let y = scrollView.contentOffset.y
+        let x = scrollView.contentOffset.y
+        print("DEBUG: content OffSet \(x) va \(y)")
     }
     
     //MARK: - Selectors

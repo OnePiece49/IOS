@@ -13,18 +13,13 @@ import FirebaseFirestore
 
 class MainTabBarController: UITabBarController {
     
-    
     // MARK: - Selectors
-
-
     @objc func actionButtonTapped() {
         guard let user = user else {return}
         let nav = UINavigationController(rootViewController: UploadTwitterController(user: user, config: .tweet))
         nav.modalPresentationStyle = .fullScreen
         present(nav, animated: true, completion: nil)
     }
-    
-    
     
     // MARK: - Properties
     var user: User? {
@@ -36,7 +31,6 @@ class MainTabBarController: UITabBarController {
         }
     }
 
-    
     var actionButton: UIButton = {
         let button = UIButton(type: .system)
         button.tintColor = .white
@@ -46,14 +40,11 @@ class MainTabBarController: UITabBarController {
         return button
     }()
     
-
-    
-    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .red
+        view.backgroundColor = .white
         checkStateUserLogin()
     }
     
@@ -76,7 +67,6 @@ class MainTabBarController: UITabBarController {
         let conversations = templateNavigationController(image: UIImage(named: "mail"), rootViewController: ConversationController())
         
         viewControllers = [feed, explore, notifications, conversations]
-        
     }
     
     func templateNavigationController(image: UIImage?, rootViewController: UIViewController) -> UINavigationController {

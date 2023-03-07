@@ -80,7 +80,6 @@ class ProfileHeader: UICollectionReusableView {
         label.font = UIFont.systemFont(ofSize: 16)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .lightGray
-        label.text = "@m.d.garp.49"
         return label
     }()
     
@@ -89,14 +88,12 @@ class ProfileHeader: UICollectionReusableView {
         label.font = UIFont.systemFont(ofSize: 16)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 3
-        label.text = "This is a user bio will span more than one line for test purpuse"
         return label
     }()
 
     
     lazy var followingLabel: UILabel = {
         let label = UILabel()
-        label.text = "0 Following"
         label.translatesAutoresizingMaskIntoConstraints = false
         
         let tapped = UITapGestureRecognizer(target: self, action: #selector(handleFollowingTapped))
@@ -107,20 +104,11 @@ class ProfileHeader: UICollectionReusableView {
     
     lazy var followersLabel: UILabel = {
         let label = UILabel()
-        label.text = "2 Followers"
         label.translatesAutoresizingMaskIntoConstraints = false
         
         let tapped = UITapGestureRecognizer(target: self, action: #selector(handleFollowersTapped))
         label.isUserInteractionEnabled = true
         label.addGestureRecognizer(tapped)
-        return label
-    }()
-
-    private let replyLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = .lightGray
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = UIFont.systemFont(ofSize: 12)
         return label
     }()
     
@@ -140,14 +128,13 @@ class ProfileHeader: UICollectionReusableView {
     }
     
     
-//    override var preferredStatusBarStyle: UIStatusBarStyle {
-//        return .lightContent
-//    }
+     var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent
+    }
     
     //MARK: - Helpers
     func configureUI() {
         backgroundColor = .white
-        addSubview(replyLabel)
         addSubview(containterView)
         addSubview(profileImageView)
         addSubview(editButton)
@@ -171,6 +158,7 @@ class ProfileHeader: UICollectionReusableView {
         detailUserStack.translatesAutoresizingMaskIntoConstraints = false
         detailUserStack.distribution = .fillProportionally
         detailUserStack.spacing = 4
+        detailUserStack.alignment = .leading
         addSubview(detailUserStack)
         detailUserStack.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 8).isActive = true
         detailUserStack.leftAnchor.constraint(equalTo: leftAnchor, constant: 12).isActive = true
@@ -208,7 +196,9 @@ class ProfileHeader: UICollectionReusableView {
         editButton.setTitle(viewmodel.actionButtonTitle, for: .normal)
         self.fullNameLabel.text = user.fullName
         self.userNameLabel.text = "@" + user.userName
-        self.bioLabel.text = viewModel.bioString
+        
+        guard let bioString = viewModel.bioString else {return}
+        self.bioLabel.text = bioString
     }
     
     //MARK: - Selectors

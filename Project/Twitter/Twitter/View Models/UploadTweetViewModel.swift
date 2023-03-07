@@ -17,11 +17,12 @@ struct UploadTweetViewModel {
     let placeholderText: String
     var shouldShowReplyLabel: Bool
     var replyText: String?
+    
     init(config: UploadTweetConfiguration) {
         switch config {
         case .tweet:
             actionButtonTitle = "Tweet"
-            placeholderText = "What's heppening ?"
+            placeholderText = "What's happening ?"
             shouldShowReplyLabel = false
         case .reply(let tweet):
             actionButtonTitle = "Reply"

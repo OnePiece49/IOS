@@ -130,8 +130,6 @@ extension NotificationController {
 
 //MARK: - NofiticationCellDelegate
 extension NotificationController: NotificationCellDelegate {
-
-    
     func didTapFollowButton(_ cell: NotificationCell) {
         guard let user = cell.notification?.user else {return}
         

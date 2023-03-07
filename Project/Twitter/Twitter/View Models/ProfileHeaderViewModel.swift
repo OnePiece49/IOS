@@ -33,8 +33,8 @@ struct ProfileHeaderViewModel {
         return attributeText(with: user.stats?.following ?? 0, text: "following")
     }
     
-    var bioString: String {
-        return user.bio ?? "This is a user bio will span more than one line for test purpuse"
+    var bioString: String? {
+        return user.bio 
     }
     
     var actionButtonTitle: String {

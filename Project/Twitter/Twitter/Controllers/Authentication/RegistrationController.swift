@@ -192,7 +192,7 @@ extension RegistrationController: UIImagePickerControllerDelegate & UINavigation
         
         imageProfile = profileName
         plusPhotoButton.layer.cornerRadius = 150/2
-        plusPhotoButton.layer.masksToBounds = true  //Bo tròn button à :))) maybe
+        plusPhotoButton.layer.masksToBounds = true
         plusPhotoButton.imageView?.contentMode = .scaleAspectFill
         plusPhotoButton.imageView?.clipsToBounds = true
         plusPhotoButton.layer.borderColor = UIColor.white.cgColor

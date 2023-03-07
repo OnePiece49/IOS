@@ -48,7 +48,6 @@ class FeedController: UICollectionViewController {
         print("DEBUG: Feed Controller Deinit")
     }
     
-    
     //MARK: - Helpers
     func configureUI() {
         view.backgroundColor = .systemBlue
@@ -84,7 +83,7 @@ class FeedController: UICollectionViewController {
         let profileView = UIImageView()
         profileView.setDimensions(width: 32, height: 32)
         profileView.layer.cornerRadius = 32 / 2
-        profileView.contentMode = .scaleAspectFit
+        profileView.contentMode = .scaleToFill
         profileView.clipsToBounds = true
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(handleProfileViewNavigationBarTap))
