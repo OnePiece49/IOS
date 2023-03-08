@@ -1,0 +1,6 @@
+framework module Pods_MedicalNews {
+  umbrella header "Pods-MedicalNews-umbrella.h"
+
+  export *
+  module * { export * }
+}
