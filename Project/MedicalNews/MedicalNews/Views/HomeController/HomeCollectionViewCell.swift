@@ -14,20 +14,15 @@ class HomeCollectionViewCell: UICollectionViewCell {
     static let reuseIdentifier = "HomeCollectionViewCell"
 
     lazy var titleImage: UIImageView = {
-         let iv = UIImageView(image: UIImage(named: "Image"))
-         iv.translatesAutoresizingMaskIntoConstraints = false
-         iv.contentMode = .scaleToFill
-         iv.layer.cornerRadius = 16
-         iv.clipsToBounds = true
-         iv.roundCorners(corners: [.topLeft], radius: 16)
+        let iv = UIImageView(image: UIImage(named: "Image"))
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        iv.contentMode = .scaleToFill
+        iv.roundCorners(corners: [.topRight, .topLeft], radius: 16)
         return iv
     }()
     
      lazy var mainTitleLabel: UILabel = {
         let label = UILabel()
-        let tap = UITapGestureRecognizer(target: self, action: #selector(handleContinueButtonTapped))
-        label.addGestureRecognizer(tap)
-        label.isUserInteractionEnabled = true
         label.numberOfLines = 0
         return label
     }()

@@ -11,13 +11,11 @@ import UIKit
 struct NewsViewModel {
     var articles: [ArticleList]
     
-    var currentIndex: Int = 0
+    var currentIndex: Int = 1
     
     var numberArticle: Int {
         return articles.count
     }
-    
-
     
     var imageTitleTURL: URL? {
         return URL(string: self.articles[0].picture)
@@ -26,12 +24,15 @@ struct NewsViewModel {
     var titleString: String {
         return articles[0].title
     }
+
+    func getLinkArticle(index: Int) -> URL? {
+        return URL(string: articles[index + 1].link)
+    }
     
     var dateTitleString: String {
         let inputDateFormatter = DateFormatter()
         inputDateFormatter.dateFormat = "dd/MM/yyyy"
         guard let inputDate = inputDateFormatter.date(from: articles[0].created_at) else {
-            // handle error
             fatalError("Invalid date format")
         }
 
@@ -50,7 +51,6 @@ struct NewsViewModel {
         let inputDateFormatter = DateFormatter()
         inputDateFormatter.dateFormat = "dd/MM/yyyy"
         guard let inputDate = inputDateFormatter.date(from: articles[currentIndex].created_at) else {
-            // handle error
             fatalError("Invalid date format")
         }
 

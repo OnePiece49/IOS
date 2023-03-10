@@ -8,21 +8,29 @@
 import Foundation
 import UIKit
 
+protocol HeaderHomeViewDelegate: AnyObject {
+    func didTapAvatarImage()
+}
+
 class HeaderHomeView: UIView {
     //MARK: - Properties
+    weak var delegate: HeaderHomeViewDelegate?
     private let headerImageView: UIImageView = {
         let iv = UIImageView()
         iv.image = UIImage(named: "background-home")
         iv.contentMode = .scaleToFill
         iv.translatesAutoresizingMaskIntoConstraints = false
+
         return iv
     }()
     
-    private var avatarImage: UIImageView = {
-        let iv = UIImageView()
-        iv.image = UIImage(named: "Avatar")
+    private lazy var avatarImage: UIImageView = {
+        let iv = UIImageView(image: UIImage(named: "Avatar"))
         iv.contentMode = .scaleToFill
         iv.translatesAutoresizingMaskIntoConstraints = false
+        let tap = UITapGestureRecognizer(target: self, action: #selector(handleDidTapAvatarImage))
+        iv.addGestureRecognizer(tap)
+        iv.isUserInteractionEnabled = true
         return iv
     }()
     
@@ -66,7 +74,7 @@ class HeaderHomeView: UIView {
         
         let stack = UIStackView(arrangedSubviews: [userNameLabel, activeStack])
         stack.axis = .vertical
-        stack.spacing = 6
+        stack.spacing = 1
         stack.alignment = .top
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
@@ -101,5 +109,8 @@ class HeaderHomeView: UIView {
         userActiveStack.leftAnchor.constraint(equalTo: leftAnchor, constant: 16).isActive = true
     }
     
-    //MARK: -
+    //MARK: - Selectors
+    @objc func handleDidTapAvatarImage() {
+        delegate?.didTapAvatarImage()
+    }
 }

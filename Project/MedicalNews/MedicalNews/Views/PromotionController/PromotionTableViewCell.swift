@@ -1,18 +1,25 @@
 //
-//  NewsTableViewCell.swift
+//  PromotionController.swift
 //  MedicalNews
 //
-//  Created by Long Bảo on 08/03/2023.
+//  Created by Long Bảo on 09/03/2023.
 //
 
 import Foundation
 import UIKit
 import SDWebImage
 
-class NewsTableViewCell: UITableViewCell {
+protocol PromotionTableViewCellDelegate: AnyObject {
+    func didTapSaveButton(_: PromotionTableViewCell)
+}
+
+class PromotionTableViewCell: UITableViewCell {
     //MARK: - Properties
-    static let reuseIdentifier = "NewsTableViewCell"
-    var viewModel: NewsViewModel? {
+    static let reuseIdentifier = "PromotionTableViewCell"
+    weak var delegate: PromotionTableViewCellDelegate?
+    private var isChangeSaveButton = true
+    
+    var viewModel: PromotionViewModel? {
         didSet {configure()}
     }
     
@@ -47,7 +54,7 @@ class NewsTableViewCell: UITableViewCell {
         return label
     }()
     
-    private let saveButton: UIButton = {
+     let saveButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.widthAnchor.constraint(equalToConstant: 11).isActive = true
@@ -56,17 +63,6 @@ class NewsTableViewCell: UITableViewCell {
         button.addTarget(self, action: #selector(handleSaveButtonTapped), for: .touchUpInside)
         return button
     }()
-    
-
-//    private lazy var stackTitle: UIStackView = {
-//        let stack = UIStackView(arrangedSubviews: [mainTitleLabel, subTitleLabel])
-//        stack.axis = .vertical
-//        stack.spacing = 4
-//        stack.translatesAutoresizingMaskIntoConstraints = false
-//        stack.alignment = .top
-//        mainTitleLabel.widthAnchor.constraint(equalTo: stack.widthAnchor).isActive = true
-//        return stack
-//    }()
     
     //MARK: - View LifeCycle
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -84,7 +80,8 @@ class NewsTableViewCell: UITableViewCell {
     
     //MARK: - Helpers
     func configureUI() {
-        addSubview(titleImage)
+        contentView.addSubview(titleImage)
+        backgroundColor = UIColor(red: 0.898, green: 0.898, blue: 0.898, alpha: 1)
         titleImage.topAnchor.constraint(equalTo: topAnchor, constant: 12).isActive = true
         titleImage.leftAnchor.constraint(equalTo: leftAnchor, constant: 16).isActive = true
         titleImage.widthAnchor.constraint(equalTo: titleImage.heightAnchor, multiplier: 150 / 78).isActive = true
@@ -92,15 +89,15 @@ class NewsTableViewCell: UITableViewCell {
         titleImage.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -12).isActive = true
         
         
-        addSubview(mainNewsTitleLabel)
-        addSubview(dateLabel)
+        contentView.addSubview(mainNewsTitleLabel)
+        contentView.addSubview(dateLabel)
         mainNewsTitleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 13).isActive = true
         mainNewsTitleLabel.leftAnchor.constraint(equalTo: titleImage.rightAnchor, constant: 12).isActive = true
         mainNewsTitleLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -16).isActive = true
         dateLabel.topAnchor.constraint(equalTo: mainNewsTitleLabel.bottomAnchor, constant: 4).isActive = true
         dateLabel.leftAnchor.constraint(equalTo: titleImage.rightAnchor, constant: 12).isActive = true
         
-        addSubview(saveButton)
+        contentView.addSubview(saveButton)
         saveButton.rightAnchor.constraint(equalTo: rightAnchor, constant: -18.5).isActive = true
         saveButton.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -13).isActive = true
 
@@ -112,12 +109,18 @@ class NewsTableViewCell: UITableViewCell {
         }
 
         titleImage.sd_setImage(with: viewModel.imageArticleUrl, completed: .none)
-        mainNewsTitleLabel.text = viewModel.titleArticleString
-        dateLabel.text = viewModel.dateArticleString
+        mainNewsTitleLabel.text = viewModel.titlePromotionString
+        dateLabel.text = viewModel.dateTitleString
     }
     
     //MARK: - Selectors
     @objc func handleSaveButtonTapped() {
-        
+        if isChangeSaveButton {
+            delegate?.didTapSaveButton(self)
+            isChangeSaveButton = !isChangeSaveButton
+        } else {
+            saveButton.setImage(UIImage(named: "bookmark"), for: .normal)
+            isChangeSaveButton = !isChangeSaveButton
+        }
     }
 }

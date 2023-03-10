@@ -10,8 +10,8 @@ import UIKit
 import SDWebImage
 
 protocol HomeTableViewCellDelegate: AnyObject {
-    func didTapHomeTableViewCell(_: HomeTableViewCell)
-    func didTapGetAllNewsButton()
+    func didTapCollectionViewCell(_: HomeTableViewCell, indexPath: IndexPath)
+    func didTapGetAllNewsButton(_: HomeTableViewCell)
 }
 
 class HomeTableViewCell: UITableViewCell {
@@ -84,7 +84,7 @@ class HomeTableViewCell: UITableViewCell {
         collectionView.register(HomeCollectionViewCell.self, forCellWithReuseIdentifier: HomeCollectionViewCell.reuseIdentifier)
         collectionView.delegate = self
         collectionView.dataSource = self
-        collectionView.showsVerticalScrollIndicator = false
+        collectionView.showsHorizontalScrollIndicator = false
     }
     
     func configureHeader() {
@@ -163,12 +163,12 @@ extension HomeTableViewCell: UICollectionViewDataSource, UICollectionViewDelegat
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        delegate?.didTapHomeTableViewCell(self)
+        delegate?.didTapCollectionViewCell(self, indexPath: indexPath)
     }
 }
 
 extension HomeTableViewCell: HeaderHomeTableViewDelegate {
     func didTapGetAllNewsButton() {
-        delegate?.didTapGetAllNewsButton()
+        delegate?.didTapGetAllNewsButton(self)
     }
 }

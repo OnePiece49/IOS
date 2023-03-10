@@ -164,8 +164,8 @@ class IntroViewController: UICollectionViewController {
     }
     
     @objc func handleLoginButtonTapped() {
-        //navigationController?.pushViewController(RegisterController(), animated: true)
-        navigationController?.pushViewController(HomeController(), animated: true)
+
+        navigationController?.pushViewController(LoginController(phoneNumber: "123456789"), animated: true)
     }
 }
 

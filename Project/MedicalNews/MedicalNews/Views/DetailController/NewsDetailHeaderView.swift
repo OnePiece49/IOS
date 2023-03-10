@@ -1,18 +1,17 @@
 //
-//  HeaderNewsController.swift
+//  DetailNewsHeaderController.swift
 //  MedicalNews
 //
 //  Created by Long Bảo on 08/03/2023.
 //
 
 import Foundation
+
+import Foundation
 import UIKit
+import WebKit
 
-protocol NewsHeaderControllerDelegate: AnyObject {
-    func didBackButtonTapped()
-}
-
-class NewsHeaderView: UIView {
+class NewsDetailHeaderView: UIView {
     //MARK: - Properties
     weak var delegate: NewsHeaderControllerDelegate?
     let headerImageView: UIImageView = {
@@ -22,6 +21,7 @@ class NewsHeaderView: UIView {
         iv.translatesAutoresizingMaskIntoConstraints = false
         return iv
     }()
+
     
     private lazy var backButton: UIButton = {
         let button = UIButton()
@@ -54,7 +54,7 @@ class NewsHeaderView: UIView {
         label.font = UIFont(name: "NunitoSans-Bold", size: 20)
         label.textColor =  UIColor(red: 0.141, green: 0.165, blue: 0.38, alpha: 1)
         label.textAlignment = .left
-        label.text = "Tin tức"
+        label.text = "Chi tiết tin tức"
         label.numberOfLines = 0
         return label
     }()
@@ -88,7 +88,7 @@ class NewsHeaderView: UIView {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont(name: "NunitoSans-Regular", size: 12)
         label.textColor =  UIColor(red: 0.492, green: 0.516, blue: 0.596, alpha: 1)
-        label.textAlignment = .left
+        label.textAlignment = .center
         label.text = "23 tháng 6 2021"
         return label
     }()
@@ -107,29 +107,28 @@ class NewsHeaderView: UIView {
     
     //MARK: - Helpers
     func configureUI() {
-        addSubview(headerImageView)
+        //addSubview(headerImageView)
         addSubview(titleStack)
-        titleStack.topAnchor.constraint(equalTo: topAnchor, constant: 44).isActive = true
+        titleStack.topAnchor.constraint(equalTo: topAnchor).isActive = true
         titleStack.leftAnchor.constraint(equalTo: leftAnchor, constant: 16).isActive = true
         titleStack.rightAnchor.constraint(equalTo: rightAnchor, constant: -16).isActive = true
-        titleStack.heightAnchor.constraint(equalToConstant: 44).isActive = true
         
-        headerImageView.topAnchor.constraint(equalTo: titleStack.bottomAnchor).isActive = true
-        headerImageView.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
-        headerImageView.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
-        headerImageView.heightAnchor.constraint(equalTo: headerImageView.widthAnchor, multiplier: 200 / 375).isActive = true
-        
-        let stack = UIStackView(arrangedSubviews: [mainNewsTitleLabel, dateLabel])
-        addSubview(stack)
-        stack.axis = .vertical
-        stack.spacing = 4
-        stack.distribution = .fill
-        stack.alignment = .fill
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        stack.topAnchor.constraint(equalTo: headerImageView.bottomAnchor, constant: 16).isActive = true
-        stack.leftAnchor.constraint(equalTo: leftAnchor, constant: 16).isActive = true
-        stack.rightAnchor.constraint(equalTo: rightAnchor, constant: -16).isActive = true
-        stack.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+//        headerImageView.topAnchor.constraint(equalTo: titleStack.bottomAnchor).isActive = true
+//        headerImageView.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
+//        headerImageView.widthAnchor.constraint(equalTo: widthAnchor).isActive = true
+//        headerImageView.heightAnchor.constraint(equalTo: headerImageView.widthAnchor, multiplier: 200 / 375).isActive = true
+//
+//        let stack = UIStackView(arrangedSubviews: [mainNewsTitleLabel, dateLabel])
+//        addSubview(stack)
+//        stack.axis = .vertical
+//        stack.spacing = 4
+//        stack.distribution = .fill
+//        stack.alignment = .top
+//        stack.translatesAutoresizingMaskIntoConstraints = false
+//        stack.topAnchor.constraint(equalTo: headerImageView.bottomAnchor, constant: 16).isActive = true
+//        stack.leftAnchor.constraint(equalTo: leftAnchor, constant: 16).isActive = true
+//        stack.rightAnchor.constraint(equalTo: rightAnchor, constant: -16).isActive = true
+//        stack.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
     }
     
     @objc func handleBackButtonTapped() {

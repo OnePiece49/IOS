@@ -22,7 +22,6 @@ class HomeController: UIViewController {
     }
     
     //MARK: - View Lifecycle
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
@@ -40,6 +39,7 @@ class HomeController: UIViewController {
         header.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
         header.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         header.heightAnchor.constraint(equalTo: header.widthAnchor, multiplier: 143 / 375).isActive = true
+        header.delegate = self
         configureTableView()
     }
     
@@ -103,23 +103,51 @@ extension HomeController: UITableViewDelegate, UITableViewDataSource {
 }
 
 extension HomeController: HomeTableViewCellDelegate {
-    func didTapGetAllNewsButton() {
-        let newsController = NewsController()
-        guard let viewModel = viewModel else {return}
-        newsController.viewModel = NewsViewModel(articles: viewModel.articles)
-        navigationController?.pushViewController(newsController, animated: true)
-    }
+    func didTapGetAllNewsButton(_ cell: HomeTableViewCell) {
+        guard let option = cell.option else {return}
+            switch option {
+            case .articlesList:
+                let newsController = NewsController()
+                guard let viewModel = viewModel else {return}
+                newsController.viewModel = NewsViewModel(articles: viewModel.articles)
+                navigationController?.pushViewController(newsController, animated: true)
+            case .promotionList:
+                let promotionVC = PromotionController()
+                guard let promotions = viewModel?.promotions else {return}
+                promotionVC.viewModel = PromotionViewModel(promotions: promotions)
+                navigationController?.pushViewController(promotionVC, animated: true)
+            case .doctorList:
+                let doctorVC = DoctorsController()
+                guard let doctors = viewModel?.doctors else {return}
+                doctorVC.viewModel = DoctorViewModel(doctorList: doctors)
+                navigationController?.pushViewController(doctorVC, animated: true)
+            }
+        }
     
-    func didTapHomeTableViewCell(_ cell: HomeTableViewCell) {
+    func didTapCollectionViewCell(_ cell: HomeTableViewCell, indexPath: IndexPath) {
         guard let option = cell.option else {return}
         switch option {
         case .articlesList:
-            navigationController?.pushViewController(NewsDetailController(), animated: true)
+            let newdetailsVC = NewsDetailController()
+            navigationController?.pushViewController(newdetailsVC, animated: true)
+            newdetailsVC.newsURL = cell.viewModel?.getLinkArticle(index: indexPath.row)
         case .promotionList:
-            navigationController?.pushViewController(PromotionController(), animated: true)
+            let promotionVC = PromotionController()
+            guard let promotions = viewModel?.promotions else {return}
+            promotionVC.viewModel = PromotionViewModel(promotions: promotions)
+            navigationController?.pushViewController(promotionVC, animated: true)
         case .doctorList:
-            navigationController?.pushViewController(DoctorsController(), animated: true)
+            let doctorVC = DoctorsController()
+            guard let doctors = viewModel?.doctors else {return}
+            doctorVC.viewModel = DoctorViewModel(doctorList: doctors)
+            navigationController?.pushViewController(doctorVC, animated: true)
         }
+    }
+}
+
+extension HomeController: HeaderHomeViewDelegate {
+    func didTapAvatarImage() {
+        self.navigationController?.pushViewController(SettingUserInforController(), animated: true)
     }
     
     

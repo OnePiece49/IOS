@@ -32,6 +32,7 @@ struct HomeViewModel {
     var option: TitleSection?
 
     var currentIndex: Int = 0
+    var tempIndex: Int = 0
     
     var numberSectionTable: Int {
         return 3
@@ -47,6 +48,10 @@ struct HomeViewModel {
     
     var numberDoctors: Int {
         return doctors.count
+    }
+    
+    func getLinkArticle(index: Int) -> URL? {
+        return URL(string: articles[index].link)
     }
     
     
@@ -107,8 +112,8 @@ struct HomeViewModel {
     
     var reviewTextAttributed: NSAttributedString {
         if option == .doctorList {
-            let textAttributed = NSMutableAttributedString(string: "\(doctors[currentIndex].ratio_star)", attributes: [NSAttributedString.Key.font : UIFont(name: "NunitoSans-Bold", size: 13) ?? UIFont.boldSystemFont(ofSize: 13), NSAttributedString.Key.foregroundColor: UIColor(red: 0.278, green: 0.29, blue: 0.341, alpha: 1)])
-            textAttributed.append(NSAttributedString(string: "(\(doctors[currentIndex].number_of_reviews))", attributes: [NSAttributedString.Key.font: UIFont(name: "NunitoSans-Bold", size: 15) ?? UIFont.boldSystemFont(ofSize: 17)]))
+            let textAttributed = NSMutableAttributedString(string:  "\(doctors[currentIndex].ratio_star) ", attributes: .none)
+            textAttributed.append(NSAttributedString(string: "(\(doctors[currentIndex].number_of_reviews))", attributes: [NSAttributedString.Key.font: UIFont(name: "NunitoSans-Regular", size: 15) ?? UIFont.boldSystemFont(ofSize: 14), NSAttributedString.Key.foregroundColor: UIColor(red: 0.557, green: 0.604, blue: 0.671, alpha: 1)]))
             return textAttributed
         } else {
             return NSMutableAttributedString(string: "", attributes: [NSAttributedString.Key.font : UIFont(name: "NunitoSans-Bold", size: 13) ?? UIFont.boldSystemFont(ofSize: 13), NSAttributedString.Key.foregroundColor: UIColor(red: 0.173, green: 0.525, blue: 0.404, alpha: 1)])

@@ -11,7 +11,7 @@ import UIKit
 class NewsController: UIViewController {
     //MARK: - Properties
     let header = NewsHeaderView()
-    let tableView = UITableView()
+    let tableView = UITableView(frame: .zero, style: .grouped)
     var viewModel: NewsViewModel? {
         didSet {
             tableView.reloadData()
@@ -40,6 +40,9 @@ class NewsController: UIViewController {
         header.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         header.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 751), for: .vertical)
         header.delegate = self
+        let tap = UITapGestureRecognizer(target: self, action: #selector(hanldeTapHeader))
+        header.addGestureRecognizer(tap)
+        header.isUserInteractionEnabled = true
     }
     
     func updateHeader() {
@@ -65,25 +68,39 @@ class NewsController: UIViewController {
     }
     
     //MARK: - Selectors
+    @objc func hanldeTapHeader() {
+        let detailVC = NewsDetailController()
+        detailVC.newsURL = viewModel?.getLinkArticle(index: -1)
+        self.navigationController?.pushViewController(detailVC, animated: true)
+    }
 }
 
 extension NewsController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel?.numberArticle ?? 0
+        guard let viewModel = viewModel else {return 0}
+        return viewModel.numberArticle - 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: NewsTableViewCell.reuseIdentifier, for: indexPath) as! NewsTableViewCell
+        guard let viewModel = viewModel else { return cell}
         cell.viewModel = viewModel
-        cell.viewModel?.currentIndex = indexPath.row
+        if indexPath.row == viewModel.numberArticle {return cell}
+        cell.viewModel?.currentIndex = indexPath.row + 1
         return cell
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let detailVC = NewsDetailController()
+        detailVC.newsURL = viewModel?.getLinkArticle(index: indexPath.row)
+        self.navigationController?.pushViewController(detailVC, animated: true)
+    }
+    
 }
 
 extension NewsController: NewsHeaderControllerDelegate {
     func didBackButtonTapped() {
         self.navigationController?.popViewController(animated: true)
     }
-    
     
 }
