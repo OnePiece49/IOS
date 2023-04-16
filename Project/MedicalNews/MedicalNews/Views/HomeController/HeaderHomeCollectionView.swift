@@ -9,11 +9,12 @@ import Foundation
 import UIKit
 
 protocol HeaderHomeTableViewDelegate: AnyObject {
-    func didTapGetAllNewsButton()
+    func didTapGetAllNewsButton(option: TitleSection)
 }
 
-class HeaderHomeTableView: UIView {
+class HeaderHomeCollectionView: UICollectionReusableView {
     //MARK: - Properties
+    static let identifier = "HeaderHomeCollectionView"
     weak var delegate: HeaderHomeTableViewDelegate?
     
     var option: TitleSection? {
@@ -31,7 +32,7 @@ class HeaderHomeTableView: UIView {
         return label
     }()
     
-    private lazy var getAllNewsButton: UIButton = {
+    private lazy var allNewsButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         let attributedButton = NSMutableAttributedString(string: "Xem tất cả", attributes: [NSAttributedString.Key.font: UIFont(name: "NunitoSans-SemiBold", size: 13) ?? UIFont.boldSystemFont(ofSize: 13)])
@@ -53,7 +54,7 @@ class HeaderHomeTableView: UIView {
     }()
     
     private lazy var getAllNewsStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [getAllNewsButton, getAllNewsImageButton])
+        let stack = UIStackView(arrangedSubviews: [allNewsButton, getAllNewsImageButton])
         stack.spacing = 5
         stack.axis = .horizontal
         stack.translatesAutoresizingMaskIntoConstraints = false
@@ -78,7 +79,7 @@ class HeaderHomeTableView: UIView {
         addSubview(mainInfoLabel)
         addSubview(getAllNewsStack)
         mainInfoLabel.topAnchor.constraint(equalTo: topAnchor, constant: 20).isActive = true
-        mainInfoLabel.leftAnchor.constraint(equalTo: leftAnchor, constant: 16).isActive = true
+        mainInfoLabel.leftAnchor.constraint(equalTo: leftAnchor, constant: 0).isActive = true
         mainInfoLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -16).isActive = true
         getAllNewsStack.topAnchor.constraint(equalTo: topAnchor, constant: 21).isActive = true
         getAllNewsStack.rightAnchor.constraint(equalTo: rightAnchor, constant: -21).isActive = true
@@ -95,7 +96,7 @@ class HeaderHomeTableView: UIView {
     
     //MARK: - Selectors
     @objc func handleGetAllNewsButtonTapped() {
-        delegate?.didTapGetAllNewsButton()
+        delegate?.didTapGetAllNewsButton(option: self.option ?? .articlesList )
     }
     
 

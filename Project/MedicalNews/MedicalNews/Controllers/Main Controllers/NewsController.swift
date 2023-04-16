@@ -98,7 +98,7 @@ extension NewsController: UITableViewDelegate, UITableViewDataSource {
     
 }
 
-extension NewsController: NewsHeaderControllerDelegate {
+extension NewsController: NewsHeaderDetailControllerDelegate {
     func didBackButtonTapped() {
         self.navigationController?.popViewController(animated: true)
     }

@@ -10,7 +10,7 @@ import UIKit
 
 class RegisterController: UIViewController {
     //MARK: - Properties    
-    private let titleImage: UIImageView = {
+    private let headerImageView: UIImageView = {
         let iv = UIImageView(image: UIImage(named: "BG"))
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.contentMode = .scaleToFill
@@ -160,11 +160,11 @@ class RegisterController: UIViewController {
     //MARK: - Helpers
     func configureUI() {
         view.backgroundColor = .white
-        view.addSubview(titleImage)
-        titleImage.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
-        titleImage.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-        titleImage.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
-        titleImage.heightAnchor.constraint(equalTo: titleImage.widthAnchor, multiplier: 188 / 375).isActive = true
+        view.addSubview(headerImageView)
+        headerImageView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        headerImageView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+        headerImageView.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+        headerImageView.heightAnchor.constraint(equalTo: headerImageView.widthAnchor, multiplier: 188 / 375).isActive = true
         
         view.addSubview(backButton)
         backButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 50).isActive = true
@@ -175,7 +175,7 @@ class RegisterController: UIViewController {
         languageLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16).isActive = true
         
         view.addSubview(containerInputView)
-        containerInputView.topAnchor.constraint(equalTo: titleImage.bottomAnchor, constant: 56).isActive = true
+        containerInputView.topAnchor.constraint(equalTo: headerImageView.bottomAnchor, constant: 56).isActive = true
         containerInputView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 25).isActive = true
         containerInputView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -23).isActive = true
         containerInputView.heightAnchor.constraint(equalToConstant: 56).isActive = true
@@ -194,13 +194,13 @@ class RegisterController: UIViewController {
     }
     
     private func enableView() {
-        continuteButton.isEnabled = true
-        continuteButton.alpha = 1
+        self.continuteButton.isEnabled = true
+        self.continuteButton.alpha = 1
     }
     
     private func disableView() {
-        continuteButton.isEnabled = false
-        continuteButton.alpha = 0.3
+        self.continuteButton.isEnabled = false
+        self.continuteButton.alpha = 0.3
     }
         
     //MARK: - Selectors
@@ -216,9 +216,9 @@ class RegisterController: UIViewController {
     @objc func handleDidBeginChangeTextField() {
         guard let text = inputPhoneTextField.text else {return}
         if text.count == 9 && text.first != Character("0") || text.count == 10 && text.first == Character("0") {
-            enableView()
+            self.enableView()
         } else {
-            disableView()
+            self.disableView()
         }
     }
     

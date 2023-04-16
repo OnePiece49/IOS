@@ -9,9 +9,15 @@ import Foundation
 import UIKit
 import SDWebImage
 
-class HomeCollectionViewCell: UICollectionViewCell {
+class NewsAndPromotionCollectionViewCell: UICollectionViewCell {
     //MARK: - Properties
-    static let reuseIdentifier = "HomeCollectionViewCell"
+    static let reuseIdentifier = "NewsAndPromotionCollectionViewCell"
+    var option: TitleSection!
+    var viewModel: HomeCollectionViewCellModel? {
+        didSet {
+            updateUI()
+        }
+    }
 
     lazy var titleImage: UIImageView = {
         let iv = UIImageView(image: UIImage(named: "Image"))
@@ -75,6 +81,12 @@ class HomeCollectionViewCell: UICollectionViewCell {
         stackTitle.leftAnchor.constraint(equalTo: titleImage.leftAnchor, constant: 11).isActive = true
         stackTitle.rightAnchor.constraint(equalTo: titleImage.rightAnchor, constant: -12).isActive = true
         stackTitle.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -11).isActive = true
+    }
+    
+    func updateUI() {
+        titleImage.sd_setImage(with: viewModel?.getImageURL(option: option), completed: .none)
+        mainTitleLabel.attributedText = viewModel?.getMainTextAttributed(option: option)
+        subTitleLabel.attributedText = viewModel?.getSubTextAttributed(option: option)
     }
     
     //MARK: - Selectors

@@ -11,7 +11,7 @@ class HomeSerVice {
     private let ariticleURL = "https://gist.githubusercontent.com/hdhuy179/f967ffb777610529b678f0d5c823352a/raw"
     static let shared = HomeSerVice()
     
-    func fetchArticleList(completion: @escaping([ArticleList]) -> Void) {
+    func fetchArticleList(completion: @escaping([ArticleModel]) -> Void) {
         guard let url = URL(string: ariticleURL) else {return}
         URLSession.shared.dataTask(with: url) { data, _, erorr in
             if let erorr = erorr {
@@ -27,7 +27,7 @@ class HomeSerVice {
         }.resume()
     }
     
-    func fetchPromotionList(completion: @escaping([PromotionList]) -> Void) {
+    func fetchPromotionList(completion: @escaping([PromotionModel]) -> Void) {
         guard let url = URL(string: ariticleURL) else {return}
         URLSession.shared.dataTask(with: url) { data, _, erorr in
             if let erorr = erorr {
@@ -43,7 +43,7 @@ class HomeSerVice {
         }.resume()
     }
     
-    func fetchDoctorList(completion: @escaping([DoctorList]) -> Void) {
+    func fetchDoctorList(completion: @escaping([DoctorModel]) -> Void) {
         guard let url = URL(string: ariticleURL) else {return}
         URLSession.shared.dataTask(with: url) { data, _, erorr in
             if let erorr = erorr {

@@ -74,10 +74,6 @@ extension DoctorsController: UICollectionViewDelegateFlowLayout, UICollectionVie
         return CGSize(width: view.frame.width - 24, height: 105)
     }
     
-//    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-//        return 11
-//    }
-    
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }

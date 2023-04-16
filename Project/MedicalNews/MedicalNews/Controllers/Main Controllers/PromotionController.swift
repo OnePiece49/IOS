@@ -76,7 +76,13 @@ extension PromotionController: UITableViewDelegate, UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
-    
+
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let detailController = NewsDetailController()
+        detailController.newsURL = viewModel?.getLinkPromotion(index: indexPath.row)
+        self.navigationController?.pushViewController(detailController, animated: true)
+        self.tableView.deselectRow(at: indexPath, animated: true)
+    }
 }
 
 extension PromotionController: PromotionTableViewCellDelegate {

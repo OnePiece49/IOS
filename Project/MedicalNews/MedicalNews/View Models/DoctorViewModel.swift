@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 struct DoctorViewModel {
-    var doctorList: [DoctorList]
+    var doctorList: [DoctorModel]
     
     var currentIndex: Int = 1
     
@@ -37,7 +37,7 @@ struct DoctorViewModel {
         
     }
 
-    init(doctorList: [DoctorList]) {
+    init(doctorList: [DoctorModel]) {
         self.doctorList = doctorList
     }
 }

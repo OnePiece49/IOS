@@ -14,8 +14,18 @@ class LoginController: UIViewController {
     private var counter: Int = 0
     private var time: Int = 0
     private var lastNumberCharacter: [Int] = [0, 0, 0, 0, 0, 0, 0]
+    private var OTPCode: [String] = ["0", "0", "0", "0", "0", "0"]
+    private var generateOTPCode: String {
+        get {
+            let otp = String(arc4random_uniform(900000) + 100000)
+            for (key, _) in OTPCode.enumerated() {
+                OTPCode[key] =  String(otp[otp.index(otp.startIndex, offsetBy: key)])
+            }
+            return otp
+        }
+    }
     
-    private  var heightKeypad: CGFloat = 0
+    private var heightKeypad: CGFloat = 0
     private lazy var bottomAnchorContinuteButtonToView: NSLayoutConstraint = continuteButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -50)
     private lazy var bottomAnchorContinuteButtonToResendButton: NSLayoutConstraint = continuteButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -315)
     
@@ -182,7 +192,7 @@ class LoginController: UIViewController {
     private lazy var resendMessageButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        let attributedButton = NSMutableAttributedString(string: "Gửi lại mã sau 60s", attributes: [NSAttributedString.Key.font: UIFont(name: "NunitoSans-Bold", size: 15) ?? UIFont.boldSystemFont(ofSize: 15), NSAttributedString.Key.foregroundColor: UIColor(red: 0.173, green: 0.525, blue: 0.404, alpha: 1)])
+        let attributedButton = NSMutableAttributedString(string: "Gửi lại mã sau 10s", attributes: [NSAttributedString.Key.font: UIFont(name: "NunitoSans-Bold", size: 15) ?? UIFont.boldSystemFont(ofSize: 15), NSAttributedString.Key.foregroundColor: UIColor(red: 0.173, green: 0.525, blue: 0.404, alpha: 1)])
         button.setAttributedTitle(attributedButton, for: .normal)
         button.layer.borderWidth = 1
         button.layer.borderColor = UIColor(red: 0.173, green: 0.525, blue: 0.404, alpha: 1).cgColor
@@ -237,6 +247,7 @@ class LoginController: UIViewController {
         disableMultipleInputTextField(from: 2, to: 6)
         enableInputTextField(index: 1)
         setTimerForResendButton()
+        checkForPermission()
     }
     
     //MARK: - Helpers
@@ -273,6 +284,47 @@ class LoginController: UIViewController {
         bottomAnchorContinuteButtonToView.isActive = true
     }
     
+    private func checkForPermission() {
+        let notificationCenter = UNUserNotificationCenter.current()
+        notificationCenter.delegate = self
+        
+        notificationCenter.getNotificationSettings { settings in
+            switch settings.authorizationStatus {
+            case .authorized:
+                self.dispathNotification()
+            case .denied:
+                return
+            case .notDetermined:
+                notificationCenter.requestAuthorization(options: [.sound, .alert]) { isAllow, error in
+                    if isAllow {
+                        self.dispathNotification()
+                    } else {
+                        return
+                    }
+                }
+            default:
+                return
+            }
+        }
+    }
+    
+    private func dispathNotification() {
+        let identifier = "send-otp-notification"
+        let notificationCenter = UNUserNotificationCenter.current()
+        let content = UNMutableNotificationContent()
+        
+        let title = "Mã OTP của bạn"
+        
+        content.title = title
+        content.body = String(self.generateOTPCode)
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+        
+        let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
+        
+        notificationCenter.removePendingNotificationRequests(withIdentifiers: [identifier])
+        notificationCenter.add(request, withCompletionHandler: .none)
+    }
+    
     private func setNotificationCenter() {
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardDidHideNotification, object: nil)
@@ -284,10 +336,10 @@ class LoginController: UIViewController {
     
     @objc func handleTimer(timer: Timer) {
         self.counter += 1
-        self.time = 60 - self.counter
+        self.time = 10 - self.counter
         let attributedButton = NSMutableAttributedString(string: "Gửi lại mã sau \(self.time)s", attributes: [NSAttributedString.Key.font: UIFont(name: "NunitoSans-Bold", size: 15) ?? UIFont.boldSystemFont(ofSize: 15), NSAttributedString.Key.foregroundColor: UIColor(red: 0.173, green: 0.525, blue: 0.404, alpha: 1)])
         self.resendMessageButton.setAttributedTitle(attributedButton, for: .normal)
-        if self.counter == 60 {
+        if self.counter == 10 {
             self.counter = -1
             timer.invalidate()
             enableResendButton()
@@ -297,7 +349,7 @@ class LoginController: UIViewController {
     private func enableResendButton() {
         self.resendMessageButton.alpha = 1.0
         self.resendMessageButton.isEnabled = true
-        let attributedButton = NSMutableAttributedString(string: "Gửi lại mã sau", attributes: [NSAttributedString.Key.font: UIFont(name: "NunitoSans-Bold", size: 15) ?? UIFont.boldSystemFont(ofSize: 15), NSAttributedString.Key.foregroundColor: UIColor(red: 0.173, green: 0.525, blue: 0.404, alpha: 1)])
+        let attributedButton = NSMutableAttributedString(string: "Gửi lại mã", attributes: [NSAttributedString.Key.font: UIFont(name: "NunitoSans-Bold", size: 15) ?? UIFont.boldSystemFont(ofSize: 15), NSAttributedString.Key.foregroundColor: UIColor(red: 0.173, green: 0.525, blue: 0.404, alpha: 1)])
         self.resendMessageButton.setAttributedTitle(attributedButton, for: .normal)
     }
     
@@ -401,11 +453,12 @@ class LoginController: UIViewController {
         self.setTimerForResendButton()
         self.resendMessageButton.isEnabled = false
         self.resendMessageButton.alpha = 0.3
+        self.dispathNotification()
     }
     
     @objc func handleContinueButtonTapped() {
-        if input1TextField.text != "1" || input2TextField.text != "1" || input3TextField.text ==  "1" &&
-            input4TextField.text != "1" || input5TextField.text != "1" || input6TextField.text != "1" {
+        if input1TextField.text != OTPCode[0] || input2TextField.text != OTPCode[1] || input3TextField.text ==  OTPCode[2] &&
+            input4TextField.text != OTPCode[3] || input5TextField.text != OTPCode[4] || input6TextField.text != OTPCode[5] {
             self.wrongCodeLabel.isHidden = false
         } else {
             let homeController = HomeController()
@@ -484,6 +537,15 @@ class LoginController: UIViewController {
     
 }
 
+//MARK: - delegate NotifcationCenterDelegate
+extension LoginController: UNUserNotificationCenterDelegate {
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.sound, .banner])
+    }
+}
+
+
+//MARK: - delegate InputTextFieldDelegate
 extension LoginController: InputTextFieldDelegate {
     func textFieldDidDelete(_ textField: UITextField) {
         guard let text = textField.text else {return }
@@ -547,9 +609,6 @@ extension LoginController: InputTextFieldDelegate {
             input5TextField.text = ""
             lastNumberCharacter[5] = 0
         }
-
-  
-    
     }
 }
 

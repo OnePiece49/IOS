@@ -11,21 +11,22 @@ import UIKit
 class HomeController: UIViewController {
     //MARK: - Properties
     private let header = HeaderHomeView()
-    private let tableView = UITableView()
-    private var viewModel: HomeViewModel? {
-        didSet {
-            DispatchQueue.main.async {
-                self.tableView.reloadData()
-            }
- 
-        }
-    }
+    private let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+    
+    private var viewModel: HomeViewModel = HomeViewModel()
     
     //MARK: - View Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
-        fetchData()
+        
+        self.viewModel.binding = {
+            DispatchQueue.main.async {
+                self.collectionView.reloadData()
+            }
+        }
+        
+        self.fetchData()
     }
     
     //MARK: - Helpers
@@ -40,114 +41,149 @@ class HomeController: UIViewController {
         header.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         header.heightAnchor.constraint(equalTo: header.widthAnchor, multiplier: 143 / 375).isActive = true
         header.delegate = self
-        configureTableView()
+        configureCollectionView()
     }
     
-    func configureTableView() {
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.register(HomeTableViewCell.self, forCellReuseIdentifier: HomeTableViewCell.reuseIdentifier)
-        view.addSubview(tableView)
-        tableView.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.topAnchor.constraint(equalTo: header.bottomAnchor, constant: -16).isActive = true
-        tableView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-        tableView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
-        tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        tableView.layer.cornerRadius = 16
-        tableView.separatorStyle = .none
-        tableView.isExclusiveTouch = false
+    private func configureCollectionView() {
+        view.addSubview(collectionView)
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
+        
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.topAnchor.constraint(equalTo: header.bottomAnchor, constant: -16).isActive = true
+        collectionView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+        collectionView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+        collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        collectionView.layer.cornerRadius = 16
+
+        //collectionView.isExclusiveTouch = false
+        collectionView.register(NewsAndPromotionCollectionViewCell.self, forCellWithReuseIdentifier: NewsAndPromotionCollectionViewCell.reuseIdentifier)
+        collectionView.register(HomeDoctorCollectionViewCell.self, forCellWithReuseIdentifier: HomeDoctorCollectionViewCell.reuseIdentifier)
+        collectionView.register(HeaderHomeCollectionView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderHomeCollectionView.identifier)
+        collectionView.collectionViewLayout = createLayout()
     }
     
-    func fetchData() {
-        HomeSerVice.shared.fetchAllData { homeModel in
-            self.viewModel = HomeViewModel(homeModel: homeModel)
+
+    func createLayout() -> UICollectionViewLayout {
+        func createSectionDoctor() -> NSCollectionLayoutSection {
+            let item = ComposionalLayout.createItem(layoutSize: NSCollectionLayoutSize.init(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0)))
+            //item.edgeSpacing =
+            let group = ComposionalLayout.createGroup(axis: .horizontal, layoutSize: NSCollectionLayoutSize.init(widthDimension: .absolute(121), heightDimension: .absolute(185)), itemArray: [item])
+            
+            let section = ComposionalLayout.createSection(group: group)
+            return section
         }
+        
+        func createSectionNewsAndPromotion() -> NSCollectionLayoutSection {
+            let item = ComposionalLayout.createItem(layoutSize: NSCollectionLayoutSize.init(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0)))
+            let group = ComposionalLayout.createGroup(axis: .horizontal, layoutSize: NSCollectionLayoutSize.init(widthDimension: .absolute(258), heightDimension: .absolute(220)), itemArray: [item])
+            
+            let section = ComposionalLayout.createSection(group: group)
+            return section
+        }
+        
+        let layout = UICollectionViewCompositionalLayout { section, env -> NSCollectionLayoutSection? in
+            switch section {
+            case 0:
+                let section = createSectionNewsAndPromotion()
+                return section
+            case 1:
+                let section = createSectionNewsAndPromotion()
+                return section
+            default:
+                let section = createSectionDoctor()
+                return section
+            }
+        }
+        
+        return layout
+    }
+    
+    private func fetchData() {
+        viewModel.fetchData()
     }
     
     //MARK: - Selectors
 }
 
 //MARK: - Delegate Datasource/DelegateTableViewController
-extension HomeController: UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
-    }
+extension HomeController: UICollectionViewDelegate, UICollectionViewDataSource {
     
-    func numberOfSections(in tableView: UITableView) -> Int {
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 3
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: HomeTableViewCell.reuseIdentifier, for: indexPath) as! HomeTableViewCell
-        cell.option = TitleSection(rawValue: indexPath.section)
-        cell.viewModel = viewModel
-        cell.delegate = self
-        return cell
-    }
-    
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 0
-    }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if indexPath.section == 2 {
-            return 251
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        if indexPath.section == 0 {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NewsAndPromotionCollectionViewCell.reuseIdentifier, for: indexPath) as! NewsAndPromotionCollectionViewCell
+            cell.option =  .articlesList
+            let article = self.viewModel.getArticle(indexPath: indexPath)
+            cell.viewModel = HomeCollectionViewCellModel(option: .articlesList, articleModel: article)
+            return cell
+        } else if indexPath.section == 1 {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: NewsAndPromotionCollectionViewCell.reuseIdentifier, for: indexPath) as! NewsAndPromotionCollectionViewCell
+            cell.option = .promotionList
+            let promotion = self.viewModel.getPromotion(indexPath: indexPath)
+            cell.viewModel = HomeCollectionViewCellModel(option: .promotionList, promotionModel: promotion)
+            
+            return cell
+        } else {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeDoctorCollectionViewCell.reuseIdentifier, for: indexPath) as! HomeDoctorCollectionViewCell
+            cell.option = TitleSection(rawValue: 2) ?? .doctorList
+            let doctor = self.viewModel.getDoctor(indexPath: indexPath)
+            cell.viewModel = HomeCollectionViewCellModel(option: .doctorList, doctorModel: doctor)
+
+            return cell
         }
-        return 284
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: false)
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return viewModel.getNumberNews(section: section) 
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: HeaderHomeCollectionView.identifier, for: indexPath) as! HeaderHomeCollectionView
+        header.option = TitleSection(rawValue: indexPath.section) ?? .articlesList
+        header.delegate = self
+        return header
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if indexPath.section == 2 {
+            return
+        }
+        
+        let detailController = NewsDetailController()
+        detailController.newsURL = viewModel.getUrl(indexPath: indexPath)
+        self.navigationController?.pushViewController(detailController, animated: true)
     }
 }
 
-extension HomeController: HomeTableViewCellDelegate {
-    func didTapGetAllNewsButton(_ cell: HomeTableViewCell) {
-        guard let option = cell.option else {return}
-            switch option {
-            case .articlesList:
-                let newsController = NewsController()
-                guard let viewModel = viewModel else {return}
-                newsController.viewModel = NewsViewModel(articles: viewModel.articles)
-                navigationController?.pushViewController(newsController, animated: true)
-            case .promotionList:
-                let promotionVC = PromotionController()
-                guard let promotions = viewModel?.promotions else {return}
-                promotionVC.viewModel = PromotionViewModel(promotions: promotions)
-                navigationController?.pushViewController(promotionVC, animated: true)
-            case .doctorList:
-                let doctorVC = DoctorsController()
-                guard let doctors = viewModel?.doctors else {return}
-                doctorVC.viewModel = DoctorViewModel(doctorList: doctors)
-                navigationController?.pushViewController(doctorVC, animated: true)
-            }
-        }
-    
-    func didTapCollectionViewCell(_ cell: HomeTableViewCell, indexPath: IndexPath) {
-        guard let option = cell.option else {return}
-        switch option {
-        case .articlesList:
-            let newdetailsVC = NewsDetailController()
-            navigationController?.pushViewController(newdetailsVC, animated: true)
-            newdetailsVC.newsURL = cell.viewModel?.getLinkArticle(index: indexPath.row)
-        case .promotionList:
-            let promotionVC = PromotionController()
-            guard let promotions = viewModel?.promotions else {return}
-            promotionVC.viewModel = PromotionViewModel(promotions: promotions)
-            navigationController?.pushViewController(promotionVC, animated: true)
-        case .doctorList:
-            let doctorVC = DoctorsController()
-            guard let doctors = viewModel?.doctors else {return}
-            doctorVC.viewModel = DoctorViewModel(doctorList: doctors)
-            navigationController?.pushViewController(doctorVC, animated: true)
-        }
-    }
-}
 
 extension HomeController: HeaderHomeViewDelegate {
     func didTapAvatarImage() {
         self.navigationController?.pushViewController(SettingUserInforController(), animated: true)
+    }
+}
+
+extension HomeController: HeaderHomeTableViewDelegate {
+    func didTapGetAllNewsButton(option: TitleSection) {
+        switch option {
+        case .articlesList:
+            let newsController = NewsController()
+            newsController.viewModel = NewsViewModel(articles: viewModel.getArticleList())
+            self.navigationController?.pushViewController(newsController, animated: true)
+        case .promotionList:
+            let promotionController = PromotionController()
+            promotionController.viewModel = PromotionViewModel(promotions: viewModel.getPromotionList())
+            self.navigationController?.pushViewController(promotionController, animated: true)
+        case .doctorList:
+            let doctorController = DoctorsController()
+            doctorController.viewModel = DoctorViewModel(doctorList: viewModel.getDoctorList())
+            self.navigationController?.pushViewController(doctorController, animated: true)
+        }
+
     }
     
     

@@ -8,13 +8,19 @@
 import Foundation
 import UIKit
 
-protocol NewsHeaderControllerDelegate: AnyObject {
+protocol NewsHeaderDetailControllerDelegate: AnyObject {
     func didBackButtonTapped()
+    func didSharedButtonTapped()
+}
+
+extension NewsHeaderDetailControllerDelegate {
+    func didSharedButtonTapped() {}
 }
 
 class NewsHeaderView: UIView {
+    
     //MARK: - Properties
-    weak var delegate: NewsHeaderControllerDelegate?
+    weak var delegate: NewsHeaderDetailControllerDelegate?
     let headerImageView: UIImageView = {
         let iv = UIImageView()
         iv.image = UIImage(named: "Rectangle 4767")
@@ -34,7 +40,7 @@ class NewsHeaderView: UIView {
         return button
     }()
     
-    private lazy var shareButton: UIButton = {
+    lazy var shareButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.widthAnchor.constraint(equalToConstant: 32).isActive = true
@@ -43,7 +49,7 @@ class NewsHeaderView: UIView {
         button.setImage(UIImage(named: "Group"), for: .normal)
         button.layer.borderWidth = 1
         button.layer.borderColor = UIColor(rgb: 0xEEEFF4).cgColor
-        button.addTarget(self, action: #selector(handleBackButtonTapped), for: .touchUpInside)
+        button.addTarget(self, action: #selector(handleSharedButtonTapped), for: .touchUpInside)
         button.backgroundColor = UIColor(rgb: 0xFFFFFF)
         return button
     }()
@@ -65,10 +71,10 @@ class NewsHeaderView: UIView {
         stack.axis = .horizontal
         stack.distribution = .equalCentering
         stack.alignment = .center
-        backButton.widthAnchor.constraint(equalToConstant: 32).isActive = true
-        backButton.heightAnchor.constraint(equalToConstant: 32).isActive = true
-        shareButton.heightAnchor.constraint(equalToConstant: 32).isActive = true
-        shareButton.heightAnchor.constraint(equalToConstant: 32).isActive = true
+//        backButton.widthAnchor.constraint(equalToConstant: 32).isActive = true
+//        backButton.heightAnchor.constraint(equalToConstant: 32).isActive = true
+//        shareButton.heightAnchor.constraint(equalToConstant: 32).isActive = true
+//        shareButton.heightAnchor.constraint(equalToConstant: 32).isActive = true
         return stack
     }()
     
@@ -134,5 +140,9 @@ class NewsHeaderView: UIView {
     
     @objc func handleBackButtonTapped() {
         delegate?.didBackButtonTapped()
+    }
+    
+    @objc func handleSharedButtonTapped() {
+        
     }
 }

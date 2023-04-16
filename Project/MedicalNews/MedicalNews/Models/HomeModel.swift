@@ -14,13 +14,13 @@ struct HomeModel: Codable {
 }
 
 struct Data: Codable {
-    let articleList: [ArticleList]
-    let promotionList: [PromotionList]
-    let doctorList: [DoctorList]
+    let articleList: [ArticleModel]
+    let promotionList: [PromotionModel]
+    let doctorList: [DoctorModel]
 }
 
 
-struct ArticleList: Codable {
+struct ArticleModel: Codable {
     let id: Int
     let title: String
     let picture: String
@@ -29,7 +29,7 @@ struct ArticleList: Codable {
     let link: String
 }
 
-struct PromotionList: Codable {
+struct PromotionModel: Codable {
     let id: Int
     let name: String
     let picture: String
@@ -38,7 +38,7 @@ struct PromotionList: Codable {
     
 }
 
-struct DoctorList: Codable {
+struct DoctorModel: Codable {
     let id: Int
     let full_name: String
     let name: String

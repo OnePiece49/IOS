@@ -108,7 +108,7 @@ class PromotionTableViewCell: UITableViewCell {
             return
         }
 
-        titleImage.sd_setImage(with: viewModel.imageArticleUrl, completed: .none)
+        titleImage.sd_setImage(with: viewModel.imagePromotionUrl, completed: .none)
         mainNewsTitleLabel.text = viewModel.titlePromotionString
         dateLabel.text = viewModel.dateTitleString
     }

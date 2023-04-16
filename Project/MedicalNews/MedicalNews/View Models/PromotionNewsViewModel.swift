@@ -32,7 +32,7 @@ enum PromotionOption: Int {
 }
 
 struct PromotionViewModel {
-    var promotionList: [PromotionList]
+    var promotionList: [PromotionModel]
     
     var currentIndex: Int = 0
     
@@ -40,8 +40,8 @@ struct PromotionViewModel {
         return promotionList.count
     }
     
-    func getLinkArticle(index: Int) -> URL? {
-        return URL(string: promotionList[index + 1].link)
+    func getLinkPromotion(index: Int) -> URL? {
+        return URL(string: promotionList[index].link)
     }
     
     var dateTitleString: String {
@@ -62,7 +62,7 @@ struct PromotionViewModel {
         return promotionList[currentIndex].name
     }
     
-    var dateArticleString: String {
+    var datePromotionString: String {
         let inputDateFormatter = DateFormatter()
         inputDateFormatter.dateFormat = "dd/MM/yyyy"
         guard let inputDate = inputDateFormatter.date(from: promotionList[currentIndex].created_at) else {
@@ -75,11 +75,11 @@ struct PromotionViewModel {
         return outputDateString
     }
     
-    var imageArticleUrl: URL? {
+    var imagePromotionUrl: URL? {
         return URL(string: self.promotionList[currentIndex].picture)
     }
 
-    init(promotions: [PromotionList]) {
+    init(promotions: [PromotionModel]) {
         self.promotionList = promotions
     }
 }

@@ -57,7 +57,9 @@ class NewsDetailController: UIViewController {
         let queue = DispatchQueue(label: "stopIndicator")
  
         queue.async {
-            while self.webView.isLoading {}
+            while self.webView.isLoading {
+                Thread.sleep(forTimeInterval: 0.1)
+            }
             
             DispatchQueue.main.async {
                 self.loadingIndicator.stopAnimating()
@@ -82,9 +84,13 @@ class NewsDetailController: UIViewController {
     //MARK: - Selectors
 }
 
-extension NewsDetailController: NewsHeaderControllerDelegate {
+extension NewsDetailController: NewsHeaderDetailControllerDelegate {
     func didBackButtonTapped() {
         navigationController?.popViewController(animated: true)
+    }
+    
+    func didSharedButtonTapped() {
+        UIPasteboard.general.url = self.newsURL
     }
 }
 

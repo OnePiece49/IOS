@@ -13,7 +13,7 @@ import WebKit
 
 class NewsDetailHeaderView: UIView {
     //MARK: - Properties
-    weak var delegate: NewsHeaderControllerDelegate?
+    weak var delegate: NewsHeaderDetailControllerDelegate?
     let headerImageView: UIImageView = {
         let iv = UIImageView()
         iv.image = UIImage(named: "Rectangle 4767")
@@ -43,7 +43,7 @@ class NewsDetailHeaderView: UIView {
         button.setImage(UIImage(named: "Group"), for: .normal)
         button.layer.borderWidth = 1
         button.layer.borderColor = UIColor(rgb: 0xEEEFF4).cgColor
-        button.addTarget(self, action: #selector(handleBackButtonTapped), for: .touchUpInside)
+        button.addTarget(self, action: #selector(hanldeSharedButtonTapped), for: .touchUpInside)
         button.backgroundColor = UIColor(rgb: 0xFFFFFF)
         return button
     }()
@@ -133,5 +133,9 @@ class NewsDetailHeaderView: UIView {
     
     @objc func handleBackButtonTapped() {
         delegate?.didBackButtonTapped()
+    }
+    
+    @objc func hanldeSharedButtonTapped() {
+        delegate?.didSharedButtonTapped()
     }
 }

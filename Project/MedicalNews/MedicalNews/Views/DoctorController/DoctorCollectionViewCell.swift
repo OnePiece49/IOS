@@ -131,7 +131,7 @@ class DoctorCollectionViewCell: UICollectionViewCell {
         self.reviewLabel.attributedText = viewModel.reviewTextAttributed
         self.userNameImage.sd_setImage(with: viewModel.imageURL, completed: .none)
         self.userNameLabel.text = viewModel.userNameDoctorString
-        self.userNameImage.sd_setImage(with: viewModel.imageURL, placeholderImage: UIImage(named: "doctor 1 1"), options: .lowPriority, completed: .none)
+        self.userNameImage.sd_setImage(with: viewModel.imageURL, placeholderImage: UIImage(named: "doctor"), options: .lowPriority, completed: .none)
         
     }
 }

@@ -10,7 +10,14 @@ import UIKit
 
 class HomeDoctorCollectionViewCell: UICollectionViewCell {
     static let reuseIdentifier = "HomeDoctorCollectionViewCell"
-     lazy var userNameImage: UIImageView = {
+    var option: TitleSection!
+    var viewModel: HomeCollectionViewCellModel? {
+        didSet {
+            updateUI()
+        }
+    }
+    
+    lazy var userNameImage: UIImageView = {
          let iv = UIImageView()
          iv.translatesAutoresizingMaskIntoConstraints = false
          iv.contentMode = .scaleToFill
@@ -99,9 +106,10 @@ class HomeDoctorCollectionViewCell: UICollectionViewCell {
     
     //MARK: - Helpers
     func configureUI() {
-        backgroundColor  = UIColor.white
+        //backgroundColor  = UIColor.white
         layer.borderWidth = 1
         layer.borderColor = UIColor(rgb: 0xEEEFF4).cgColor
+
         addSubview(userNameImage)
         userNameImage.topAnchor.constraint(equalTo: topAnchor, constant: 12).isActive = true
         userNameImage.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
@@ -114,6 +122,13 @@ class HomeDoctorCollectionViewCell: UICollectionViewCell {
         infoUserStack.leftAnchor.constraint(equalTo: userNameImage.leftAnchor, constant: 12).isActive = true
         infoUserStack.rightAnchor.constraint(equalTo: rightAnchor, constant: -12).isActive = true
         infoUserStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -12).isActive = true
+    }
+    
+    func updateUI() {
+        userNameImage.sd_setImage(with: viewModel?.getImageURL(option: option), placeholderImage: UIImage(named: "doctor"), options: .lowPriority, completed: .none)
+        userNameLabel.text = viewModel?.getUserNameDoctorString(option: option)
+        majorLabel.text = viewModel?.getMajorDoctorString(option: option)
+        reviewLabel.attributedText = viewModel?.getReviewTextAttributed(option: option)
     }
     
     //MARK: - Selectors

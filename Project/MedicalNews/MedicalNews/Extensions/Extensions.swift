@@ -31,7 +31,6 @@ protocol InputTextFieldDelegate: AnyObject {
 }
 
 class InputTextField: UITextField {
-
     weak var delegateInput: InputTextFieldDelegate?
 
     override func deleteBackward() {

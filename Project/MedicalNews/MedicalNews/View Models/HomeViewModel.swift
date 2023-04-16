@@ -8,10 +8,10 @@
 import Foundation
 import UIKit
 
-enum TitleSection: Int {
-    case articlesList
-    case promotionList
-    case doctorList
+enum TitleSection: Int ,CaseIterable {
+    case articlesList = 0
+    case promotionList = 1
+    case doctorList = 2
     
     var description: String {
         switch self {
@@ -25,120 +25,78 @@ enum TitleSection: Int {
     }
 }
 
-struct HomeViewModel {
-    var articles: [ArticleList]
-    let promotions: [PromotionList]
-    var doctors: [DoctorList]
+class HomeViewModel {
+    private var homeModel: HomeModel! {
+        didSet {
+            self.binding()
+        }
+    }
     var option: TitleSection?
 
     var currentIndex: Int = 0
     var tempIndex: Int = 0
+    var binding: (() -> Void) = {}
     
-    var numberSectionTable: Int {
-        return 3
-    }
-    
-    var numberArticle: Int {
-        return articles.count
-    }
-    
-    var numberPromotions: Int {
-        return promotions.count
-    }
-    
-    var numberDoctors: Int {
-        return doctors.count
-    }
-    
-    func getLinkArticle(index: Int) -> URL? {
-        return URL(string: articles[index].link)
-    }
-    
-    
-    var mainTextAttributed: NSAttributedString {
-        guard let option = option else {
-            return NSMutableAttributedString(string: "Ưu đãi hot", attributes: [NSAttributedString.Key.font : UIFont(name: "NunitoSans-Bold", size: 13) ?? UIFont.boldSystemFont(ofSize: 13), NSAttributedString.Key.foregroundColor: UIColor(red: 0.173, green: 0.525, blue: 0.404, alpha: 1)])
+    func fetchData() {
+        HomeSerVice.shared.fetchAllData { homeModel in
+            self.homeModel = homeModel
         }
+    }
 
-        switch option {
-        case .articlesList:
-            let textAttributed = NSMutableAttributedString(string: self.articles[currentIndex].title, attributes: [NSAttributedString.Key.font: UIFont(name: "NunitoSans-Bold", size: 15) ?? UIFont.boldSystemFont(ofSize: 17)])
-            return textAttributed
-        case .promotionList:
-            let textAttributed = NSMutableAttributedString(string: self.promotions[currentIndex].name, attributes: [NSAttributedString.Key.font: UIFont(name: "NunitoSans-Bold", size: 15) ?? UIFont.boldSystemFont(ofSize: 17)])
-            return textAttributed
-        case .doctorList:
-            return NSMutableAttributedString(string: "Ưu đãi hot", attributes: [NSAttributedString.Key.font : UIFont(name: "NunitoSans-Bold", size: 13) ?? UIFont.boldSystemFont(ofSize: 13), NSAttributedString.Key.foregroundColor: UIColor(red: 0.173, green: 0.525, blue: 0.404, alpha: 1)])
+    func getArticleList() -> [ArticleModel] {
+        return homeModel.data.articleList
+    }
+    
+    func getPromotionList() -> [PromotionModel] {
+        return homeModel.data.promotionList
+    }
+    
+    func getDoctorList() -> [DoctorModel] {
+        return homeModel.data.doctorList
+    }
+    
+    func getNumberNews(section: Int) -> Int {
+        switch section {
+        case 0:
+            guard let homeModel = self.homeModel else {return 0}
+            return homeModel.data.articleList.count
+        case 1:
+            guard let homeModel = self.homeModel else {return 0}
+            return homeModel.data.promotionList.count
+        case 2:
+            guard let homeModel = self.homeModel else {return 0}
+            return homeModel.data.doctorList.count
+        default:
+            return 0
         }
     }
     
-    var subTextAttributed: NSAttributedString {
-        guard let option = option else {
-            return NSMutableAttributedString(string: "Ưu đãi hot", attributes: [NSAttributedString.Key.font : UIFont(name: "NunitoSans-Bold", size: 13) ?? UIFont.boldSystemFont(ofSize: 13), NSAttributedString.Key.foregroundColor: UIColor(red: 0.173, green: 0.525, blue: 0.404, alpha: 1)])
-        }
-
-        switch option {
-        case .articlesList:
-            let textAttributed = NSMutableAttributedString(string: "Ưu đãi hot", attributes: [NSAttributedString.Key.font : UIFont(name: "NunitoSans-Bold", size: 13) ?? UIFont.boldSystemFont(ofSize: 13), NSAttributedString.Key.foregroundColor: UIColor(red: 0.173, green: 0.525, blue: 0.404, alpha: 1)])
-            textAttributed.append(NSAttributedString(string: " • ", attributes: [ NSMutableAttributedString.Key.foregroundColor: UIColor(red: 0.851, green: 0.859, blue: 0.882, alpha: 1)]))
-            textAttributed.append(NSAttributedString(string: self.articles[currentIndex].created_at, attributes: [NSAttributedString.Key.font: UIFont(name: "NunitoSans-Regular", size: 13) ?? UIFont.boldSystemFont(ofSize: 13), NSAttributedString.Key.foregroundColor: UIColor(red: 0.588, green: 0.608, blue: 0.671, alpha: 1)]))
-            return textAttributed
-            
-        case .promotionList:
-            let textAttributed = NSMutableAttributedString(string: "Ưu đãi hot", attributes: [NSAttributedString.Key.font : UIFont(name: "NunitoSans-Bold", size: 13) ?? UIFont.boldSystemFont(ofSize: 13), NSAttributedString.Key.foregroundColor: UIColor(red: 0.173, green: 0.525, blue: 0.404, alpha: 1)])
-            textAttributed.append(NSAttributedString(string: " • ", attributes: [ NSMutableAttributedString.Key.foregroundColor: UIColor(red: 0.851, green: 0.859, blue: 0.882, alpha: 1)]))
-            textAttributed.append(NSAttributedString(string: self.articles[currentIndex].created_at, attributes: [NSAttributedString.Key.font: UIFont(name: "NunitoSans-Regular", size: 13) ?? UIFont.boldSystemFont(ofSize: 17), NSAttributedString.Key.foregroundColor: UIColor(red: 0.588, green: 0.608, blue: 0.671, alpha: 1)]))
-            return textAttributed
-        case .doctorList:
-            return NSMutableAttributedString(string: "", attributes: [NSAttributedString.Key.font : UIFont(name: "NunitoSans-Regular", size: 13) ?? UIFont.boldSystemFont(ofSize: 13), NSAttributedString.Key.foregroundColor: UIColor(red: 0.173, green: 0.525, blue: 0.404, alpha: 1)])
-        }
+    func getArticle(indexPath: IndexPath) -> ArticleModel {
+        return homeModel.data.articleList[indexPath.row]
     }
     
-    var userNameDoctorString: String {
-        if option == .doctorList {
-            return doctors[currentIndex].full_name
-        } else {
-            return ""
-        }
+    func getPromotion(indexPath: IndexPath) -> PromotionModel {
+        return homeModel.data.promotionList[indexPath.row]
     }
     
-    var majorDoctorString: String {
-        if option == .doctorList {
-            return doctors[currentIndex].majors_name
-        } else {
-            return ""
-        }
+    func getDoctor(indexPath: IndexPath) -> DoctorModel {
+        return homeModel.data.doctorList[indexPath.row]
     }
     
-    var reviewTextAttributed: NSAttributedString {
-        if option == .doctorList {
-            let textAttributed = NSMutableAttributedString(string:  "\(doctors[currentIndex].ratio_star) ", attributes: .none)
-            textAttributed.append(NSAttributedString(string: "(\(doctors[currentIndex].number_of_reviews))", attributes: [NSAttributedString.Key.font: UIFont(name: "NunitoSans-Regular", size: 15) ?? UIFont.boldSystemFont(ofSize: 14), NSAttributedString.Key.foregroundColor: UIColor(red: 0.557, green: 0.604, blue: 0.671, alpha: 1)]))
-            return textAttributed
-        } else {
-            return NSMutableAttributedString(string: "", attributes: [NSAttributedString.Key.font : UIFont(name: "NunitoSans-Bold", size: 13) ?? UIFont.boldSystemFont(ofSize: 13), NSAttributedString.Key.foregroundColor: UIColor(red: 0.173, green: 0.525, blue: 0.404, alpha: 1)])
-        }
-    }
-    
-    var imageURL: URL? {
-        guard let option = option else {
+    func getUrl(indexPath: IndexPath) -> URL? {
+        if indexPath.section != 0 && indexPath.section != 1 {
             return nil
         }
         
-        switch option {
-        case .articlesList:
-            return URL(string: self.articles[currentIndex].picture)
-        case .promotionList:
-            return URL(string: self.promotions[currentIndex].picture)
-        case .doctorList:
-            return URL(string: self.doctors[currentIndex].avatar)
+        switch indexPath.section {
+        case 0:
+            return URL(string: getArticleList()[indexPath.row].link)
+        case 1:
+            return URL(string: getPromotionList()[indexPath.row].link)
+        default:
+            return nil
         }
     }
 
-    init(homeModel: HomeModel) {
-        self.articles = homeModel.data.articleList
-        self.promotions = homeModel.data.promotionList
-        self.doctors = homeModel.data.doctorList
-    }
     
 }

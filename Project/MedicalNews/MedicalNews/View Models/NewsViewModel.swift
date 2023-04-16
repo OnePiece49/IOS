@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 struct NewsViewModel {
-    var articles: [ArticleList]
+    var articles: [ArticleModel]
     
     var currentIndex: Int = 1
     
@@ -64,7 +64,7 @@ struct NewsViewModel {
         return URL(string: self.articles[currentIndex].picture)
     }
 
-    init(articles: [ArticleList]) {
+    init(articles: [ArticleModel]) {
         self.articles = articles
     }
 }

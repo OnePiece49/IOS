@@ -9,7 +9,7 @@ import UIKit
 
 class IntroViewController: UICollectionViewController {
     //MARK: - Properties
-    private let imageInfor = ["Healthtracker-1", "Healthtracker-2", "Healthtracker-2"]
+    private let headerImageName = ["Healthtracker-1", "Healthtracker-2", "Healthtracker-2"]
     private let pageControl = UIPageControl()
     private let backgroudImageview: UIImageView = {
         let iv = UIImageView()
@@ -139,13 +139,13 @@ class IntroViewController: UICollectionViewController {
         collectionView.dataSource = self
         collectionView.isScrollEnabled = true
         collectionView.isPagingEnabled = true
-        collectionView.showsVerticalScrollIndicator = false
+        collectionView.showsHorizontalScrollIndicator = false
         collectionView.register(IntroCollectionViewCell.self, forCellWithReuseIdentifier: IntroCollectionViewCell.identifier)
     }
     
     func configurePageControll() {
         view.addSubview(pageControl)
-        pageControl.numberOfPages = imageInfor.count
+        pageControl.numberOfPages = headerImageName.count
         pageControl.currentPage = 0
         
         pageControl.tintColor = .blue
@@ -176,12 +176,12 @@ extension IntroViewController {
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return imageInfor.count
+        return headerImageName.count
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: IntroCollectionViewCell.identifier, for: indexPath) as! IntroCollectionViewCell
-        cell.infoImageView.image = UIImage(named: imageInfor[indexPath.row])?.withRenderingMode(.alwaysOriginal)
+        cell.infoImageView.image = UIImage(named: headerImageName[indexPath.row])?.withRenderingMode(.alwaysOriginal)
         return cell
     }
 
@@ -190,8 +190,6 @@ extension IntroViewController {
 
 //MARK: - Delegate FlowlayoutCollectionView
 extension IntroViewController: UICollectionViewDelegateFlowLayout {
-
-    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: collectionView.frame.width, height: collectionView.frame.height)
     }
