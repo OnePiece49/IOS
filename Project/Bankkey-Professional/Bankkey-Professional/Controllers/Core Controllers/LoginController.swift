@@ -133,7 +133,7 @@ class LoginController: UIViewController {
             loginButton.configuration?.showsActivityIndicator = true
         
             self.navigationController?.pushViewController(OnboardContainerViewController(), animated: true)
-            
+            //self.navigationController?.pushViewController(LearningScrollViewController(), animated: true)
         } else {
             self.updateErrorMessageLabel(withMessage: "Incorrect username / password")
         }

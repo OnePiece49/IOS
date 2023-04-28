@@ -79,7 +79,7 @@ class ItemsController: UITableViewController, UISearchResultsUpdating {
     func configureUI() {
         configureNavigation()
         
-        tableView.register(ItemTableViewCell.self, forCellReuseIdentifier: ItemTableViewCell.reuseIdentifier)
+        tableView.register(TodoeyTableViewCell.self, forCellReuseIdentifier: TodoeyTableViewCell.reuseIdentifier)
     }
     
     func configureNavigation() {
@@ -185,7 +185,7 @@ extension ItemsController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: ItemTableViewCell.reuseIdentifier, for: indexPath) as! ItemTableViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: TodoeyTableViewCell.reuseIdentifier, for: indexPath) as! TodoeyTableViewCell
         cell.titleLabel.text = self.itemArray[indexPath.row].nameItem
         return cell
     }

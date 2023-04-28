@@ -11,11 +11,12 @@ protocol ItemTableViewCellDelegate: AnyObject {
     func didTapDeleteButton(_: IndexPath?)
 }
 
-class ItemTableViewCell: UITableViewCell {
+class TodoeyTableViewCell: UITableViewCell {
     //MARK: - Properties
     weak var delegate: ItemTableViewCellDelegate?
-    static let reuseIdentifier = "ItemTableViewCell"
+    static let reuseIdentifier = "TodoeyTableViewCell"
     var indexPath: IndexPath?
+    
     let titleLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -52,15 +53,16 @@ class ItemTableViewCell: UITableViewCell {
     func configureUI() {
         contentView.addSubview(titleLabel)
         contentView.addSubview(deleteButton)
-        titleLabel.topAnchor.constraint(equalTo: topAnchor, constant: 6).isActive = true
-        titleLabel.leftAnchor.constraint(equalTo: leftAnchor, constant: 12).isActive = true
-        titleLabel.rightAnchor.constraint(equalTo: deleteButton.leftAnchor, constant: -25).isActive = true
-        titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -6).isActive = true
+        titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 6).isActive = true
+        titleLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 12).isActive = true
+        titleLabel.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 2 / 3).isActive = true
+        titleLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -6).isActive = true
         
         deleteButton.topAnchor.constraint(equalTo: topAnchor, constant: 6).isActive = true
         deleteButton.rightAnchor.constraint(equalTo: rightAnchor, constant: -6).isActive = true
-        deleteButton.setContentHuggingPriority(.required, for: .horizontal)
-        deleteButton.setContentCompressionResistancePriority(.required, for: .horizontal)
+        deleteButton.configuration?.contentInsets = NSDirectionalEdgeInsets(top: 3, leading: 3, bottom: 3, trailing: 3)
+//        deleteButton.setContentHuggingPriority(.required, for: .horizontal)
+//        deleteButton.setContentCompressionResistancePriority(.required, for: .horizontal)
     }
     
     //MARK: - Selectors

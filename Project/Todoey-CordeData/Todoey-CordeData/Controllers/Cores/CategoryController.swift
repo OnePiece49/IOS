@@ -62,6 +62,7 @@ class CategoryController: UITableViewController {
         alertController.addAction(actionChange)
         return alertController
     }()
+    
     //MARK: - View LifeCycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -74,8 +75,7 @@ class CategoryController: UITableViewController {
     func configureUI() {
         configureNavigation()
         
-        tableView.register(ItemTableViewCell.self, forCellReuseIdentifier: ItemTableViewCell.reuseIdentifier)
-        tableView.rowHeight = UITableView.automaticDimension
+        tableView.register(TodoeyTableViewCell.self, forCellReuseIdentifier: TodoeyTableViewCell.reuseIdentifier)
     }
         
     func configureNavigation() {
@@ -90,7 +90,6 @@ class CategoryController: UITableViewController {
         self.navigationController?.navigationBar.standardAppearance = appeare
         self.navigationController?.navigationBar.compactAppearance = appeare
         self.navigationController?.navigationBar.scrollEdgeAppearance = appeare
-        
         
         self.navigationItem.searchController = searchController
         searchController.searchBar.backgroundColor = .white
@@ -151,7 +150,7 @@ extension CategoryController {
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: ItemTableViewCell.reuseIdentifier, for: indexPath) as! ItemTableViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: TodoeyTableViewCell.reuseIdentifier, for: indexPath) as! TodoeyTableViewCell
         cell.titleLabel.text = self.categoryArray[indexPath.row].nameCategory
         cell.delegate = self
         cell.indexPath = indexPath
@@ -165,9 +164,10 @@ extension CategoryController {
         self.navigationController?.pushViewController(itemsVC, animated: true)
     }
     
-    override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-        return UITableView.automaticDimension
-    }
+    
+//    override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+//        return 30
+//    }
 }
 
 //MARK: - Delegate SearchController

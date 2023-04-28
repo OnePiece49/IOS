@@ -17,7 +17,7 @@
 		6E584CFD29BED753008F7105 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6E584CFC29BED753008F7105 /* Assets.xcassets */; };
 		6E584D0029BED753008F7105 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6E584CFE29BED753008F7105 /* LaunchScreen.storyboard */; };
 		6E584D0C29BF188C008F7105 /* Item.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 6E584D0A29BF188C008F7105 /* Item.xcdatamodeld */; };
-		6E584D1329BF1AE2008F7105 /* ItemTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E584D1229BF1AE2008F7105 /* ItemTableViewCell.swift */; };
+		6E584D1329BF1AE2008F7105 /* TodoeyTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E584D1229BF1AE2008F7105 /* TodoeyTableViewCell.swift */; };
 		6E584D1529BF6289008F7105 /* CategoryController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E584D1429BF6289008F7105 /* CategoryController.swift */; };
 /* End PBXBuildFile section */
 
@@ -34,7 +34,7 @@
 		6E584CFF29BED753008F7105 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6E584D0129BED753008F7105 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6E584D0B29BF188C008F7105 /* Item.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Item.xcdatamodel; sourceTree = "<group>"; };
-		6E584D1229BF1AE2008F7105 /* ItemTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemTableViewCell.swift; sourceTree = "<group>"; };
+		6E584D1229BF1AE2008F7105 /* TodoeyTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoeyTableViewCell.swift; sourceTree = "<group>"; };
 		6E584D1429BF6289008F7105 /* CategoryController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -120,7 +120,7 @@
 		6E584D1129BF1AC6008F7105 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				6E584D1229BF1AE2008F7105 /* ItemTableViewCell.swift */,
+				6E584D1229BF1AE2008F7105 /* TodoeyTableViewCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -202,7 +202,7 @@
 				6E584CF329BED751008F7105 /* SceneDelegate.swift in Sources */,
 				6E584D1529BF6289008F7105 /* CategoryController.swift in Sources */,
 				6E18686629C02801002E3B09 /* Items+CoreDataClass.swift in Sources */,
-				6E584D1329BF1AE2008F7105 /* ItemTableViewCell.swift in Sources */,
+				6E584D1329BF1AE2008F7105 /* TodoeyTableViewCell.swift in Sources */,
 				6E584D0C29BF188C008F7105 /* Item.xcdatamodeld in Sources */,
 				6E18686529C02801002E3B09 /* Category+CoreDataProperties.swift in Sources */,
 			);
