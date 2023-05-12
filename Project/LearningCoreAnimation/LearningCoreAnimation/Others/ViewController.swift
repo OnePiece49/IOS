@@ -14,6 +14,7 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
         self.configureUI()
+ 
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -21,6 +22,12 @@ class ViewController: UIViewController {
         redView.layer.shadowOffset = CGSize(width: 2, height: 2)
         redView.layer.shadowOpacity = 1
         redView.layer.shadowRadius = 20
+        
+        
+        navigationController?.pushViewController(LearningPanGetTure(), animated: true)
+//        let learn = LearningPanGetTure()
+//        learn.modalPresentationStyle = .fullScreen
+//        present(learn, animated: true, completion: .none)
     }
     
     func moveAnimate() {

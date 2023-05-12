@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import FirebaseAuth
 
 class MainTabBarController: UITabBarController {
     //MARK: - Properties
@@ -33,10 +33,18 @@ class MainTabBarController: UITabBarController {
     private func templateNavigationController(rootViewController: UIViewController, namedImage: String) -> UINavigationController {
         let nav = UINavigationController(rootViewController: rootViewController)
         nav.navigationBar.barTintColor = .white
-        nav.tabBarItem.image = UIImage(named: namedImage)
+        nav.tabBarItem.image = UIImage(named: namedImage)?.withTintColor(.black)
         return nav
     }
     
+    
+    private func checkUserSignedIn() {
+        if Auth.auth().currentUser == nil {
+            let loginVC = LoginController()
+            loginVC.modalPresentationStyle = .overFullScreen
+            present(LoginController(), animated: true, completion: .none)
+        }
+    }
     //MARK: - Selectors
     
 }

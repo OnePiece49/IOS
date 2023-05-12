@@ -36,22 +36,15 @@ class LearningPanGetTure: UIViewController {
         subView.backgroundColor = .systemBlue
         subView.center = containerView.center
         
-        containerView.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(userIsDragging)))
+        view.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(userIsDragging)))
     }
     
     //MARK: - Selectors
     @objc func userIsDragging(_ sender: UIPanGestureRecognizer) {
-        let location = sender.translation(in: subView)
-        print("DEBUG: \(location)")
-        if let hitView = containerView.hitTest(location, with: nil) {
-            if hitView == containerView {
-                print("DEBUG: container View")
-            }
-            
-            if hitView == subView {
-                print("DEBUG: subView View")
-            }
-            
+        if sender.state == .changed {
+            let location = sender.location(in: UIWindow())
+            let locationFinger = sender.translation(in: self.view)
+            //self.view.transform = CGAffineTransform(translationX: locationFinger.x, y: locationFinger.y)
         }
     }
     

@@ -50,12 +50,17 @@ struct ComposionalLayout {
     
     static func createSection(group: NSCollectionLayoutGroup) -> NSCollectionLayoutSection {
         let section = NSCollectionLayoutSection(group: group)
-        section.interGroupSpacing = 12
-        section.orthogonalScrollingBehavior = .continuous
+        section.interGroupSpacing = 2
         
-        let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(58)), elementKind: UICollectionView.elementKindSectionHeader, alignment: .top)
+        let header = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(300)), elementKind: UICollectionView.elementKindSectionHeader, alignment: .top)
         section.boundarySupplementaryItems = [header]
-        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0)
+        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+        return section
+    }
+    
+    static func createSectionWithouHeader(group: NSCollectionLayoutGroup) -> NSCollectionLayoutSection {
+        let section = NSCollectionLayoutSection(group: group)
+        section.interGroupSpacing = 2
         return section
     }
     

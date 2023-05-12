@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseCore
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -16,7 +17,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: scene)
         self.window = window
         window.makeKeyAndVisible()
-        window.rootViewController = UINavigationController(rootViewController: FakeController())
+//        window.rootViewController = UINavigationController(rootViewController: MainTabBarController())
+        window.rootViewController = MainTabBarController()
     }
 
 }
