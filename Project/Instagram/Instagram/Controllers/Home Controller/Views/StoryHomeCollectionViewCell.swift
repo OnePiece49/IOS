@@ -1,15 +1,15 @@
 //
-//  StoryCollectionViewCell.swift
+//  StoryHomeCollectionViewCell.swift
 //  Instagram
 //
-//  Created by Long Bảo on 06/05/2023.
+//  Created by Long Bảo on 14/05/2023.
 //
 
 import UIKit
 
-class StoryCollectionViewCell: UICollectionViewCell {
+class StoryHomeCollectionViewCell: UICollectionViewCell {
     //MARK: - Properties
-    static let identifier = "StoryCollectionViewCell"
+    static let identifier = "StoryHomeCollectionViewCell"
     
     var storyLayer: InstagramStoryLayer!
     var isRunningAnimationStory = false
@@ -17,15 +17,28 @@ class StoryCollectionViewCell: UICollectionViewCell {
     private lazy var storyImageView: UIImageView = {
         let iv = UIImageView()
         iv.translatesAutoresizingMaskIntoConstraints = false
-        iv.backgroundColor = .blue
+        iv.backgroundColor = .red
         iv.clipsToBounds = true
-        iv.layer.cornerRadius = 54 / 2
+        iv.layer.cornerRadius = 64 / 2
         iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleImageStoryTapped)))
         iv.isUserInteractionEnabled = true
         return iv
     }()
     
-    private lazy var storyLabel: UILabel = {
+     lazy var plusStoryImageView: UIImageView = {
+        let iv = UIImageView(image: UIImage(systemName: "plus.circle.fill"))
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        iv.tintColor = .systemBlue
+        iv.layer.borderWidth = 5.3
+        iv.layer.borderColor = UIColor.white.cgColor
+        iv.layer.masksToBounds = true
+        iv.layer.cornerRadius = 32 / 2
+        iv.backgroundColor = .white
+        iv.isHidden = true
+        return iv
+    }()
+    
+     lazy var storyLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = "Tin nổi bật"
@@ -50,22 +63,30 @@ class StoryCollectionViewCell: UICollectionViewCell {
     func configureUI() {
         addSubview(storyImageView)
         addSubview(storyLabel)
+        addSubview(plusStoryImageView)
+        
         NSLayoutConstraint.activate([
             storyImageView.topAnchor.constraint(equalTo: topAnchor, constant: 5),
             storyImageView.centerXAnchor.constraint(equalTo: centerXAnchor),
         ])
-        storyImageView.setDimensions(width: 54, height: 54)
+        storyImageView.setDimensions(width: 64, height: 64)
         
         NSLayoutConstraint.activate([
             storyLabel.centerXAnchor.constraint(equalTo: storyImageView.centerXAnchor),
-            storyLabel.topAnchor.constraint(equalTo: storyImageView.bottomAnchor, constant: 8.3),
+            storyLabel.topAnchor.constraint(equalTo: storyImageView.bottomAnchor, constant: 10),
         ])
         storyLabel.setDimensions(width: 80, height: 15)
+        
+        NSLayoutConstraint.activate([
+            plusStoryImageView.bottomAnchor.constraint(equalTo: storyImageView.bottomAnchor, constant: 8),
+            plusStoryImageView.rightAnchor.constraint(equalTo: storyImageView.rightAnchor, constant: 8)
+        ])
+        plusStoryImageView.setDimensions(width: 32, height: 32)
+        
         layoutIfNeeded()
         self.storyLayer = InstagramStoryLayer(centerPoint: CGPoint(x: storyImageView.bounds.midX, y: storyImageView.bounds.midY), width: self.storyImageView.bounds.width + 10, lineWidth: 2.35)
         storyImageView.layer.addSublayer(storyLayer)
         storyImageView.layer.masksToBounds = false
-
     }
     
     //MARK: - Selectors
@@ -82,4 +103,5 @@ class StoryCollectionViewCell: UICollectionViewCell {
     
 }
 //MARK: - delegate
+
 

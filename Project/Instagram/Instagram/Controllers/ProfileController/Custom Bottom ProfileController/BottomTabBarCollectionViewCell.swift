@@ -38,7 +38,7 @@ class BottomTabBarCollectionViewCell: UICollectionViewCell {
             optionImage.centerXAnchor.constraint(equalTo: centerXAnchor),
             optionImage.centerYAnchor.constraint(equalTo: centerYAnchor),
         ])
-        optionImage.setDimensions(width: 46, height: 40)
+        optionImage.setDimensions(width: 30, height: 26)
     }
     
     //MARK: - Selectors

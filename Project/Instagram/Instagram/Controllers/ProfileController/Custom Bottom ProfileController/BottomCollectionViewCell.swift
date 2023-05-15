@@ -10,9 +10,11 @@ import UIKit
 class BottomCollectionViewCell: UICollectionViewCell {
     //MARK: - Properties
     static let identifier = "BottomCollectionViewCell"
+
     lazy var photoImage: UIImageView = {
         let iv = UIImageView()
         iv.translatesAutoresizingMaskIntoConstraints = false
+        
         return iv
     }()
     
@@ -51,7 +53,6 @@ class BottomCollectionViewCell: UICollectionViewCell {
             testLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             testLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
         ])
-        
     }
     
     //MARK: - Selectors

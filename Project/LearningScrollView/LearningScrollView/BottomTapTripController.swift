@@ -335,7 +335,7 @@ extension BottomTapTripController: UIScrollViewDelegate {
 
         for i in 0..<controllers.count {
             let tempIndexPath = IndexPath(row: i, section: 0)
-            let cell = collectionView.cellForItem(at: tempIndexPath) as! Bot
+            let cell = collectionView.cellForItem(at: tempIndexPath) 
             if i != rowSelected {
                 cell?.backgroundColor = self.configureTabBar.backgroundColor
             } else {

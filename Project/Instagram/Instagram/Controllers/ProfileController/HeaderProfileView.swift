@@ -13,16 +13,22 @@ enum HeaderType: String {
     case following
 }
 
-class HeaderProfileView: UIView {
+class HeaderProfileView: UICollectionReusableView {
     //MARK: - Properties
+    static let identifier = "HeaderProfileView"
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     private var leftAnchorDivider: NSLayoutConstraint!
+    weak var delegate: HeaderProfileViewDelegate?
+    var heightBioConstraint: NSLayoutConstraint!
+    var storyAvatarLayer: InstagramStoryLayer!
+    var isRunningAnimationStory = false
     
     private lazy var postLabel = Utilites.createHeaderProfileInfoLabel(type: .posts, with: "80")
     private lazy var followersLabel = Utilites.createHeaderProfileInfoLabel(type: .followers, with: "428.5k")
     private lazy var followingLabel = Utilites.createHeaderProfileInfoLabel(type: .following, with: "60k")
     private lazy var editButton = Utilites.createHeaderProfileButton(with: "Edit")
     private lazy var shareButton = Utilites.createHeaderProfileButton(with: "Share")
+
     
     private lazy var infoStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [postLabel, followersLabel, followingLabel])
@@ -66,7 +72,7 @@ class HeaderProfileView: UIView {
             lineButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
             lineButton.topAnchor.constraint(equalTo: view.topAnchor),
         ])
-        lineButton.setDimensions(width: 35, height: 30)
+        lineButton.setDimensions(width: 30, height: 26)
         return view
     }()
     
@@ -84,10 +90,20 @@ class HeaderProfileView: UIView {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .black
         label.font = UIFont.systemFont(ofSize: 14)
-        label.text = "Hello everyone \nI'm viet \nNice to meet you guys"
-        label.numberOfLines = 0
+        label.text = "Hello everyone \nI'm viet \nNice to meet you guys \nRất vui được làm quen các bạn \n\n\n Xin chao moi nguoi nhe"
+        label.numberOfLines = 2
         label.textAlignment = .left
         return label
+    }()
+    
+    private lazy var readMoreButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("Read more", for: .normal)
+        button.setTitleColor(.blue, for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(handleDidTapReadMoreButton), for: .touchUpInside)
+        return button
     }()
     
     private lazy var avartImageView: UIImageView = {
@@ -96,6 +112,8 @@ class HeaderProfileView: UIView {
         iv.clipsToBounds = true
         iv.layer.cornerRadius = 100 / 2
         iv.contentMode = .scaleToFill
+        iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleAvatarImageStoryTapped)))
+        iv.isUserInteractionEnabled = true
         return iv
     }()
     
@@ -130,6 +148,7 @@ class HeaderProfileView: UIView {
         view.addSubview(infoStackView)
         view.addSubview(fullnameLabel)
         view.addSubview(bioLabel)
+        view.addSubview(readMoreButton)
         view.addSubview(containerButtonView)
         view.addSubview(collectionView)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -160,25 +179,37 @@ class HeaderProfileView: UIView {
         ])
         
         NSLayoutConstraint.activate([
+            readMoreButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -8),
+            readMoreButton.bottomAnchor.constraint(equalTo: bioLabel.bottomAnchor),
+        ])
+        
+        self.heightBioConstraint = bioLabel.heightAnchor.constraint(equalToConstant: 34)
+        NSLayoutConstraint.activate([
             bioLabel.topAnchor.constraint(equalTo: fullnameLabel.bottomAnchor, constant: 8),
             bioLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
-            bioLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
+            bioLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -25),
         ])
         
         NSLayoutConstraint.activate([
-            containerButtonView.topAnchor.constraint(equalTo: bioLabel.bottomAnchor, constant: 18),
+            collectionView.topAnchor.constraint(equalTo: bioLabel.bottomAnchor, constant: 18),
+            collectionView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            collectionView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            collectionView.heightAnchor.constraint(equalToConstant: 88),
+        ])
+        
+        NSLayoutConstraint.activate([
+            containerButtonView.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 15),
             containerButtonView.leftAnchor.constraint(equalTo: view.leftAnchor),
             containerButtonView.rightAnchor.constraint(equalTo: view.rightAnchor),
             containerButtonView.heightAnchor.constraint(equalToConstant: 34),
+            containerButtonView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -7),
         ])
         
-        NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: containerButtonView.bottomAnchor, constant: 23),
-            collectionView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            collectionView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            collectionView.heightAnchor.constraint(equalToConstant: 120),
-        ])
-                
+        view.layoutIfNeeded()
+        
+        self.storyAvatarLayer = InstagramStoryLayer(centerPoint: CGPoint(x: avartImageView.bounds.midX, y: avartImageView.bounds.midY), width: avartImageView.bounds.width + 2, lineWidth: 4)
+        avartImageView.layer.addSublayer(storyAvatarLayer)
+        avartImageView.layer.masksToBounds = false
         return view
     }()
     
@@ -195,7 +226,6 @@ class HeaderProfileView: UIView {
     
     //MARK: - Helpers
     func configureUI() {
-        backgroundColor = .systemCyan
         addSubview(containerInfoView)
         
         NSLayoutConstraint.activate([
@@ -209,11 +239,17 @@ class HeaderProfileView: UIView {
         collectionView.register(StoryCollectionViewCell.self, forCellWithReuseIdentifier: StoryCollectionViewCell.identifier)
         collectionView.delegate = self
         collectionView.dataSource = self
+        collectionView.isScrollEnabled = false
+
     }
     
     func createStorySection() -> NSCollectionLayoutSection {
         let item = ComposionalLayout.createItem(layoutSize: .init(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0)))
-        let group = ComposionalLayout.createGroup(axis: .horizontal, layoutSize: .init(widthDimension: .absolute(60), heightDimension: .absolute(100)), item: item, count: 1)
+        let group = ComposionalLayout.createGroup(axis:
+                                                        .horizontal,
+                                                  layoutSize:
+                                                        .init(widthDimension: .absolute(60), heightDimension: .absolute(100)),
+                                                  item: item, count: 1)
         let section = ComposionalLayout.createSectionWithouHeader(group: group)
         section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0)
         section.interGroupSpacing = 25
@@ -228,6 +264,29 @@ class HeaderProfileView: UIView {
     }
     
     //MARK: - Selectors
+    @objc func handleDidTapReadMoreButton() {
+        self.bioLabel.numberOfLines = 0
+        let oldHeight = heightBioConstraint.constant
+        
+        NSLayoutConstraint.deactivate([heightBioConstraint])
+        let rect = NSString(string: bioLabel.text ?? "").boundingRect(with: CGSize(width: bounds.width - 33, height: .greatestFiniteMagnitude), options: NSStringDrawingOptions.usesLineFragmentOrigin, attributes: [.font: UIFont.systemFont(ofSize: 14)], context: nil)
+        self.heightBioConstraint.constant = rect.height
+
+        containerInfoView.layoutIfNeeded()
+        layoutIfNeeded()
+        readMoreButton.isHidden = true
+        self.delegate?.didTapReadMoreButton(oldHeight: oldHeight, newHeight: heightBioConstraint.constant)
+    }
+    
+    @objc func handleAvatarImageStoryTapped() {
+        if !isRunningAnimationStory {
+            self.storyAvatarLayer.startAnimation()
+        } else {
+            self.storyAvatarLayer.stopAnimation()
+        }
+        
+        isRunningAnimationStory = !isRunningAnimationStory
+    }
     
 }
 //MARK: - delegate
@@ -246,4 +305,9 @@ extension HeaderProfileView: UICollectionViewDataSource, UICollectionViewDelegat
     }
     
 
+}
+
+protocol HeaderProfileViewDelegate: AnyObject {
+    func didTapReadMoreButton(oldHeight: CGFloat, newHeight: CGFloat)
+    
 }

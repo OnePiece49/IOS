@@ -19,18 +19,26 @@ class BottomTapTripController: UIViewController {
     //MARK: - Properties
     let scrollView = UIScrollView()
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-    let heightBarView: CGFloat = 80
+    let heightBarView: CGFloat = 44
     var configureTabBar = ConfigureTabBar()
     var delegate: BottomTapTripControllerDelegate?
     var xAnchorDivider: NSLayoutConstraint!
     var widthAnchorDivider: NSLayoutConstraint!
     var spacingControllers: CGFloat = 4
+    var newestControllerContrainted = 0
+    var rightConstraintScrollView: NSLayoutConstraint!
 
     
     private var currentXContentOffset: CGFloat = 0
     private var previousContentOffset: CGFloat = 0
     
     var currentWidth: CGFloat = 0
+    
+    private let fakeView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
     
     var currentIndex: Int {
         return Int(scrollView.contentOffset.x / view.frame.width)
@@ -46,7 +54,7 @@ class BottomTapTripController: UIViewController {
     private lazy var divider: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .red
+        view.backgroundColor = .green
         return view
     }()
     
@@ -73,7 +81,9 @@ class BottomTapTripController: UIViewController {
     func configureUI() {
         view.backgroundColor = .white
         self.configureCollectionView()
-        self.configureChildController()
+//        self.configureChildController()
+        self.addFirstChildController()
+        
         scrollView.backgroundColor = .white
         scrollView.layoutIfNeeded()
         scrollView.contentInsetAdjustmentBehavior = .never
@@ -92,13 +102,81 @@ class BottomTapTripController: UIViewController {
         divider.backgroundColor = self.configureTabBar.dividerColor
 
         NSLayoutConstraint.activate([
-            divider.heightAnchor.constraint(equalToConstant: 5),
+            divider.heightAnchor.constraint(equalToConstant: 2),
             divider.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 1),
             widthAnchorDivider,
             xAnchorDivider,
         ])
     }
     
+    
+    func addConstraintController(index: Int) {
+        if index > self.newestControllerContrainted && index < controllers.count {
+            for i in (self.newestControllerContrainted + 1)...index {
+                addChild(controllers[i])
+                scrollView.addSubview(controllers[i].view)
+                didMove(toParent: self)
+                controllers[i].view.translatesAutoresizingMaskIntoConstraints = false
+                
+                NSLayoutConstraint.activate([
+                    controllers[i].view.heightAnchor.constraint(equalTo: controllers[i-1].view.heightAnchor),
+                    controllers[i].view.widthAnchor.constraint(equalTo: controllers[i-1].view.widthAnchor),
+                ])
+        
+                NSLayoutConstraint.activate([
+                    controllers[i].view.heightAnchor.constraint(equalToConstant: view.frame.height - self.heightBarView - self.insetTop),
+                    controllers[i].view.widthAnchor.constraint(equalToConstant: view.frame.width),
+                ])
+                
+                NSLayoutConstraint.activate([
+                    controllers[i-1].view.rightAnchor.constraint(equalTo: controllers[i].view.leftAnchor, constant: -self.spacingControllers),
+                ])
+
+                
+                if i == self.controllers.count - 1 {
+                    NSLayoutConstraint.deactivate([self.rightConstraintScrollView])
+                    NSLayoutConstraint.activate([
+                        controllers[i].view.rightAnchor.constraint(equalTo: scrollView.rightAnchor, constant: (CGFloat(self.controllers.count - 1)) * self.spacingControllers)
+                    ])
+                    scrollView.layoutIfNeeded()
+                    print("DEBUG: \(self.scrollView.contentSize)")
+                    self.fakeView.removeFromSuperview()
+                }
+            }
+            self.newestControllerContrainted = index
+        }
+    }
+    
+    func addFirstChildController() {
+        addChild(controllers[0])
+        self.scrollView.addSubview(controllers[0].view)
+        didMove(toParent: self)
+        controllers[0].view.translatesAutoresizingMaskIntoConstraints = false
+        
+        scrollView.addSubview(fakeView)
+        let width = self.view.bounds.width
+        
+        self.rightConstraintScrollView =  fakeView.leftAnchor.constraint(equalTo: controllers[0].view.rightAnchor, constant: CGFloat((Double(controllers.count) - 1.3)) * width)
+        NSLayoutConstraint.activate([
+            controllers[0].view.leftAnchor.constraint(equalTo: self.scrollView.leftAnchor),
+            controllers[0].view.topAnchor.constraint(equalTo: self.scrollView.topAnchor),
+            controllers[0].view.bottomAnchor.constraint(equalTo: self.scrollView.bottomAnchor),
+            controllers[0].view.heightAnchor.constraint(equalToConstant: view.frame.height - self.heightBarView - self.insetTop),
+            controllers[0].view.widthAnchor.constraint(equalTo: view.widthAnchor),
+            self.rightConstraintScrollView,
+            
+            fakeView.rightAnchor.constraint(equalTo: scrollView.rightAnchor),
+            fakeView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            fakeView.widthAnchor.constraint(equalToConstant: 40),
+            fakeView.heightAnchor.constraint(equalToConstant: 50),
+        ])
+
+        
+        scrollView.layoutIfNeeded()
+        print("DEBUG: \(scrollView.contentSize)")
+
+        
+    }
     
     func configureChildController() {
         controllers.forEach { controller in
@@ -221,7 +299,11 @@ class BottomTapTripController: UIViewController {
 extension BottomTapTripController: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let temp = Float(scrollView.contentOffset.x.truncatingRemainder(dividingBy: view.frame.width).truncatingRemainder(dividingBy: self.spacingControllers))
-    
+        if scrollView.contentOffset.x > self.currentXContentOffset
+            && floor(temp) != temp {
+            self.addConstraintController(index: self.currentIndex + 1)
+        }
+        
         if scrollView == self.scrollView,
            floor(temp) == temp && temp != 0  {
                 let xCOntentOffset = scrollView.contentOffset.x
@@ -294,7 +376,6 @@ extension BottomTapTripController: UIScrollViewDelegate {
         NSLayoutConstraint.deactivate([self.widthAnchorDivider,
                                        self.xAnchorDivider])
         
-        
         UIView.animate(withDuration: 0.15) {
             self.widthAnchorDivider.constant = self.currentWidth
             self.xAnchorDivider = self.divider.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: cell.frame.origin.x )
@@ -306,7 +387,7 @@ extension BottomTapTripController: UIScrollViewDelegate {
             self.view.layoutIfNeeded()
         }
         
-        UIView.animate(withDuration: 0.05, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.5, options: .curveEaseInOut) {
+        UIView.animate(withDuration: 0.05, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.8, options: .curveLinear) {
             scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x + CGFloat(self.currentIndex) * self.spacingControllers, y: 0)
         }
 
@@ -325,7 +406,7 @@ extension BottomTapTripController: UIScrollViewDelegate {
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if !decelerate {
-            UIView.animate(withDuration: 0.05, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.5, options: .curveEaseInOut) {
+            UIView.animate(withDuration: 0.05, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.8, options: .curveLinear) {
                 scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x + CGFloat(self.currentIndex) * self.spacingControllers, y: 0)
             }
         }
@@ -396,6 +477,8 @@ extension BottomTapTripController: UICollectionViewDelegate, UICollectionViewDat
             self.view.layoutIfNeeded()
             self.scrollView.contentOffset = CGPoint(x: contentOffset, y: 0)
         }
+        
+        self.addConstraintController(index: indexPath.row)
         delegate?.didMoveToNextController(collectionView: self.currentCollectionView,
                                      currentIndex: self.currentIndex)
         

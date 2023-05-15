@@ -70,9 +70,6 @@ class InstagramHeaderView: UIView {
         return stackView
     }()
     
-    private func addBadgeValueLabel(label: BadgeValueLabel) {
- 
-    }
     
     //MARK: - View Lifecycle
     override init(frame: CGRect) {

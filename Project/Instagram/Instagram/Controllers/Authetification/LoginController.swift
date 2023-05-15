@@ -89,7 +89,7 @@ class LoginController: UIViewController {
         ]
         layer0.locations = [0, 0.31, 0.68, 1]
         layer0.frame = view.bounds
-        print("DEBUG: \(loginLabel.frame)")
+        
         view.layer.insertSublayer(layer0, at: 0)
     }
     

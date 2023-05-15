@@ -22,7 +22,7 @@ class MainTabBarController: UITabBarController {
     
     //MARK: - Helpers
     private func configureUI() {
-        let homeNaVc = templateNavigationController(rootViewController: HomeController(collectionViewLayout: UICollectionViewFlowLayout()), namedImage: "home")
+        let homeNaVc = templateNavigationController(rootViewController: HomeController(), namedImage: "home")
         let searchNaVc = templateNavigationController(rootViewController: SearchController(), namedImage: "search")
         let shortVideoNaVc = templateNavigationController(rootViewController: ShortVideoController(), namedImage: "video")
         let profileNaVc = templateNavigationController(rootViewController: ProfileController(), namedImage: "profile")
