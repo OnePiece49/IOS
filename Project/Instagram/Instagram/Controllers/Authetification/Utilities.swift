@@ -46,6 +46,17 @@ class Utilites {
         button.setTitleColor(.black, for: .normal)
         return button
     }
+    
+    static func createStatusFeedLabel(username: String, status: String, fontSize: CGFloat = 14) -> UILabel {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        let attributes = NSMutableAttributedString(string: "\(username) ", attributes: [.font: UIFont.systemFont(ofSize: fontSize, weight: .semibold), .foregroundColor: UIColor.black])
+        attributes.append(NSAttributedString(string: status, attributes: [.font: UIFont.systemFont(ofSize: fontSize, weight: .regular), .foregroundColor: UIColor.black]))
+        label.attributedText = attributes
+        label.numberOfLines = 2
+        return label
+    }
+    
 }
 
 class TextField: UITextField {

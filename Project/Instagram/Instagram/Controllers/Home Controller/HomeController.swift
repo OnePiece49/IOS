@@ -10,6 +10,8 @@ import UIKit
 
 class HomeController: UIViewController {
     //MARK: - Properties
+    
+    
     private lazy var instagramHeaderView: InstagramHeaderView = {
         let header = InstagramHeaderView()
         header.translatesAutoresizingMaskIntoConstraints = false
@@ -48,11 +50,16 @@ class HomeController: UIViewController {
         collectionView.dataSource = self
         collectionView.register(StoryHomeCollectionViewCell.self,
                                 forCellWithReuseIdentifier: StoryHomeCollectionViewCell.identifier)
-        collectionView.register(HomeFeedCollectionViewCell.self, forCellWithReuseIdentifier: HomeFeedCollectionViewCell.identifier)
+        collectionView.register(HomeFeedCollectionViewCell.self,
+                                forCellWithReuseIdentifier: HomeFeedCollectionViewCell.identifier)
+        collectionView.register(FooterStoryCollectionView.self,
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
+                                withReuseIdentifier: FooterStoryCollectionView.identifier)
         collectionView.collectionViewLayout = self.createLayoutCollectionView()
     }
     
     func activeConstraint() {
+        print("DEBUG: \(insetTop)")
         view.addSubview(instagramHeaderView)
         view.addSubview(collectionView)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -61,7 +68,7 @@ class HomeController: UIViewController {
             instagramHeaderView.topAnchor.constraint(equalTo: view.topAnchor, constant: self.insetTop),
             instagramHeaderView.leftAnchor.constraint(equalTo: view.leftAnchor),
         ])
-        instagramHeaderView.setDimensions(width: view.frame.width, height: 53)
+        instagramHeaderView.setDimensions(width: view.frame.width, height: 35)
         
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: instagramHeaderView.bottomAnchor),
@@ -76,18 +83,20 @@ class HomeController: UIViewController {
         let group = ComposionalLayout.createGroup(axis:
                                                         .horizontal,
                                                   layoutSize:
-                                                        .init(widthDimension: .absolute(60), heightDimension: .absolute(100)),
+                                                        .init(widthDimension: .absolute(82), heightDimension: .absolute(100)),
                                                   item: item, count: 1)
         let section = ComposionalLayout.createSectionWithouHeader(group: group)
-        section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0)
-        section.interGroupSpacing = 25
+        
+        section.interGroupSpacing = 2
         section.orthogonalScrollingBehavior = .continuous
+        let footer = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(0.5)), elementKind: UICollectionView.elementKindSectionFooter, alignment: .bottom)
+        section.boundarySupplementaryItems = [footer]
         return section
     }
     
     func createFeedSection() -> NSCollectionLayoutSection {
         let item = ComposionalLayout.createItem(layoutSize: .init(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(400)))
-        let group = ComposionalLayout.createGroup(axis: .vertical,
+        let group = ComposionalLayout.createGroup(axis: .horizontal,
                                                   layoutSize: .init(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(400)),
                                                   item: item,
                                                   count: 1)
@@ -97,13 +106,16 @@ class HomeController: UIViewController {
     }
     
     func createLayoutCollectionView() -> UICollectionViewLayout {
-        let layout = UICollectionViewCompositionalLayout { section, env in
+        let configuration = UICollectionViewCompositionalLayoutConfiguration()
+        configuration.interSectionSpacing = 11
+        let layout = UICollectionViewCompositionalLayout (sectionProvider: { section, env in
             if section == 0 {
                 return self.createStorySection()
             } else  {
                 return self.createFeedSection()
             }
-        }
+        }, configuration: configuration)
+        
         
         return layout
     }
@@ -135,5 +147,9 @@ extension HomeController: UICollectionViewDelegate, UICollectionViewDataSource {
         return 20
     }
     
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        let footer = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: FooterStoryCollectionView.identifier, for: indexPath)
+        return footer
+    }
     
 }

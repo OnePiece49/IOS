@@ -92,13 +92,13 @@ class InstagramHeaderView: UIView {
         
         
         NSLayoutConstraint.activate([
-            instagramLabel.leftAnchor.constraint(equalToSystemSpacingAfter: leftAnchor, multiplier: 1),
-            instagramLabel.topAnchor.constraint(equalToSystemSpacingBelow: topAnchor, multiplier: 0),
+            instagramLabel.leftAnchor.constraint(equalToSystemSpacingAfter: leftAnchor, multiplier: 1.5),
+            instagramLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
         ])
         
         NSLayoutConstraint.activate([
-            buttonStackView.topAnchor.constraint(equalToSystemSpacingBelow: topAnchor, multiplier: 0),
-            buttonStackView.rightAnchor.constraint(equalTo: rightAnchor, constant: -30)
+            buttonStackView.centerYAnchor.constraint(equalTo: instagramLabel.centerYAnchor),
+            buttonStackView.rightAnchor.constraint(equalTo: rightAnchor, constant: -13)
         ])
         
         NSLayoutConstraint.activate([

@@ -24,10 +24,11 @@ class MainTabBarController: UITabBarController {
     private func configureUI() {
         let homeNaVc = templateNavigationController(rootViewController: HomeController(), namedImage: "home")
         let searchNaVc = templateNavigationController(rootViewController: SearchController(), namedImage: "search")
+        let uploadFeedNavc = templateNavigationController(rootViewController: UploadFeedController(), namedImage: "Add")
         let shortVideoNaVc = templateNavigationController(rootViewController: ShortVideoController(), namedImage: "video")
         let profileNaVc = templateNavigationController(rootViewController: ProfileController(), namedImage: "profile")
         
-        viewControllers = [homeNaVc, searchNaVc, shortVideoNaVc, profileNaVc]
+        viewControllers = [homeNaVc, searchNaVc, uploadFeedNavc ,shortVideoNaVc, profileNaVc]
     }
     
     private func templateNavigationController(rootViewController: UIViewController, namedImage: String) -> UINavigationController {

@@ -19,7 +19,7 @@ class StoryHomeCollectionViewCell: UICollectionViewCell {
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.backgroundColor = .red
         iv.clipsToBounds = true
-        iv.layer.cornerRadius = 64 / 2
+        iv.layer.cornerRadius = 58 / 2
         iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleImageStoryTapped)))
         iv.isUserInteractionEnabled = true
         return iv
@@ -43,7 +43,7 @@ class StoryHomeCollectionViewCell: UICollectionViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = "Tin nổi bật"
         label.textColor = .black
-        label.font = UIFont.systemFont(ofSize: 13, weight: .light)
+        label.font = UIFont.systemFont(ofSize: 13, weight: .regular)
         label.textAlignment = .center
         return label
     }()
@@ -67,15 +67,18 @@ class StoryHomeCollectionViewCell: UICollectionViewCell {
         
         NSLayoutConstraint.activate([
             storyImageView.topAnchor.constraint(equalTo: topAnchor, constant: 5),
-            storyImageView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            storyImageView.leftAnchor.constraint(equalTo: leftAnchor, constant: 12),
+            storyImageView.rightAnchor.constraint(equalTo: rightAnchor, constant: -12),
+            storyImageView.heightAnchor.constraint(equalTo: storyImageView.widthAnchor),
         ])
-        storyImageView.setDimensions(width: 64, height: 64)
         
         NSLayoutConstraint.activate([
-            storyLabel.centerXAnchor.constraint(equalTo: storyImageView.centerXAnchor),
-            storyLabel.topAnchor.constraint(equalTo: storyImageView.bottomAnchor, constant: 10),
+            storyLabel.topAnchor.constraint(equalTo: storyImageView.bottomAnchor, constant: 5.8),
+            storyLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -2),
+            storyLabel.leftAnchor.constraint(equalTo: leftAnchor),
+            storyLabel.rightAnchor.constraint(equalTo: rightAnchor),
         ])
-        storyLabel.setDimensions(width: 80, height: 15)
+        
         
         NSLayoutConstraint.activate([
             plusStoryImageView.bottomAnchor.constraint(equalTo: storyImageView.bottomAnchor, constant: 8),
