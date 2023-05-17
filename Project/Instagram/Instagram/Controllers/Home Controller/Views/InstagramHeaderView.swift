@@ -84,7 +84,6 @@ class InstagramHeaderView: UIView {
     
     //MARK: - Helpers
     func configureUI() {
-        //backgroundColor = .black
         addSubview(instagramLabel)
         addSubview(buttonStackView)
         addSubview(likeBadgeValueLabel)
@@ -98,7 +97,7 @@ class InstagramHeaderView: UIView {
         
         NSLayoutConstraint.activate([
             buttonStackView.centerYAnchor.constraint(equalTo: instagramLabel.centerYAnchor),
-            buttonStackView.rightAnchor.constraint(equalTo: rightAnchor, constant: -13)
+            buttonStackView.rightAnchor.constraint(equalTo: rightAnchor, constant: -21)
         ])
         
         NSLayoutConstraint.activate([

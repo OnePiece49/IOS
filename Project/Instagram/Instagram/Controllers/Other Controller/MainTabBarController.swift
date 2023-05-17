@@ -10,6 +10,11 @@ import FirebaseAuth
 
 class MainTabBarController: UITabBarController {
     //MARK: - Properties
+    private lazy var homeNaVc = templateNavigationController(rootViewController: HomeController(), namedImage: "home")
+    private lazy var searchNaVc = templateNavigationController(rootViewController: SearchController(), namedImage: "search")
+    private lazy var uploadFeedNavc = templateNavigationController(rootViewController: PickPhotoController(), namedImage: "Add")
+    private lazy var shortVideoNaVc = templateNavigationController(rootViewController: ShortVideoController(), namedImage: "video")
+    private lazy var profileNaVc = templateNavigationController(rootViewController: ProfileController(), namedImage: "profile")
     
     //MARK: - View Lifecycle
     override func viewDidLoad() {
@@ -22,13 +27,13 @@ class MainTabBarController: UITabBarController {
     
     //MARK: - Helpers
     private func configureUI() {
-        let homeNaVc = templateNavigationController(rootViewController: HomeController(), namedImage: "home")
-        let searchNaVc = templateNavigationController(rootViewController: SearchController(), namedImage: "search")
-        let uploadFeedNavc = templateNavigationController(rootViewController: UploadFeedController(), namedImage: "Add")
-        let shortVideoNaVc = templateNavigationController(rootViewController: ShortVideoController(), namedImage: "video")
-        let profileNaVc = templateNavigationController(rootViewController: ProfileController(), namedImage: "profile")
-        
-        viewControllers = [homeNaVc, searchNaVc, uploadFeedNavc ,shortVideoNaVc, profileNaVc]
+
+        viewControllers = [homeNaVc,
+                           searchNaVc,
+                           uploadFeedNavc,
+                           shortVideoNaVc,
+                           profileNaVc]
+        delegate = self
     }
     
     private func templateNavigationController(rootViewController: UIViewController, namedImage: String) -> UINavigationController {
@@ -50,3 +55,16 @@ class MainTabBarController: UITabBarController {
     
 }
 //MARK: - delegate
+extension MainTabBarController: UITabBarControllerDelegate {
+    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+        if viewController == self.homeNaVc && self.selectedViewController == self.homeNaVc {
+            
+            guard let homeVC =  self.homeNaVc.viewControllers.first as? HomeController,
+                  homeVC.isPresenting else {return}
+            
+            UIView.animate(withDuration: 0.4) {
+                homeVC.collectionView.setContentOffset(CGPoint(x: 0, y: 0), animated: true)
+            }
+        }
+    }
+}

@@ -1,14 +1,13 @@
 //
-//  UploadHeaderPhotoView.swift
+//  PhotoCollectionViewCell.swift
 //  Instagram
 //
 //  Created by Long Bảo on 15/05/2023.
 //
 
-
 import UIKit
 
-class UploadHeaderPhotoView: UIView {
+class PickPhotoCollectionViewCell: UICollectionViewCell {
     //MARK: - Properties
     let photoImageView: UIImageView = {
         let iv = UIImageView()
@@ -19,6 +18,7 @@ class UploadHeaderPhotoView: UIView {
         return iv
     }()
     
+    static let identifier = "PickPhotoCollectionViewCell"
     
     //MARK: - View Lifecycle
     override init(frame: CGRect) {
@@ -34,7 +34,6 @@ class UploadHeaderPhotoView: UIView {
     //MARK: - Helpers
     func configureUI() {
         addSubview(photoImageView)
-        backgroundColor = .white
         NSLayoutConstraint.activate([
             photoImageView.leftAnchor.constraint(equalTo: leftAnchor),
             photoImageView.topAnchor.constraint(equalTo: topAnchor),

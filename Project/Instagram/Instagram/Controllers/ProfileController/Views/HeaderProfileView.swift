@@ -107,13 +107,16 @@ class HeaderProfileView: UICollectionReusableView {
     }()
     
     private lazy var avartImageView: UIImageView = {
-        let iv = UIImageView(image: UIImage(systemName: "person.circle"))
+        let iv = UIImageView(image: UIImage(named: "jennie"))
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.clipsToBounds = true
         iv.layer.cornerRadius = 100 / 2
-        iv.contentMode = .scaleToFill
-        iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleAvatarImageStoryTapped)))
+        iv.contentMode = .scaleAspectFill
+        iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action:
+                                                        #selector(handleAvatarImageStoryTapped)))
         iv.isUserInteractionEnabled = true
+        iv.layer.masksToBounds = true
+  
         return iv
     }()
     
@@ -206,10 +209,12 @@ class HeaderProfileView: UICollectionReusableView {
         ])
         
         view.layoutIfNeeded()
+
         
         self.storyAvatarLayer = InstagramStoryLayer(centerPoint: CGPoint(x: avartImageView.bounds.midX, y: avartImageView.bounds.midY), width: avartImageView.bounds.width + 2, lineWidth: 4)
         avartImageView.layer.addSublayer(storyAvatarLayer)
         avartImageView.layer.masksToBounds = false
+        self.cropImage()
         return view
     }()
     
@@ -218,6 +223,7 @@ class HeaderProfileView: UICollectionReusableView {
         super.init(frame: frame)
         translatesAutoresizingMaskIntoConstraints = false
         configureUI()
+        cropImage()
     }
     
     required init?(coder: NSCoder) {
@@ -261,6 +267,47 @@ class HeaderProfileView: UICollectionReusableView {
         let layout = UICollectionViewCompositionalLayout(section: createStorySection())
         layout.configuration.interSectionSpacing = 10
         return layout
+    }
+    
+    
+    func cropImage() {
+        let maskLayer = CAShapeLayer()
+        maskLayer.path = UIBezierPath(roundedRect: avartImageView.bounds, cornerRadius: avartImageView.bounds.width / 2).cgPath
+        avartImageView.layer.mask = maskLayer
+        
+        let sourceImage = UIImage(
+            named: "jennie"
+        )!
+
+        // The shortest side
+        let sideLength = min(
+            sourceImage.size.width,
+            sourceImage.size.height
+        )
+
+        // Determines the x,y coordinate of a centered
+        // sideLength by sideLength square
+        let sourceSize = sourceImage.size
+        let xOffset = (sourceSize.width - sideLength) / 2.0
+        let yOffset = (sourceSize.height - sideLength) / 2.0
+
+        // The cropRect is the rect of the image to keep,
+        // in this case centered
+        let cropRect = CGRect(
+            x: xOffset,
+            y: yOffset,
+            width: sideLength,
+            height: sideLength
+        ).integral
+
+        // Center crop the image
+        let sourceCGImage = sourceImage.cgImage!
+        let croppedCGImage = sourceCGImage.cropping(
+            to: cropRect
+        )!
+
+        let image = UIImage(cgImage: croppedCGImage)
+        avartImageView.image = image
     }
     
     //MARK: - Selectors

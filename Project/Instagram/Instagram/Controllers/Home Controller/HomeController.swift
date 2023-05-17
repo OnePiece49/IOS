@@ -10,7 +10,9 @@ import UIKit
 
 class HomeController: UIViewController {
     //MARK: - Properties
-    
+    var isPresenting: Bool = true
+    let heightHeaderView: CGFloat = 55
+    var currentYContentOffset: CGFloat = 0
     
     private lazy var instagramHeaderView: InstagramHeaderView = {
         let header = InstagramHeaderView()
@@ -18,7 +20,7 @@ class HomeController: UIViewController {
         return header
     }()
     
-    private let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+    let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     
     //MARK: - View Lifecycle
     override func viewDidLoad() {
@@ -27,18 +29,20 @@ class HomeController: UIViewController {
         configureUI()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.navigationController?.navigationBar.isHidden = false
-        self.navigationController?.navigationBar.barStyle = .default
-        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: UIBarMetrics.default)
-        self.navigationController?.navigationBar.shadowImage = UIImage()
+        self.isPresenting = true
+        self.navigationController?.navigationBar.isHidden = true
+        
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        self.isPresenting = false
     }
     
     //MARK: - Helpers
     func configureUI() {
         view.backgroundColor = .white
-        self.navigationItem.titleView = instagramHeaderView
         
         let appearTabBar = UITabBarAppearance()
         appearTabBar.backgroundColor = .white
@@ -48,6 +52,7 @@ class HomeController: UIViewController {
         self.activeConstraint()
         collectionView.delegate = self
         collectionView.dataSource = self
+        collectionView.bounces = false
         collectionView.register(StoryHomeCollectionViewCell.self,
                                 forCellWithReuseIdentifier: StoryHomeCollectionViewCell.identifier)
         collectionView.register(HomeFeedCollectionViewCell.self,
@@ -59,19 +64,18 @@ class HomeController: UIViewController {
     }
     
     func activeConstraint() {
-        print("DEBUG: \(insetTop)")
         view.addSubview(instagramHeaderView)
         view.addSubview(collectionView)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            instagramHeaderView.topAnchor.constraint(equalTo: view.topAnchor, constant: self.insetTop),
+            instagramHeaderView.topAnchor.constraint(equalTo: view.topAnchor, constant: insetTop),
             instagramHeaderView.leftAnchor.constraint(equalTo: view.leftAnchor),
         ])
-        instagramHeaderView.setDimensions(width: view.frame.width, height: 35)
+        instagramHeaderView.setDimensions(width: view.frame.width, height: self.heightHeaderView)
         
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: instagramHeaderView.bottomAnchor),
+            collectionView.topAnchor.constraint(equalTo: instagramHeaderView.bottomAnchor, constant: -5),
             collectionView.leftAnchor.constraint(equalTo: view.leftAnchor),
             collectionView.rightAnchor.constraint(equalTo: view.rightAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
@@ -123,7 +127,7 @@ class HomeController: UIViewController {
     
 }
 //MARK: - delegate
-extension HomeController: UICollectionViewDelegate, UICollectionViewDataSource {
+extension HomeController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if indexPath.section == 0 {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: StoryHomeCollectionViewCell.identifier, for: indexPath) as! StoryHomeCollectionViewCell
@@ -136,7 +140,6 @@ extension HomeController: UICollectionViewDelegate, UICollectionViewDataSource {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeFeedCollectionViewCell.identifier, for: indexPath) as! HomeFeedCollectionViewCell
             return cell
         }
-        
     }
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -152,4 +155,42 @@ extension HomeController: UICollectionViewDelegate, UICollectionViewDataSource {
         return footer
     }
     
+}
+
+extension HomeController: UICollectionViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let yContentOffset = scrollView.contentOffset.y
+        let transform: CGAffineTransform
+        var alpha: CGFloat = 1
+        
+
+        if yContentOffset < heightHeaderView {
+            transform = CGAffineTransform(translationX: 0, y: -yContentOffset)
+            alpha = 1 - CGFloat(yContentOffset) / CGFloat(heightHeaderView)
+            
+        } else {
+            transform = CGAffineTransform(translationX: 0, y: -heightHeaderView )
+            alpha = 0
+        }
+        
+        UIView.animate(withDuration: 0.25) {
+            self.instagramHeaderView.transform = transform
+            self.collectionView.transform = transform
+            self.instagramHeaderView.alpha = alpha
+        }
+    
+        
+        if yContentOffset < 3 {
+            UIView.animate(withDuration: 0.25) {
+                self.instagramHeaderView.transform = .identity
+                self.collectionView.transform = .identity
+                self.instagramHeaderView.alpha = 1
+            }
+        }
+        
+    }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        self.currentYContentOffset = scrollView.contentOffset.y
+    }
 }

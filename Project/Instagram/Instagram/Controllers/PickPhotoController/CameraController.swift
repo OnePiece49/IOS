@@ -45,6 +45,7 @@ class CameraController: UIViewController {
         iv.contentMode = .scaleAspectFit
         iv.tintColor = .white
         iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleCaptureButtonTapped)))
+        iv.isUserInteractionEnabled = true
         return iv
     }()
     
@@ -150,7 +151,6 @@ class CameraController: UIViewController {
         self.view.layer.insertSublayer(self.previewLayer, at: 0)
         previewLayer.frame = self.view.layer.frame
         previewLayer.videoGravity = .resizeAspectFill
-        print("DEBUG: \(previewLayer.frame)")
     }
     
     //MARK: - Selectors
@@ -173,8 +173,9 @@ class CameraController: UIViewController {
 extension CameraController: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         if !self.isCapurePhoto {
-            return
+            return 
         }
+        self.isCapurePhoto = false
         
         guard let cvBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {return}
         let ciImage = CIImage(cvImageBuffer: cvBuffer)
@@ -182,6 +183,9 @@ extension CameraController: AVCaptureVideoDataOutputSampleBufferDelegate {
         let context = CIContext()
         
         guard let cgImage = context.createCGImage(ciImage, from: ciImage.extent) else {return}
-        let uiImageView = UIImage(cgImage: cgImage)
+        let uiImage = UIImage(cgImage: cgImage)
+        
+        let captureVC = CapturePhotoController(image: uiImage)
+        navigationController?.pushViewController(captureVC, animated: true)
     }
 }

@@ -100,6 +100,7 @@ class LoginController: UIViewController {
     //MARK: - Helpers
     func configureUI() {
         view.backgroundColor = .white
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleDidEndEditing)))
         
         view.addSubview(titleImageView)
         view.addSubview(userTextField)
@@ -186,6 +187,11 @@ class LoginController: UIViewController {
             mainTBVC.modalPresentationStyle = .fullScreen
             self.present(mainTBVC, animated: true, completion: .none)
         }
+    }
+    
+    @objc func handleDidEndEditing() {
+        self.userTextField.endEditing(true)
+        self.passwordTextField.endEditing(true)
     }
     
 }
