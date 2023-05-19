@@ -36,29 +36,38 @@ class InstagramHeaderView: UIView {
     lazy var messageBadgeValueLabel = BadgeValueLabel(frame: .zero)
     lazy var likeBadgeValueLabel = BadgeValueLabel(frame: .zero)
     
-    private lazy var instagramLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "Instagram"
-        label.font = UIFont.systemFont(ofSize: 20, weight: .bold)
-        label.textColor = .black
-        return label
+    private lazy var logoButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(named: "logo"), for: .normal)
+        button.contentMode = .scaleToFill
+        button.tintColor = .label
+        button.contentVerticalAlignment = .fill
+        button.contentHorizontalAlignment = .fill
+        return button
+    }()
+    
+    
+    private lazy var sublogoImageView: UIImageView = {
+        let iv = UIImageView(image: UIImage(systemName: "chevron.down"))
+        iv.contentMode = .scaleAspectFit
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        iv.tintColor = .label
+        return iv
     }()
     
     private lazy var likeButton: UIButton = {
         let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setImage(UIImage(named: "like"), for: .normal)
-        button.tintColor = .black
+        button.tintColor = .label
         return button
     }()
     
     private lazy var messageButton: UIButton = {
-        let button = UIButton(type: .custom)
+        let button = UIButton(type: .system)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setImage(UIImage(named: "message"), for: .normal)
-        button.tintColor = .black
-
+        button.tintColor = .label
         return button
     }()
     
@@ -84,31 +93,32 @@ class InstagramHeaderView: UIView {
     
     //MARK: - Helpers
     func configureUI() {
-        addSubview(instagramLabel)
+        backgroundColor = .label
+        addSubview(logoButton)
+        addSubview(sublogoImageView)
         addSubview(buttonStackView)
         addSubview(likeBadgeValueLabel)
         addSubview(messageBadgeValueLabel)
         
         
         NSLayoutConstraint.activate([
-            instagramLabel.leftAnchor.constraint(equalToSystemSpacingAfter: leftAnchor, multiplier: 1.5),
-            instagramLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
-        ])
-        
-        NSLayoutConstraint.activate([
-            buttonStackView.centerYAnchor.constraint(equalTo: instagramLabel.centerYAnchor),
-            buttonStackView.rightAnchor.constraint(equalTo: rightAnchor, constant: -21)
-        ])
-        
-        NSLayoutConstraint.activate([
+            logoButton.leftAnchor.constraint(equalToSystemSpacingAfter: leftAnchor, multiplier: 1),
+            logoButton.centerYAnchor.constraint(equalTo: centerYAnchor, constant: -1),
+            
+            sublogoImageView.leftAnchor.constraint(equalTo: logoButton.rightAnchor, constant: -11),
+            sublogoImageView.centerYAnchor.constraint(equalTo: logoButton.centerYAnchor),
+            
+            buttonStackView.centerYAnchor.constraint(equalTo: logoButton.centerYAnchor),
+            buttonStackView.rightAnchor.constraint(equalTo: rightAnchor, constant: -21),
+            
             messageBadgeValueLabel.bottomAnchor.constraint(equalTo: messageButton.topAnchor, constant: 8),
             messageBadgeValueLabel.leftAnchor.constraint(equalTo: messageButton.rightAnchor, constant: -8),
-        ])
-        
-        NSLayoutConstraint.activate([
+            
             likeBadgeValueLabel.bottomAnchor.constraint(equalTo: likeButton.topAnchor, constant: 10),
             likeBadgeValueLabel.leftAnchor.constraint(equalTo: likeButton.rightAnchor, constant: -10),
         ])
+        logoButton.setDimensions(width: 130, height: 55)
+        sublogoImageView.setDimensions(width: 30, height: 20)
     }
     
     //MARK: - Selectors

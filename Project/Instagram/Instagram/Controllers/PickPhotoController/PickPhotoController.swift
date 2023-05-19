@@ -7,7 +7,6 @@
 
 import Foundation
 import UIKit
-
 import Photos
 
 class PickPhotoController: UIViewController {
@@ -50,13 +49,17 @@ class PickPhotoController: UIViewController {
         shouldInsetCell = true
         configureUI()
         requestAuthorization()
+        headerPhotoView.photoImageView.image = nil
     }
     
     override func viewWillDisappear(_ animated: Bool) {
+        self.tabBarController?.tabBar.isHidden = false
+
         requestImageQueue.async {
             self.shouldInsetCell = false
         }
     }
+    
     
     //MARK: - Helpers
     func configureUI() {
@@ -73,7 +76,7 @@ class PickPhotoController: UIViewController {
         headerPhotoView.translatesAutoresizingMaskIntoConstraints = false
         headerPhotoView.delegate = self
         NSLayoutConstraint.activate([
-            headerPhotoView.topAnchor.constraint(equalTo: view.topAnchor),
+            headerPhotoView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             headerPhotoView.leftAnchor.constraint(equalTo: view.leftAnchor),
             headerPhotoView.rightAnchor.constraint(equalTo: view.rightAnchor),
             headerPhotoView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 5 / 8)
@@ -206,17 +209,18 @@ class PickPhotoController: UIViewController {
         if sender.state == .began {
             self.latestYCropView = cropView.frame.origin.y
         } else if sender.state == .changed {
-            if cropView.frame.minY >= headerPhotoView.heightHeaderTitle && cropView.frame.maxY <= (self.heightImageHeader + headerPhotoView.heightHeaderTitle) {
-                if transition.y + latestYCropView < headerPhotoView.heightHeaderTitle {
+            if cropView.frame.minY >= headerPhotoView.heightHeaderTitle + self.insetTop
+                && cropView.frame.maxY <= (self.heightImageHeader + headerPhotoView.heightHeaderTitle + self.insetTop) {
+                if transition.y + latestYCropView < headerPhotoView.heightHeaderTitle + self.insetTop {
                     cropView.frame = CGRect(x: cropView.frame.origin.x,
-                                            y: headerPhotoView.heightHeaderTitle,
+                                            y: headerPhotoView.heightHeaderTitle + self.insetTop,
                                             width: cropView.frame.width,
                                             height: cropView.frame.height)
                     return
                     
-                } else if transition.y + latestYCropView + cropView.frame.height > (self.heightImageHeader + headerPhotoView.heightHeaderTitle) {
+                } else if transition.y + latestYCropView + cropView.frame.height > (self.heightImageHeader + headerPhotoView.heightHeaderTitle + self.insetTop) {
                     cropView.frame = CGRect(x: cropView.frame.origin.x,
-                                            y: self.heightImageHeader + headerPhotoView.heightHeaderTitle - cropView.frame.height,
+                                            y: self.heightImageHeader + headerPhotoView.heightHeaderTitle - cropView.frame.height + self.insetTop,
                                             width: cropView.frame.width,
                                             height: cropView.frame.height)
                     return
@@ -295,7 +299,7 @@ extension PickPhotoController: UICollectionViewDataSource, UICollectionViewDeleg
         let heightImage = image.size.height
         let widthImage = image.size.width
 
-        let yBeginCrop = heightImage * ((self.cropView.frame.minY -  self.headerPhotoView.photoImageView.frame.minY) / self.heightImageHeader)
+        let yBeginCrop = heightImage * ((self.cropView.frame.minY -  self.headerPhotoView.photoImageView.frame.minY - self.insetTop) / self.heightImageHeader)
 
         let heightExpected = heightImage * CGFloat(self.expectePhotodRatio)
         
@@ -333,8 +337,7 @@ extension PickPhotoController: PickHeaderPhotoDelegate {
     
     func didSelectCamera() {
         let camVC = CameraController()
-        camVC.modalPresentationStyle = .fullScreen
-        present(camVC, animated: true, completion: .none)
+        navigationController?.pushViewController(camVC, animated: false)
     }
 }
 

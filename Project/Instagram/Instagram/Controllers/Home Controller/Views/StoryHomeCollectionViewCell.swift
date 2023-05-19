@@ -42,7 +42,7 @@ class StoryHomeCollectionViewCell: UICollectionViewCell {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = "Tin nổi bật"
-        label.textColor = .black
+        label.textColor = .label
         label.font = UIFont.systemFont(ofSize: 13, weight: .regular)
         label.textAlignment = .center
         return label
@@ -70,17 +70,12 @@ class StoryHomeCollectionViewCell: UICollectionViewCell {
             storyImageView.leftAnchor.constraint(equalTo: leftAnchor, constant: 12),
             storyImageView.rightAnchor.constraint(equalTo: rightAnchor, constant: -12),
             storyImageView.heightAnchor.constraint(equalTo: storyImageView.widthAnchor),
-        ])
-        
-        NSLayoutConstraint.activate([
+            
             storyLabel.topAnchor.constraint(equalTo: storyImageView.bottomAnchor, constant: 5.8),
             storyLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -2),
             storyLabel.leftAnchor.constraint(equalTo: leftAnchor),
             storyLabel.rightAnchor.constraint(equalTo: rightAnchor),
-        ])
-        
-        
-        NSLayoutConstraint.activate([
+            
             plusStoryImageView.bottomAnchor.constraint(equalTo: storyImageView.bottomAnchor, constant: 8),
             plusStoryImageView.rightAnchor.constraint(equalTo: storyImageView.rightAnchor, constant: 8)
         ])

@@ -25,10 +25,10 @@ class Utilites {
     static func createHeaderProfileInfoLabel(type: HeaderType, with number: String) -> UILabel {
         let infoLabel = UILabel()
         infoLabel.text = type.rawValue
-        infoLabel.textColor = .black
+        infoLabel.textColor = .label
         infoLabel.translatesAutoresizingMaskIntoConstraints = false
-        let attributedText = NSMutableAttributedString(attributedString: NSAttributedString(string: "\(number)\n", attributes: [.font: UIFont.systemFont(ofSize: 16, weight: .semibold), .foregroundColor: UIColor.black]))
-        attributedText.append(NSAttributedString(string: type.rawValue, attributes: [.font: UIFont.systemFont(ofSize: 15), .foregroundColor: UIColor.black]))
+        let attributedText = NSMutableAttributedString(attributedString: NSAttributedString(string: "\(number)\n", attributes: [.font: UIFont.systemFont(ofSize: 16, weight: .semibold), .foregroundColor: UIColor.label]))
+        attributedText.append(NSAttributedString(string: type.rawValue, attributes: [.font: UIFont.systemFont(ofSize: 15), .foregroundColor: UIColor.label]))
         infoLabel.attributedText = attributedText
         infoLabel.numberOfLines = 0
         infoLabel.textAlignment = .center
@@ -43,19 +43,20 @@ class Utilites {
         button.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
         button.titleLabel?.textAlignment = .center
         button.layer.cornerRadius = 5.3
-        button.setTitleColor(.black, for: .normal)
+        button.setTitleColor(.label, for: .normal)
         return button
     }
     
     static func createStatusFeedLabel(username: String, status: String, fontSize: CGFloat = 14) -> UILabel {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        let attributes = NSMutableAttributedString(string: "\(username) ", attributes: [.font: UIFont.systemFont(ofSize: fontSize, weight: .semibold), .foregroundColor: UIColor.black])
-        attributes.append(NSAttributedString(string: status, attributes: [.font: UIFont.systemFont(ofSize: fontSize, weight: .regular), .foregroundColor: UIColor.black]))
+        let attributes = NSMutableAttributedString(string: "\(username) ", attributes: [.font: UIFont.systemFont(ofSize: fontSize, weight: .semibold), .foregroundColor: UIColor.label])
+        attributes.append(NSAttributedString(string: status, attributes: [.font: UIFont.systemFont(ofSize: fontSize, weight: .regular), .foregroundColor: UIColor.label]))
         label.attributedText = attributes
         label.numberOfLines = 2
         return label
     }
+    
     
 }
 

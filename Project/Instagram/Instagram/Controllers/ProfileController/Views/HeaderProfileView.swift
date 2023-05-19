@@ -13,6 +13,12 @@ enum HeaderType: String {
     case following
 }
 
+protocol HeaderProfileViewDelegate: AnyObject {
+    func didSelectEditButton()
+    func didTapReadMoreButton(oldHeight: CGFloat, newHeight: CGFloat)
+    func didTapthreeLineImageView()
+}
+
 class HeaderProfileView: UICollectionReusableView {
     //MARK: - Properties
     static let identifier = "HeaderProfileView"
@@ -23,13 +29,14 @@ class HeaderProfileView: UICollectionReusableView {
     var storyAvatarLayer: InstagramStoryLayer!
     var isRunningAnimationStory = false
     
+    var navigationBar: NavigationCustomView!
+    
     private lazy var postLabel = Utilites.createHeaderProfileInfoLabel(type: .posts, with: "80")
     private lazy var followersLabel = Utilites.createHeaderProfileInfoLabel(type: .followers, with: "428.5k")
     private lazy var followingLabel = Utilites.createHeaderProfileInfoLabel(type: .following, with: "60k")
     private lazy var editButton = Utilites.createHeaderProfileButton(with: "Edit")
     private lazy var shareButton = Utilites.createHeaderProfileButton(with: "Share")
 
-    
     private lazy var infoStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [postLabel, followersLabel, followingLabel])
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -37,43 +44,6 @@ class HeaderProfileView: UICollectionReusableView {
         stackView.distribution = .equalSpacing
         stackView.alignment = .fill
         return stackView
-    }()
-    
-    private lazy var usernameLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "m.d.garp.49"
-        label.font = UIFont.systemFont(ofSize: 24, weight: .semibold)
-        label.textAlignment = .left
-        return label
-    }()
-    
-    private lazy var lineButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setImage(UIImage(systemName: "line.3.horizontal"), for: .normal)
-        button.contentMode = .scaleToFill
-        button.tintColor = .black
-        return button
-    }()
-    
-    private lazy var usernameContainerView: UIView = {
-        let view = UIView()
-        view.addSubview(usernameLabel)
-        view.addSubview(lineButton)
-        view.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            usernameLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 15),
-            usernameLabel.topAnchor.constraint(equalTo: view.topAnchor),
-        ])
-        
-        NSLayoutConstraint.activate([
-            lineButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
-            lineButton.topAnchor.constraint(equalTo: view.topAnchor),
-        ])
-        lineButton.setDimensions(width: 30, height: 26)
-        return view
     }()
     
     private lazy var fullnameLabel: UILabel = {
@@ -88,9 +58,8 @@ class HeaderProfileView: UICollectionReusableView {
     private lazy var bioLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.textColor = .black
         label.font = UIFont.systemFont(ofSize: 14)
-        label.text = "Hello everyone \nI'm viet \nNice to meet you guys \nRất vui được làm quen các bạn \n\n\n Xin chao moi nguoi nhe"
+        label.text = "Hello everyone \nI'm Jennie \nNice to meet you guys \nRất vui được làm quen các bạn \n\n\n Xin chao moi nguoi nhe"
         label.numberOfLines = 2
         label.textAlignment = .left
         return label
@@ -99,7 +68,7 @@ class HeaderProfileView: UICollectionReusableView {
     private lazy var readMoreButton: UIButton = {
         let button = UIButton()
         button.setTitle("Read more", for: .normal)
-        button.setTitleColor(.blue, for: .normal)
+        button.setTitleColor(.systemBlue, for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 16)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(handleDidTapReadMoreButton), for: .touchUpInside)
@@ -111,14 +80,24 @@ class HeaderProfileView: UICollectionReusableView {
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.clipsToBounds = true
         iv.layer.cornerRadius = 100 / 2
-        iv.contentMode = .scaleAspectFill
-        iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action:
-                                                        #selector(handleAvatarImageStoryTapped)))
+        iv.addGestureRecognizer(UITapGestureRecognizer(target: self,
+                                                       action: #selector(handleAvatarImageStoryTapped)))
         iv.isUserInteractionEnabled = true
         iv.layer.masksToBounds = true
-  
         return iv
     }()
+    
+    private lazy var plusStoryImageView: UIImageView = {
+       let iv = UIImageView(image: UIImage(systemName: "plus.circle.fill"))
+       iv.translatesAutoresizingMaskIntoConstraints = false
+       iv.tintColor = .systemBlue
+       iv.layer.borderWidth = 5.3
+       iv.layer.borderColor = UIColor.white.cgColor
+       iv.layer.masksToBounds = true
+       iv.layer.cornerRadius = 32 / 2
+       iv.backgroundColor = .white
+       return iv
+   }()
     
     private lazy var containerButtonView: UIView = {
         let view = UIView()
@@ -131,9 +110,7 @@ class HeaderProfileView: UICollectionReusableView {
             editButton.topAnchor.constraint(equalTo: view.topAnchor),
             editButton.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 1 / 2, constant: -(20 + 20 + 8) / 2),
             editButton.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-        ])
-        
-        NSLayoutConstraint.activate([
+            
             shareButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
             shareButton.topAnchor.constraint(equalTo: view.topAnchor),
             shareButton.widthAnchor.constraint(equalTo: editButton.widthAnchor),
@@ -146,71 +123,63 @@ class HeaderProfileView: UICollectionReusableView {
     private lazy var containerInfoView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(usernameContainerView)
         view.addSubview(avartImageView)
+        view.addSubview(plusStoryImageView)
         view.addSubview(infoStackView)
         view.addSubview(fullnameLabel)
         view.addSubview(bioLabel)
         view.addSubview(readMoreButton)
         view.addSubview(containerButtonView)
         view.addSubview(collectionView)
+        
+        setupNavigationBar()
+        view.addSubview(navigationBar)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            usernameContainerView.topAnchor.constraint(equalTo: view.topAnchor),
-            usernameContainerView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            usernameContainerView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            usernameContainerView.heightAnchor.constraint(equalToConstant: 25),
-        ])
-        
-        NSLayoutConstraint.activate([
-            avartImageView.topAnchor.constraint(equalTo: usernameContainerView.bottomAnchor, constant: 20),
-            avartImageView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
-        ])
-        avartImageView.setDimensions(width: 100, height: 100)
-        
-        NSLayoutConstraint.activate([
-            infoStackView.centerYAnchor.constraint(equalTo: avartImageView.centerYAnchor),
-            infoStackView.leftAnchor.constraint(equalTo: avartImageView.rightAnchor, constant: 38),
-            infoStackView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
-        ])
-        
-        NSLayoutConstraint.activate([
-            fullnameLabel.centerXAnchor.constraint(equalTo: avartImageView.centerXAnchor),
-            fullnameLabel.topAnchor.constraint(equalTo: avartImageView.bottomAnchor, constant: 8),
-            fullnameLabel.widthAnchor.constraint(equalToConstant: 120),
-        ])
-        
-        NSLayoutConstraint.activate([
-            readMoreButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -8),
-            readMoreButton.bottomAnchor.constraint(equalTo: bioLabel.bottomAnchor),
-        ])
         
         self.heightBioConstraint = bioLabel.heightAnchor.constraint(equalToConstant: 34)
         NSLayoutConstraint.activate([
+            navigationBar.topAnchor.constraint(equalTo: view.topAnchor),
+            navigationBar.leftAnchor.constraint(equalTo: view.leftAnchor),
+            navigationBar.rightAnchor.constraint(equalTo: view.rightAnchor),
+            navigationBar.heightAnchor.constraint(equalToConstant: 50),
+            
+            avartImageView.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 8),
+            avartImageView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
+            
+            plusStoryImageView.bottomAnchor.constraint(equalTo: avartImageView.bottomAnchor, constant: 6),
+            plusStoryImageView.rightAnchor.constraint(equalTo: avartImageView.rightAnchor, constant: -3),
+            
+            infoStackView.centerYAnchor.constraint(equalTo: avartImageView.centerYAnchor),
+            infoStackView.leftAnchor.constraint(equalTo: avartImageView.rightAnchor, constant: 38),
+            infoStackView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
+            
+            fullnameLabel.centerXAnchor.constraint(equalTo: avartImageView.centerXAnchor),
+            fullnameLabel.topAnchor.constraint(equalTo: avartImageView.bottomAnchor, constant: 8),
+            fullnameLabel.widthAnchor.constraint(equalToConstant: 120),
+            
+            readMoreButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -8),
+            readMoreButton.bottomAnchor.constraint(equalTo: bioLabel.bottomAnchor),
+            
             bioLabel.topAnchor.constraint(equalTo: fullnameLabel.bottomAnchor, constant: 8),
             bioLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
             bioLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -25),
-        ])
-        
-        NSLayoutConstraint.activate([
+            
             collectionView.topAnchor.constraint(equalTo: bioLabel.bottomAnchor, constant: 18),
             collectionView.leftAnchor.constraint(equalTo: view.leftAnchor),
             collectionView.rightAnchor.constraint(equalTo: view.rightAnchor),
             collectionView.heightAnchor.constraint(equalToConstant: 88),
-        ])
-        
-        NSLayoutConstraint.activate([
+            
             containerButtonView.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 15),
             containerButtonView.leftAnchor.constraint(equalTo: view.leftAnchor),
             containerButtonView.rightAnchor.constraint(equalTo: view.rightAnchor),
             containerButtonView.heightAnchor.constraint(equalToConstant: 34),
             containerButtonView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -7),
         ])
-        
+        avartImageView.setDimensions(width: 100, height: 100)
+        plusStoryImageView.setDimensions(width: 32, height: 32)
+
         view.layoutIfNeeded()
 
-        
         self.storyAvatarLayer = InstagramStoryLayer(centerPoint: CGPoint(x: avartImageView.bounds.midX, y: avartImageView.bounds.midY), width: avartImageView.bounds.width + 2, lineWidth: 4)
         avartImageView.layer.addSublayer(storyAvatarLayer)
         avartImageView.layer.masksToBounds = false
@@ -222,6 +191,7 @@ class HeaderProfileView: UICollectionReusableView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         translatesAutoresizingMaskIntoConstraints = false
+        editButton.addTarget(self, action: #selector(handleEditButtonTapped), for: .touchUpInside)
         configureUI()
         cropImage()
     }
@@ -249,6 +219,40 @@ class HeaderProfileView: UICollectionReusableView {
 
     }
     
+    func setupNavigationBar() {
+        let attributeFirstLeftButton = AttibutesButton(image: UIImage(systemName: "lock"),
+                                                  sizeImage: CGSize(width: 15, height: 15),
+                                                   tincolor: .label)
+        let attributeSecondLeftButton = AttibutesButton(tilte: "m.d.garp.49",
+                                                   font: UIFont.systemFont(ofSize: 23, weight: .bold),
+                                                   titleColor: .label)
+        let attributeThreeLeftButton = AttibutesButton(image: UIImage(systemName: "chevron.down"),
+                                                  sizeImage: CGSize(width: 13, height: 10),
+                                                   tincolor: .label)
+        
+        let attributeFirstRightButton = AttibutesButton(image: UIImage(systemName: "line.3.horizontal"),
+                                                  sizeImage: CGSize(width: 28, height: 25),
+                                                   tincolor: .label) {
+            self.delegate?.didTapthreeLineImageView()
+        }
+        let attributeSecondRightButton = AttibutesButton(image: UIImage(systemName: "plus.app"),
+                                                  sizeImage: CGSize(width: 28, height: 27),
+                                                   tincolor: .label) {
+            self.delegate?.didTapthreeLineImageView()
+        }
+
+        self.navigationBar = NavigationCustomView(attributeLeftButtons: [attributeFirstLeftButton,
+                                                                         attributeSecondLeftButton,
+                                                                         attributeThreeLeftButton],
+                                                  attributeRightBarButtons: [attributeFirstRightButton,
+                                                                             attributeSecondRightButton],
+                                                  isHiddenDivider: true,
+                                                  beginSpaceLeftButton: 12,
+                                                  beginSpaceRightButton: 13,
+                                                  continueSpaceleft: 5,
+                                                  continueSpaceRight: 15)
+    }
+    
     func createStorySection() -> NSCollectionLayoutSection {
         let item = ComposionalLayout.createItem(layoutSize: .init(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0)))
         let group = ComposionalLayout.createGroup(axis:
@@ -272,27 +276,23 @@ class HeaderProfileView: UICollectionReusableView {
     
     func cropImage() {
         let maskLayer = CAShapeLayer()
-        maskLayer.path = UIBezierPath(roundedRect: avartImageView.bounds, cornerRadius: avartImageView.bounds.width / 2).cgPath
+        maskLayer.path = UIBezierPath(roundedRect: avartImageView.bounds,
+                                      cornerRadius: avartImageView.bounds.width / 2).cgPath
         avartImageView.layer.mask = maskLayer
-        
+
         let sourceImage = UIImage(
             named: "jennie"
         )!
 
-        // The shortest side
         let sideLength = min(
             sourceImage.size.width,
             sourceImage.size.height
         )
 
-        // Determines the x,y coordinate of a centered
-        // sideLength by sideLength square
         let sourceSize = sourceImage.size
         let xOffset = (sourceSize.width - sideLength) / 2.0
         let yOffset = (sourceSize.height - sideLength) / 2.0
 
-        // The cropRect is the rect of the image to keep,
-        // in this case centered
         let cropRect = CGRect(
             x: xOffset,
             y: yOffset,
@@ -300,7 +300,6 @@ class HeaderProfileView: UICollectionReusableView {
             height: sideLength
         ).integral
 
-        // Center crop the image
         let sourceCGImage = sourceImage.cgImage!
         let croppedCGImage = sourceCGImage.cropping(
             to: cropRect
@@ -335,6 +334,14 @@ class HeaderProfileView: UICollectionReusableView {
         isRunningAnimationStory = !isRunningAnimationStory
     }
     
+    @objc func handleEditButtonTapped() {
+        delegate?.didSelectEditButton()
+    }
+    
+    @objc func handleThreeLineImageTapped() {
+        delegate?.didTapthreeLineImageView()
+    }
+    
 }
 //MARK: - delegate
 extension HeaderProfileView: UICollectionViewDataSource, UICollectionViewDelegate {
@@ -354,7 +361,3 @@ extension HeaderProfileView: UICollectionViewDataSource, UICollectionViewDelegat
 
 }
 
-protocol HeaderProfileViewDelegate: AnyObject {
-    func didTapReadMoreButton(oldHeight: CGFloat, newHeight: CGFloat)
-    
-}

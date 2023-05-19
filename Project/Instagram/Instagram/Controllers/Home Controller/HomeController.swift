@@ -11,7 +11,7 @@ import UIKit
 class HomeController: UIViewController {
     //MARK: - Properties
     var isPresenting: Bool = true
-    let heightHeaderView: CGFloat = 55
+    let heightHeaderView: CGFloat = 60
     var currentYContentOffset: CGFloat = 0
     
     private lazy var instagramHeaderView: InstagramHeaderView = {
@@ -38,6 +38,7 @@ class HomeController: UIViewController {
     
     override func viewDidDisappear(_ animated: Bool) {
         self.isPresenting = false
+        self.tabBarController?.tabBar.isHidden = false
     }
     
     //MARK: - Helpers
@@ -66,6 +67,8 @@ class HomeController: UIViewController {
     func activeConstraint() {
         view.addSubview(instagramHeaderView)
         view.addSubview(collectionView)
+        instagramHeaderView.backgroundColor = .systemBackground
+        view.backgroundColor = .systemBackground
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
@@ -162,7 +165,6 @@ extension HomeController: UICollectionViewDelegate {
         let yContentOffset = scrollView.contentOffset.y
         let transform: CGAffineTransform
         var alpha: CGFloat = 1
-        
 
         if yContentOffset < heightHeaderView {
             transform = CGAffineTransform(translationX: 0, y: -yContentOffset)
@@ -172,19 +174,18 @@ extension HomeController: UICollectionViewDelegate {
             transform = CGAffineTransform(translationX: 0, y: -heightHeaderView )
             alpha = 0
         }
-        
-        UIView.animate(withDuration: 0.25) {
-            self.instagramHeaderView.transform = transform
+
             self.collectionView.transform = transform
+            self.instagramHeaderView.transform = transform
             self.instagramHeaderView.alpha = alpha
-        }
-    
-        
+            self.view.layoutIfNeeded()
+
         if yContentOffset < 3 {
-            UIView.animate(withDuration: 0.25) {
+            UIView.animate(withDuration: 0.3) {
                 self.instagramHeaderView.transform = .identity
                 self.collectionView.transform = .identity
                 self.instagramHeaderView.alpha = 1
+                self.view.layoutIfNeeded()
             }
         }
         

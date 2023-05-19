@@ -6,11 +6,12 @@
 //
 
 import UIKit
+import Photos
 
 class CapturePhotoController: UIViewController {
     //MARK: - Properties
-    
-    
+
+
     private lazy var photoImageView: UIImageView = {
         let iv = UIImageView(image: UIImage(named: "jennie"))
         iv.translatesAutoresizingMaskIntoConstraints = false
@@ -53,14 +54,23 @@ class CapturePhotoController: UIViewController {
             backImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             backImageView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
         ])
-        saveImageView.setDimensions(width: 35, height: 35)
-        backImageView.setDimensions(width: 35, height: 35)
+        saveImageView.setDimensions(width: 30, height: 30)
+        backImageView.setDimensions(width: 30, height: 30)
         
         return view
     }()
     
     
     //MARK: - View Lifecycle
+    
+    override func viewDidAppear(_ animated: Bool) {
+        self.tabBarController?.tabBar.isHidden = true
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        self.tabBarController?.tabBar.isHidden = false
+    }
+    
     init(image: UIImage?) {
         super.init(nibName: nil, bundle: nil)
         self.photoImageView.image = image
@@ -84,7 +94,7 @@ class CapturePhotoController: UIViewController {
     
     //MARK: - Helpers
     func configureUI() {
-
+        activeConstraint()
     }
     
     func activeConstraint() {
@@ -106,11 +116,25 @@ class CapturePhotoController: UIViewController {
     
     //MARK: - Selectors
     @objc func handleSaveImageTapped() {
-        self.navigationController?.popViewController(animated: true)
+        guard let image = self.photoImageView.image else {return}
+        PHPhotoLibrary.shared().performChanges {
+
+            PHAssetChangeRequest.creationRequestForAsset(from: image)
+            } completionHandler: { success, error in
+                if let error = error {
+                    print("DEBUG: cannot save photo \(error.localizedDescription)")
+                } else {
+                    print("DEBUG: save image success")
+                }
+                DispatchQueue.main.async {
+                    self.navigationController?.popToRootViewController(animated: true)
+                }
+            }
     }
     
     @objc func handleBackImageTapped() {
-        self.tabBarController?.selectedViewController = self.tabBarController?.viewControllers?.first
+        navigationController?.popViewController(animated: true)
+
     }
     
 }

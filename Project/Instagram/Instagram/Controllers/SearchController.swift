@@ -18,6 +18,9 @@ class SearchController: UIViewController {
         configureUI()
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        self.tabBarController?.tabBar.isHidden = false
+    }
     
     
     //MARK: - Helpers

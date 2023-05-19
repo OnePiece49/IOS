@@ -29,7 +29,6 @@ class StoryCollectionViewCell: UICollectionViewCell {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = "Tin nổi bật"
-        label.textColor = .black
         label.font = UIFont.systemFont(ofSize: 13, weight: .light)
         label.textAlignment = .center
         return label
@@ -53,14 +52,13 @@ class StoryCollectionViewCell: UICollectionViewCell {
         NSLayoutConstraint.activate([
             storyImageView.topAnchor.constraint(equalTo: topAnchor, constant: 5),
             storyImageView.centerXAnchor.constraint(equalTo: centerXAnchor),
-        ])
-        storyImageView.setDimensions(width: 54, height: 54)
-        
-        NSLayoutConstraint.activate([
+            
             storyLabel.centerXAnchor.constraint(equalTo: storyImageView.centerXAnchor),
             storyLabel.topAnchor.constraint(equalTo: storyImageView.bottomAnchor, constant: 8.3),
         ])
+        storyImageView.setDimensions(width: 54, height: 54)
         storyLabel.setDimensions(width: 80, height: 15)
+        
         layoutIfNeeded()
         self.storyLayer = InstagramStoryLayer(centerPoint: CGPoint(x: storyImageView.bounds.midX, y: storyImageView.bounds.midY), width: self.storyImageView.bounds.width + 10, lineWidth: 2.35)
         storyImageView.layer.addSublayer(storyLayer)

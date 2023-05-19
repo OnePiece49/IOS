@@ -13,7 +13,6 @@ class UploadFeedController: UIViewController {
     var imageUpload: UIImage? {
         didSet {
             self.headerView.imageUploadImageView.image = imageUpload
-            self.headerView.scaleImageView.image = imageUpload
         }
     }
     
@@ -57,7 +56,7 @@ class UploadFeedController: UIViewController {
         headerView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            headerView.topAnchor.constraint(equalTo: view.topAnchor),
+            headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             headerView.leftAnchor.constraint(equalTo: view.leftAnchor),
             headerView.rightAnchor.constraint(equalTo: view.rightAnchor),
             headerView.heightAnchor.constraint(equalToConstant: 300),
@@ -72,9 +71,8 @@ class UploadFeedController: UIViewController {
                        usingSpringWithDamping: 0.8,
                        initialSpringVelocity: 0.5,
                        options: []) {
-            self.headerView.scaleImageView.transform = .identity
+            self.headerView.imageUploadImageView.transform = .identity
             self.headerView.shadowView.alpha = 0
-            
         }
     }
     
@@ -92,8 +90,8 @@ extension UploadFeedController: UploadFeedHeaderDelegate {
     
     func didSelectUploadImageView() {
         view.layoutIfNeeded()
-        let translateTransform = CGAffineTransform(translationX: view.frame.midX - headerView.scaleImageView.frame.midX, y: view.frame.midY - headerView.scaleImageView.frame.midY)
-        let scaleX = view.frame.width / headerView.scaleImageView.frame.width
+        let translateTransform = CGAffineTransform(translationX: view.frame.midX - headerView.imageUploadImageView.frame.midX, y: view.frame.midY - headerView.imageUploadImageView.frame.midY)
+        let scaleX = view.frame.width / headerView.imageUploadImageView.frame.width
         let scaleTransform = CGAffineTransform(scaleX: scaleX, y: scaleX)
         let combineTransform = scaleTransform.concatenating(translateTransform)
         
@@ -104,10 +102,14 @@ extension UploadFeedController: UploadFeedHeaderDelegate {
                        initialSpringVelocity: 1,
                        options: []) {
             
-            print("DEBUG: \(self.headerView.scaleImageView.bounds.size)")
+            self.headerView.imageUploadImageView.transform = combineTransform
+            if self.headerView.imageUploadImageView.frame.width == self.view.frame.width {
+                self.headerView.shadowView.alpha = 0.9
+            } else {
+                self.headerView.shadowView.alpha = 0.0
+            }
             
-            self.headerView.scaleImageView.transform = combineTransform
-            self.headerView.shadowView.alpha = 0.9
+            
         }
 
     }

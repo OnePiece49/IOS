@@ -77,14 +77,6 @@ class UploadFeedHeaderView: UIView {
         return iv
     }()
     
-    lazy var scaleImageView: UIImageView = {
-        let iv = UIImageView()
-        iv.translatesAutoresizingMaskIntoConstraints = false
-        iv.contentMode = .scaleAspectFit
-//        iv.alpha = 0
-        return iv
-    }()
-    
     private lazy var placeHolderLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -116,7 +108,6 @@ class UploadFeedHeaderView: UIView {
     init(image: UIImage?) {
         super.init(frame: .zero)
         self.imageUploadImageView.image = image
-        self.scaleImageView.image = image
         translatesAutoresizingMaskIntoConstraints = false
         configureUI()
     }
@@ -138,54 +129,37 @@ class UploadFeedHeaderView: UIView {
         backgroundColor = .white
         addSubview(headerTitleStackView)
         addSubview(divider)
-        addSubview(imageUploadImageView)
         addSubview(placeHolderLabel)
         addSubview(statusTextView)
         addSubview(shadowView)
-        addSubview(scaleImageView)
+        addSubview(imageUploadImageView)
         
         NSLayoutConstraint.activate([
             headerTitleStackView.topAnchor.constraint(equalTo: topAnchor),
             headerTitleStackView.leftAnchor.constraint(equalTo: leftAnchor, constant: 9),
             headerTitleStackView.rightAnchor.constraint(equalTo: rightAnchor, constant: -9),
             headerTitleStackView.heightAnchor.constraint(equalToConstant: 42),
-        ])
-        
-        NSLayoutConstraint.activate([
+            
             divider.topAnchor.constraint(equalTo: headerTitleStackView.bottomAnchor, constant: 2),
             divider.leftAnchor.constraint(equalTo: leftAnchor),
             divider.rightAnchor.constraint(equalTo: rightAnchor),
             divider.heightAnchor.constraint(equalToConstant: 0.5),
-        ])
-        
-        NSLayoutConstraint.activate([
+            
             imageUploadImageView.topAnchor.constraint(equalTo: divider.bottomAnchor, constant: 11),
             imageUploadImageView.leftAnchor.constraint(equalTo: leftAnchor, constant: 10),
-        ])
-        imageUploadImageView.setDimensions(width: 70, height: 70 / ratio)
-        
-        NSLayoutConstraint.activate([
-            scaleImageView.topAnchor.constraint(equalTo: divider.bottomAnchor, constant: 11),
-            scaleImageView.leftAnchor.constraint(equalTo: leftAnchor, constant: 10),
-        ])
-        scaleImageView.setDimensions(width: 70, height: 70 / ratio)
-        
-        
-        NSLayoutConstraint.activate([
+            
             statusTextView.leftAnchor.constraint(equalTo: imageUploadImageView.rightAnchor, constant: 8),
             statusTextView.topAnchor.constraint(equalTo: divider.bottomAnchor, constant: 1),
             statusTextView.rightAnchor.constraint(equalTo: rightAnchor, constant: -10),
             statusTextView.heightAnchor.constraint(equalToConstant: 87),
-        ])
-        
-        NSLayoutConstraint.activate([
+            
             placeHolderLabel.leftAnchor.constraint(equalTo: statusTextView.leftAnchor, constant: 3),
             placeHolderLabel.topAnchor.constraint(equalTo: statusTextView.topAnchor, constant: 30)
         ])
-        
-        scaleImageView.layer.zPosition = .infinity
+
+        imageUploadImageView.setDimensions(width: 70, height: 70 / ratio)
         shadowView.layer.zPosition = .greatestFiniteMagnitude
-        
+        imageUploadImageView.layer.zPosition = .infinity
     }
     
     //MARK: - Selectors

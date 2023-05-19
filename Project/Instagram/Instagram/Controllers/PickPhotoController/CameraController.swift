@@ -18,19 +18,35 @@ class CameraController: UIViewController {
     var videoOutput: AVCaptureVideoDataOutput!
     var previewLayer: AVCaptureVideoPreviewLayer!
     var isCapurePhoto = false
-    
+    var beingBackCamera = true
     var onFlash: Bool = false
-
+    
+    
     private lazy var switchCamImageView: UIImageView = {
         let iv = UIImageView(image: UIImage(systemName: "arrow.triangle.2.circlepath.camera"))
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.contentMode = .scaleAspectFit
         iv.tintColor = .white
+        iv.addGestureRecognizer(UITapGestureRecognizer(target: self,
+                                                       action: #selector(handleSwitchImageTapped)))
+        iv.isUserInteractionEnabled = true
+        return iv
+    }()
+    
+    
+    private lazy var backImageView: UIImageView = {
+        let iv = UIImageView(image: UIImage(systemName: "xmark"))
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        iv.contentMode = .scaleAspectFit
+        iv.tintColor = .white
+        iv.addGestureRecognizer(UITapGestureRecognizer(target: self,
+                                                       action: #selector(handleBackImageTapped)))
+        iv.isUserInteractionEnabled = true
         return iv
     }()
         
     private lazy var flashImageView: UIImageView = {
-        let iv = UIImageView(image: UIImage(systemName: "bolt.fill"))
+        let iv = UIImageView(image: UIImage(systemName: "bolt.slash"))
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.contentMode = .scaleAspectFit
         iv.tintColor = .white
@@ -54,11 +70,20 @@ class CameraController: UIViewController {
         super.viewDidLoad()
         
         self.configureUI()
-        self.configureCaptureSession()
+        self.setupCaptureSession()
     }
     
     override var prefersStatusBarHidden: Bool {
         return true
+    }
+    
+ 
+    override func viewWillAppear(_ animated: Bool) {
+        self.tabBarController?.tabBar.isHidden = true
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        self.tabBarController?.tabBar.isHidden = false
     }
     
     //MARK: - Helpers
@@ -66,36 +91,36 @@ class CameraController: UIViewController {
         view.addSubview(switchCamImageView)
         view.addSubview(flashImageView)
         view.addSubview(capturePhotoImageView)
+        view.addSubview(backImageView)
         
         NSLayoutConstraint.activate([
             flashImageView.topAnchor.constraint(equalTo: view.topAnchor, constant: 8),
             flashImageView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 8),
-        ])
-        flashImageView.setDimensions(width: 30, height: 25)
-
-        NSLayoutConstraint.activate([
+            
             capturePhotoImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -13),
             capturePhotoImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-        ])
-        capturePhotoImageView.setDimensions(width: 80, height: 80)
-        
-        NSLayoutConstraint.activate([
+            
             switchCamImageView.centerYAnchor.constraint(equalTo: capturePhotoImageView.centerYAnchor),
             switchCamImageView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -13),
             
+            backImageView.topAnchor.constraint(equalTo: view.topAnchor, constant: 8),
+            backImageView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -10),
         ])
+        flashImageView.setDimensions(width: 35, height: 30)
+        capturePhotoImageView.setDimensions(width: 100, height: 100)
         switchCamImageView.setDimensions(width: 35, height: 40)
+        backImageView.setDimensions(width: 30, height: 30)
 
     }
     
-    func configureCaptureSession() {
-        DispatchQueue.global().async {
+    func setupCaptureSession() {
+        DispatchQueue.main.async {
             self.captureSession.beginConfiguration()
             
             if self.captureSession.canSetSessionPreset(.photo) {
                 self.captureSession.sessionPreset = .photo
             }
-            self.configureInputs()
+            self.setupInputs()
             DispatchQueue.main.async {
                 self.setupPreviewLayer()
             }
@@ -103,12 +128,13 @@ class CameraController: UIViewController {
             self.setupOutput()
             
             self.captureSession.automaticallyConfiguresApplicationAudioSession = true
+            self.captureSession.connections.first?.videoOrientation = .portrait
             self.captureSession.commitConfiguration()
             self.captureSession.startRunning()
         }
     }
     
-    func configureInputs() {
+    func setupInputs() {
         guard let backCamera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else {
             return
         }
@@ -129,11 +155,10 @@ class CameraController: UIViewController {
         }
         self.frontInput = fInput
         
-        if !captureSession.canAddInput(self.backInput) {
-            return
+        if captureSession.canAddInput(self.backInput) {
+            captureSession.addInput(self.backInput)
         }
         
-        captureSession.addInput(self.backInput)
     }
     
     func setupOutput() {
@@ -155,17 +180,88 @@ class CameraController: UIViewController {
     
     //MARK: - Selectors
     @objc func handleFlashButtonTapped() {
-        if onFlash {
-            flashImageView.image = UIImage(systemName: "bolt.slash.fill")
-            onFlash = false
-        } else {
-            flashImageView.image = UIImage(systemName: "bolt.fill")
-            onFlash = true
+        
+        self.captureSession.beginConfiguration()
+        guard let _ = try? self.backCamera.lockForConfiguration() else {
+            return
         }
+        
+        if !self.onFlash {
+            self.flashImageView.image = UIImage(systemName: "bolt.fill")
+            if self.backCamera.isTorchModeSupported(.on) && self.backCamera.isTorchAvailable && self.beingBackCamera {
+                self.backCamera.torchMode = .on
+                self.onFlash = true
+
+            }
+        
+        } else {
+            self.flashImageView.image = UIImage(systemName: "bolt.slash")
+
+            if self.backCamera.isTorchModeSupported(.off) && self.backCamera.isTorchAvailable && self.backCamera.hasTorch {
+                self.backCamera.torchMode = .off
+                self.onFlash = false
+            }
+
+        }
+        
+        if !self.beingBackCamera {
+            self.captureSession.removeInput(self.frontInput)
+            if self.captureSession.canAddInput(self.backInput) {
+                self.flashImageView.image = UIImage(systemName: "bolt.slash")
+                self.captureSession.addInput(self.backInput)
+                self.onFlash = false
+            }
+        }
+
+        self.backCamera.unlockForConfiguration()
+        self.beingBackCamera = true
+        self.captureSession.commitConfiguration()
+        
+    }
+    
+    @objc func handleSwitchImageTapped() {
+        self.captureSession.beginConfiguration()
+        
+        if self.beingBackCamera && self.onFlash {
+            guard let _ = try? self.backCamera.lockForConfiguration() else {
+                return
+            }
+            if self.backCamera.isTorchModeSupported(.off) {
+                self.backCamera.torchMode = .off
+            }
+            self.flashImageView.image = UIImage(systemName: "bolt.slash")
+            self.onFlash = false
+            self.backCamera.unlockForConfiguration()
+        }
+
+        if self.beingBackCamera {
+            self.captureSession.removeInput(self.backInput)
+            if self.captureSession.canAddInput(self.frontInput) {
+                self.captureSession.addInput(self.frontInput)
+            }
+            
+        } else {
+            self.captureSession.removeInput(self.frontInput)
+            if self.captureSession.canAddInput(self.backInput) {
+                self.captureSession.addInput(self.backInput)
+            }
+        }
+        
+        self.beingBackCamera = !self.beingBackCamera
+        //Khi switch camera cần gắn lại
+        self.captureSession.connections.first?.videoOrientation = .portrait
+        self.captureSession.commitConfiguration()
+        
+
     }
     
     @objc func handleCaptureButtonTapped() {
         self.isCapurePhoto = true
+    }
+    
+    @objc func handleBackImageTapped() {
+        navigationController?.popViewController(animated: true)
+
     }
     
 }
@@ -185,7 +281,10 @@ extension CameraController: AVCaptureVideoDataOutputSampleBufferDelegate {
         guard let cgImage = context.createCGImage(ciImage, from: ciImage.extent) else {return}
         let uiImage = UIImage(cgImage: cgImage)
         
-        let captureVC = CapturePhotoController(image: uiImage)
-        navigationController?.pushViewController(captureVC, animated: true)
+        DispatchQueue.main.async {
+            let captureVC = CapturePhotoController(image: uiImage)
+            self.navigationController?.pushViewController(captureVC, animated: false)
+        }
+  
     }
 }
