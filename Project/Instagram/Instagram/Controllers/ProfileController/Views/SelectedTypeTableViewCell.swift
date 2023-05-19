@@ -86,7 +86,7 @@ class SelectedTypeTableViewCell: UITableViewCell {
         let iv = UIImageView(image: UIImage(systemName: "camera"))
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.clipsToBounds = true
-        iv.tintColor = .black
+        iv.tintColor = .label
         iv.contentMode = .scaleAspectFit
         return iv
     }()
@@ -95,7 +95,7 @@ class SelectedTypeTableViewCell: UITableViewCell {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.systemFont(ofSize: 16)
-        label.textColor = .black
+        label.textColor = .label
         label.text = "Chọn thư viện ảnh"
         return label
     }()
@@ -105,7 +105,7 @@ class SelectedTypeTableViewCell: UITableViewCell {
         view.translatesAutoresizingMaskIntoConstraints = false
         view.backgroundColor = .systemGray
         view.isHidden = true
-        view.alpha = 0.3
+        view.alpha = 0.4
         return view
     }()
     
@@ -127,6 +127,7 @@ class SelectedTypeTableViewCell: UITableViewCell {
     }
     
     func activeConstraint() {
+        backgroundColor = .systemGray2
         addSubview(typePhotoImageView)
         addSubview(mainLabel)
         addSubview(divider)
@@ -146,7 +147,6 @@ class SelectedTypeTableViewCell: UITableViewCell {
             divider.leftAnchor.constraint(equalTo: mainLabel.leftAnchor, constant: -4),
             divider.rightAnchor.constraint(equalTo: rightAnchor)
         ])
-        
 
         typePhotoImageView.setDimensions(width: 30, height: 25)
     }

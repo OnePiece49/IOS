@@ -40,7 +40,7 @@ class EditBioProfileController: UIViewController {
     //MARK: - Helpers
     func configureUI() {
         setupNaviationbar()
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         view.addSubview(naviationBar)
         view.addSubview(bioTextView)
         view.addSubview(divider)

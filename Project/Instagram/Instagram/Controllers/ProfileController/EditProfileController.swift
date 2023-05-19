@@ -44,7 +44,6 @@ class EditProfileController: UIViewController {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.backgroundColor = .systemGray
-
         return view
     }()
     
@@ -66,13 +65,12 @@ class EditProfileController: UIViewController {
     }
     
     func setupNavigationBar() {
+        view.backgroundColor = .systemBackground
         let attributeLeftButton = AttibutesButton(tilte: "Cancel",
                                                   font: UIFont.systemFont(ofSize: 16)) {
             self.dismiss(animated: true, completion: .none)
         }
-        
-                                                   
-        
+
         let attributeRightButton = AttibutesButton(tilte: "Done",
                                                    font: UIFont.systemFont(ofSize: 16, weight: .semibold),
                                                    titleColor: .systemBlue) {

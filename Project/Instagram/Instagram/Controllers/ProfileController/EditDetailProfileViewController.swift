@@ -76,7 +76,7 @@ class EditDetailProfileViewController: UIViewController {
     //MARK: - Helpers
     func configureUI() {
         setupNaviationbar()
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         view.addSubview(naviationBar)
         view.addSubview(usernameLabel)
         view.addSubview(usernameTextField)
@@ -104,7 +104,8 @@ class EditDetailProfileViewController: UIViewController {
     
     func setupAttributes() {
         view.isUserInteractionEnabled = true
-        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handelScreenTouched)))
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self,
+                                                         action: #selector(handelScreenTouched)))
     }
     
     func setupNaviationbar() {

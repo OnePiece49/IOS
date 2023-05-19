@@ -69,7 +69,7 @@ class EditProfileTableViewCell: UITableViewCell {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.systemFont(ofSize: 15)
-        label.textColor = .black
+        label.textColor = .label
         return label
     }()
     
@@ -77,7 +77,7 @@ class EditProfileTableViewCell: UITableViewCell {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.systemFont(ofSize: 16)
-        label.textColor = .black
+        label.textColor = .label
         return label
     }()
     
@@ -107,6 +107,7 @@ class EditProfileTableViewCell: UITableViewCell {
     }
     
     func activeConstraint() {
+        backgroundColor = .systemBackground
         addSubview(subLabel)
         addSubview(mainLabel)
         addSubview(divider)

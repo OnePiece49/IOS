@@ -146,8 +146,8 @@ class HeaderProfileView: UICollectionReusableView {
             avartImageView.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 8),
             avartImageView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 20),
             
-            plusStoryImageView.bottomAnchor.constraint(equalTo: avartImageView.bottomAnchor, constant: 6),
-            plusStoryImageView.rightAnchor.constraint(equalTo: avartImageView.rightAnchor, constant: -3),
+            plusStoryImageView.bottomAnchor.constraint(equalTo: avartImageView.bottomAnchor, constant: 4),
+            plusStoryImageView.rightAnchor.constraint(equalTo: avartImageView.rightAnchor, constant: -4),
             
             infoStackView.centerYAnchor.constraint(equalTo: avartImageView.centerYAnchor),
             infoStackView.leftAnchor.constraint(equalTo: avartImageView.rightAnchor, constant: 38),

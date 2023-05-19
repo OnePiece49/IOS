@@ -43,7 +43,8 @@ class SelectedSettingProfileController: UIViewController {
     
     //MARK: - Helpers
     func configureUI() {
-        view.backgroundColor = .white
+        view.backgroundColor = .systemGray2
+        tableView.backgroundColor = .systemGray2
         tableView.delegate = self
         tableView.dataSource = self
         tableView.rowHeight = UITableView.automaticDimension
