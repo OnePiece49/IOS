@@ -27,6 +27,7 @@ class HomeController: UIViewController {
         super.viewDidLoad()
             
         configureUI()
+        configureProperties()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -43,32 +44,15 @@ class HomeController: UIViewController {
     
     //MARK: - Helpers
     func configureUI() {
-        view.backgroundColor = .white
-        
+        view.backgroundColor = .systemBackground
         let appearTabBar = UITabBarAppearance()
         appearTabBar.backgroundColor = .white
         tabBarController?.tabBar.standardAppearance = appearTabBar
         tabBarController?.tabBar.scrollEdgeAppearance = appearTabBar
         
-        self.activeConstraint()
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.bounces = false
-        collectionView.register(StoryHomeCollectionViewCell.self,
-                                forCellWithReuseIdentifier: StoryHomeCollectionViewCell.identifier)
-        collectionView.register(HomeFeedCollectionViewCell.self,
-                                forCellWithReuseIdentifier: HomeFeedCollectionViewCell.identifier)
-        collectionView.register(FooterStoryCollectionView.self,
-                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
-                                withReuseIdentifier: FooterStoryCollectionView.identifier)
-        collectionView.collectionViewLayout = self.createLayoutCollectionView()
-    }
-    
-    func activeConstraint() {
         view.addSubview(instagramHeaderView)
         view.addSubview(collectionView)
         instagramHeaderView.backgroundColor = .systemBackground
-        view.backgroundColor = .systemBackground
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
@@ -83,6 +67,20 @@ class HomeController: UIViewController {
             collectionView.rightAnchor.constraint(equalTo: view.rightAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+    }
+    
+    func configureProperties() {
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.bounces = false
+        collectionView.register(StoryHomeCollectionViewCell.self,
+                                forCellWithReuseIdentifier: StoryHomeCollectionViewCell.identifier)
+        collectionView.register(HomeFeedCollectionViewCell.self,
+                                forCellWithReuseIdentifier: HomeFeedCollectionViewCell.identifier)
+        collectionView.register(FooterStoryCollectionView.self,
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
+                                withReuseIdentifier: FooterStoryCollectionView.identifier)
+        collectionView.collectionViewLayout = self.createLayoutCollectionView()
     }
     
     func createStorySection() -> NSCollectionLayoutSection {

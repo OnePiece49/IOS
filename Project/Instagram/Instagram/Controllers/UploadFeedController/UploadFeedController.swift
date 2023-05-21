@@ -7,7 +7,6 @@
 
 import UIKit
 
-
 class UploadFeedController: UIViewController {
     //MARK: - Properties
     var imageUpload: UIImage? {
@@ -38,8 +37,6 @@ class UploadFeedController: UIViewController {
     override var prefersStatusBarHidden: Bool {
         return true
     }
-    
-
     
     //MARK: - Helpers
     func configureUI() {
@@ -77,14 +74,15 @@ class UploadFeedController: UIViewController {
     }
     
 }
+
 //MARK: - delegate
 extension UploadFeedController: UploadFeedHeaderDelegate {
-    func didSelectNexButton() {
+    func didSelectShareButton() {
         self.tabBarController?.selectedViewController = self.tabBarController?.viewControllers?.first
         navigationController?.popViewController(animated: false)
     }
     
-    func didSelectBackImage() {
+    func didSelectBackButton() {
         self.navigationController?.popViewController(animated: true)
     }
     
@@ -108,8 +106,6 @@ extension UploadFeedController: UploadFeedHeaderDelegate {
             } else {
                 self.headerView.shadowView.alpha = 0.0
             }
-            
-            
         }
 
     }

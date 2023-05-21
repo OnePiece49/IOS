@@ -8,64 +8,16 @@
 import UIKit
 
 protocol UploadFeedHeaderDelegate: AnyObject {
-    func didSelectBackImage()
-    func didSelectNexButton()
+    func didSelectBackButton()
+    func didSelectShareButton()
     func didSelectUploadImageView()
 }
 
 class UploadFeedHeaderView: UIView {
     //MARK: - Properties
     weak var delegate: UploadFeedHeaderDelegate?
+    var navigationBar: NavigationCustomView!
     var ratio: CGFloat = 0.75
-    
-    private lazy var backImage: UIImageView = {
-        let iv = UIImageView(image: UIImage(systemName: "chevron.backward"))
-        iv.setDimensions(width: 28, height: 28)
-        iv.tintColor = .black
-        iv.translatesAutoresizingMaskIntoConstraints = false
-        iv.isUserInteractionEnabled = true
-        iv.contentMode = .scaleAspectFit
-        iv.addGestureRecognizer(UITapGestureRecognizer(target: self,
-                                                       action: #selector(handleBackImageTapped)))
-        return iv
-    }()
-    
-    private lazy var titleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "New Post"
-        label.textColor = .black
-        label.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    private lazy var nextButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("Share", for: .normal)
-        button.setTitleColor(UIColor.systemBlue, for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 18, weight: .semibold)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.isUserInteractionEnabled = true
-        button.addGestureRecognizer(UITapGestureRecognizer(target: self,
-                                                           action: #selector(handleNextButtonTapped)))
-        return button
-    }()
-    
-    private lazy var headerTitleStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [backImage, titleLabel, nextButton])
-        stackView.distribution = .equalCentering
-        stackView.alignment = .center
-        stackView.axis = .horizontal
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        return stackView
-    }()
-    
-    private let divider: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .systemGray
-        return view
-    }()
     
     lazy var imageUploadImageView: UIImageView = {
         let iv = UIImageView()
@@ -91,7 +43,8 @@ class UploadFeedHeaderView: UIView {
         let tv = UITextView()
         tv.translatesAutoresizingMaskIntoConstraints = false
         tv.font = UIFont.systemFont(ofSize: 15)
-        tv.textColor = .black
+        tv.textColor = .label
+        tv.backgroundColor = .systemBackground
         tv.isEditable = true
         tv.isSelectable = true
         return tv
@@ -110,6 +63,7 @@ class UploadFeedHeaderView: UIView {
         self.imageUploadImageView.image = image
         translatesAutoresizingMaskIntoConstraints = false
         configureUI()
+        configureProperties()
     }
     
     
@@ -120,36 +74,28 @@ class UploadFeedHeaderView: UIView {
     
     //MARK: - Helpers
     func configureUI() {
-        self.activeConstraint()
-        statusTextView.delegate = self
-
-    }
-    
-    func activeConstraint() {
+        setupNavigation()
+        
         backgroundColor = .white
-        addSubview(headerTitleStackView)
-        addSubview(divider)
         addSubview(placeHolderLabel)
         addSubview(statusTextView)
         addSubview(shadowView)
         addSubview(imageUploadImageView)
+        addSubview(navigationBar)
+        navigationBar.translatesAutoresizingMaskIntoConstraints = false
+        navigationBar.backgroundColor = .systemBackground
         
         NSLayoutConstraint.activate([
-            headerTitleStackView.topAnchor.constraint(equalTo: topAnchor),
-            headerTitleStackView.leftAnchor.constraint(equalTo: leftAnchor, constant: 9),
-            headerTitleStackView.rightAnchor.constraint(equalTo: rightAnchor, constant: -9),
-            headerTitleStackView.heightAnchor.constraint(equalToConstant: 42),
+            navigationBar.topAnchor.constraint(equalTo: topAnchor),
+            navigationBar.leftAnchor.constraint(equalTo: leftAnchor),
+            navigationBar.rightAnchor.constraint(equalTo: rightAnchor),
+            navigationBar.heightAnchor.constraint(equalToConstant: 42),
             
-            divider.topAnchor.constraint(equalTo: headerTitleStackView.bottomAnchor, constant: 2),
-            divider.leftAnchor.constraint(equalTo: leftAnchor),
-            divider.rightAnchor.constraint(equalTo: rightAnchor),
-            divider.heightAnchor.constraint(equalToConstant: 0.5),
-            
-            imageUploadImageView.topAnchor.constraint(equalTo: divider.bottomAnchor, constant: 11),
+            imageUploadImageView.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 11),
             imageUploadImageView.leftAnchor.constraint(equalTo: leftAnchor, constant: 10),
             
             statusTextView.leftAnchor.constraint(equalTo: imageUploadImageView.rightAnchor, constant: 8),
-            statusTextView.topAnchor.constraint(equalTo: divider.bottomAnchor, constant: 1),
+            statusTextView.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 1),
             statusTextView.rightAnchor.constraint(equalTo: rightAnchor, constant: -10),
             statusTextView.heightAnchor.constraint(equalToConstant: 87),
             
@@ -162,18 +108,35 @@ class UploadFeedHeaderView: UIView {
         imageUploadImageView.layer.zPosition = .infinity
     }
     
+    func configureProperties() {
+        statusTextView.delegate = self
+    }
+    
+    func setupNavigation() {
+        let leftButtonAttribute = AttibutesButton(image: UIImage(systemName: "chevron.backward"),
+                                                  sizeImage: CGSize(width: 20, height: 20),
+                                                  tincolor: .label) {
+            self.delegate?.didSelectBackButton()
+        }
+        
+        let rightButtonAttribute = AttibutesButton(tilte: "Share", 
+                                                   font: .systemFont(ofSize: 18, weight: .semibold),
+                                                   titleColor: .systemBlue) {
+            self.delegate?.didSelectShareButton()
+        }
+        
+        self.navigationBar = NavigationCustomView(centerTitle: "New Post",
+                                                  centertitleFont: .systemFont(ofSize: 18, weight: .bold),
+                                                  attributeLeftButtons: [leftButtonAttribute],
+                                                  attributeRightBarButtons: [rightButtonAttribute],
+                                                  beginSpaceLeftButton: 9, beginSpaceRightButton: 9)
+    }
+    
     //MARK: - Selectors
-    @objc func handleNextButtonTapped() {
-        delegate?.didSelectNexButton()
-    }
-    
-    @objc func handleBackImageTapped() {
-        delegate?.didSelectBackImage()
-    }
-    
     @objc func handelImageUploadTapped() {
         delegate?.didSelectUploadImageView()
     }
+
     
 }
 //MARK: - delegate

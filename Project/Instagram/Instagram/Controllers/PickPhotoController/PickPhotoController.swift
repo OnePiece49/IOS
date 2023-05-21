@@ -31,7 +31,8 @@ class PickPhotoController: UIViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
         view.backgroundColor = .systemCyan
         view.alpha = 0.3
-        view.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(hanldeCropViewMoved)))
+        view.addGestureRecognizer(UIPanGestureRecognizer(target: self,
+                                                         action: #selector(hanldeCropViewMoved)))
         return view
     }()
     
@@ -48,6 +49,7 @@ class PickPhotoController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         shouldInsetCell = true
         configureUI()
+        configureProperties()
         requestAuthorization()
         headerPhotoView.photoImageView.image = nil
     }
@@ -64,54 +66,59 @@ class PickPhotoController: UIViewController {
     //MARK: - Helpers
     func configureUI() {
         self.navigationController?.navigationBar.isHidden = true
-        
         let appearTabBar = UITabBarAppearance()
         appearTabBar.backgroundColor = .white
         tabBarController?.tabBar.standardAppearance = appearTabBar
         tabBarController?.tabBar.scrollEdgeAppearance = appearTabBar
         
+        self.collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayoutCollectionView())
         view.addSubview(headerPhotoView)
         view.addSubview(cropView)
+        view.addSubview(collectionView)
         
         headerPhotoView.translatesAutoresizingMaskIntoConstraints = false
-        headerPhotoView.delegate = self
+        self.widthCropViewConstraint = cropView.widthAnchor.constraint(equalToConstant: 0.05)
         NSLayoutConstraint.activate([
             headerPhotoView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             headerPhotoView.leftAnchor.constraint(equalTo: view.leftAnchor),
             headerPhotoView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            headerPhotoView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 5 / 8)
-        ])
-        
-        self.widthCropViewConstraint = cropView.widthAnchor.constraint(equalToConstant: 0.05)
-        NSLayoutConstraint.activate([
+            headerPhotoView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 5 / 8),
+            
             self.widthCropViewConstraint,
-            self.cropView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            self.cropView.heightAnchor.constraint(equalTo: cropView.widthAnchor, multiplier: 1 / CGFloat(expectePhotodRatio)),
-            self.cropView.centerYAnchor.constraint(equalTo: headerPhotoView.centerYAnchor),
-        ])
-        
-        
-        self.collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayoutCollectionView())
-        view.addSubview(collectionView)
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
+            cropView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            cropView.heightAnchor.constraint(equalTo: cropView.widthAnchor,
+                                                multiplier: 1 / CGFloat(expectePhotodRatio)),
+            cropView.centerYAnchor.constraint(equalTo: headerPhotoView.centerYAnchor),
+            
             collectionView.topAnchor.constraint(equalTo: headerPhotoView.bottomAnchor, constant: 0),
             collectionView.leftAnchor.constraint(equalTo: view.leftAnchor),
             collectionView.rightAnchor.constraint(equalTo: view.rightAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
+        
+        
+    }
+    
+    func configureProperties() {
+        headerPhotoView.delegate = self
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(PickPhotoCollectionViewCell.self,
                                 forCellWithReuseIdentifier: PickPhotoCollectionViewCell.identifier)
-        
     }
     
     func createLayoutCollectionView() -> UICollectionViewLayout {
-        let item = ComposionalLayout.createItem(layoutSize: .init(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0)))
+        let itemSize: NSCollectionLayoutSize = .init(widthDimension: .fractionalWidth(1.0),
+                                                     heightDimension: .fractionalHeight(1.0))
+        let item = ComposionalLayout.createItem(layoutSize: itemSize)
     
-        let group = ComposionalLayout.createGroup(axis: .horizontal, layoutSize: .init(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalWidth(0.2)), item: item, count: 5)
-        
+        let groupSize: NSCollectionLayoutSize = .init(widthDimension: .fractionalWidth(1.0),
+                                                      heightDimension: .fractionalWidth(0.2))
+        let group = ComposionalLayout.createGroup(axis: .horizontal,
+                                                  layoutSize: groupSize,
+                                                  item: item,
+                                                  count: 5)
         group.interItemSpacing = NSCollectionLayoutSpacing.fixed(2)
         
         let section = ComposionalLayout.createSectionWithouHeader(group: group)
@@ -198,7 +205,6 @@ class PickPhotoController: UIViewController {
             numberItem += 1
             collectionView.insertItems(at: [indexPath])
         }
-
     }
     
     
@@ -259,7 +265,10 @@ extension PickPhotoController: UICollectionViewDataSource, UICollectionViewDeleg
                 view.layoutIfNeeded()
             }
 
-            manager.requestImage(for: asset, targetSize: CGSize(width: Int(1000 * ratio), height: 1000), contentMode: .aspectFit, options: requestOption()) { image, _ in
+            manager.requestImage(for: asset,
+                                targetSize: CGSize(width: Int(1000 * ratio), height: 1000),
+                                contentMode: .aspectFit,
+                                options: requestOption()) { image, _ in
                 self.headerPhotoView.photoImageView.image = image
             }
         }
@@ -284,7 +293,10 @@ extension PickPhotoController: UICollectionViewDataSource, UICollectionViewDeleg
             view.layoutIfNeeded()
         }
         
-        manager.requestImage(for: asset, targetSize: CGSize(width: Int(1000 * ratio), height: 1000), contentMode: .aspectFit, options: requestOption()) { image, _ in
+        manager.requestImage(for: asset,
+                            targetSize: CGSize(width: Int(1000 * ratio), height: 1000),
+                            contentMode: .aspectFit,
+                            options: requestOption()) { image, _ in
             self.headerPhotoView.photoImageView.image = image
         }
     }
@@ -318,7 +330,7 @@ extension PickPhotoController: UICollectionViewDataSource, UICollectionViewDeleg
 }
 
 extension PickPhotoController: PickHeaderPhotoDelegate {
-    func didSelectBackImage() {
+    func didSelectbackButtonTapped() {
         self.tabBarController?.selectedViewController = self.tabBarController?.viewControllers?.first
     }
     

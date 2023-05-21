@@ -26,13 +26,10 @@ class BadgeValueLabel: UILabel {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    
 }
 
 class InstagramHeaderView: UIView {
     //MARK: - Properties
-    
     lazy var messageBadgeValueLabel = BadgeValueLabel(frame: .zero)
     lazy var likeBadgeValueLabel = BadgeValueLabel(frame: .zero)
     
@@ -45,7 +42,6 @@ class InstagramHeaderView: UIView {
         button.contentHorizontalAlignment = .fill
         return button
     }()
-    
     
     private lazy var sublogoImageView: UIImageView = {
         let iv = UIImageView(image: UIImage(systemName: "chevron.down"))
@@ -93,13 +89,12 @@ class InstagramHeaderView: UIView {
     
     //MARK: - Helpers
     func configureUI() {
-        backgroundColor = .label
+        backgroundColor = .systemBackground
         addSubview(logoButton)
         addSubview(sublogoImageView)
         addSubview(buttonStackView)
         addSubview(likeBadgeValueLabel)
         addSubview(messageBadgeValueLabel)
-        
         
         NSLayoutConstraint.activate([
             logoButton.leftAnchor.constraint(equalToSystemSpacingAfter: leftAnchor, multiplier: 1),

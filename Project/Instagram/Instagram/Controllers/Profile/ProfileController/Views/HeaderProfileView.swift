@@ -15,7 +15,7 @@ enum HeaderType: String {
 
 protocol HeaderProfileViewDelegate: AnyObject {
     func didSelectEditButton()
-    func didTapReadMoreButton(oldHeight: CGFloat, newHeight: CGFloat)
+    func didTapReadMoreButton()
     func didTapthreeLineImageView()
 }
 
@@ -221,23 +221,23 @@ class HeaderProfileView: UICollectionReusableView {
     
     func setupNavigationBar() {
         let attributeFirstLeftButton = AttibutesButton(image: UIImage(systemName: "lock"),
-                                                  sizeImage: CGSize(width: 15, height: 15),
-                                                   tincolor: .label)
+                                                       sizeImage: CGSize(width: 15, height: 15),
+                                                       tincolor: .label)
         let attributeSecondLeftButton = AttibutesButton(tilte: "m.d.garp.49",
-                                                   font: UIFont.systemFont(ofSize: 23, weight: .bold),
-                                                   titleColor: .label)
+                                                        font: UIFont.systemFont(ofSize: 23, weight: .bold),
+                                                        titleColor: .label)
         let attributeThreeLeftButton = AttibutesButton(image: UIImage(systemName: "chevron.down"),
-                                                  sizeImage: CGSize(width: 13, height: 10),
-                                                   tincolor: .label)
+                                                       sizeImage: CGSize(width: 13, height: 10),
+                                                       tincolor: .label)
         
         let attributeFirstRightButton = AttibutesButton(image: UIImage(systemName: "line.3.horizontal"),
-                                                  sizeImage: CGSize(width: 28, height: 25),
-                                                   tincolor: .label) {
+                                                        sizeImage: CGSize(width: 28, height: 25),
+                                                        tincolor: .label) {
             self.delegate?.didTapthreeLineImageView()
         }
         let attributeSecondRightButton = AttibutesButton(image: UIImage(systemName: "plus.app"),
-                                                  sizeImage: CGSize(width: 28, height: 27),
-                                                   tincolor: .label) {
+                                                         sizeImage: CGSize(width: 28, height: 27),
+                                                         tincolor: .label) {
             self.delegate?.didTapthreeLineImageView()
         }
 
@@ -312,16 +312,11 @@ class HeaderProfileView: UICollectionReusableView {
     //MARK: - Selectors
     @objc func handleDidTapReadMoreButton() {
         self.bioLabel.numberOfLines = 0
-        let oldHeight = heightBioConstraint.constant
-        
-        NSLayoutConstraint.deactivate([heightBioConstraint])
-        let rect = NSString(string: bioLabel.text ?? "").boundingRect(with: CGSize(width: bounds.width - 33, height: .greatestFiniteMagnitude), options: NSStringDrawingOptions.usesLineFragmentOrigin, attributes: [.font: UIFont.systemFont(ofSize: 14)], context: nil)
-        self.heightBioConstraint.constant = rect.height
 
         containerInfoView.layoutIfNeeded()
         layoutIfNeeded()
         readMoreButton.isHidden = true
-        self.delegate?.didTapReadMoreButton(oldHeight: oldHeight, newHeight: heightBioConstraint.constant)
+        self.delegate?.didTapReadMoreButton()
     }
     
     @objc func handleAvatarImageStoryTapped() {
@@ -338,9 +333,6 @@ class HeaderProfileView: UICollectionReusableView {
         delegate?.didSelectEditButton()
     }
     
-    @objc func handleThreeLineImageTapped() {
-        delegate?.didTapthreeLineImageView()
-    }
     
 }
 //MARK: - delegate

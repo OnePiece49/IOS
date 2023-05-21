@@ -17,7 +17,7 @@ class ProfileController: UIViewController {
     var bottomTabTripController: BottomTapTripController!
     var selectSettingViewTopConstraint: NSLayoutConstraint!
     var heightHeaderConstraint: NSLayoutConstraint!
-    var isPresentingSelectVC = false
+    var beganPresentSettingVC = false
     let heightSelectedSettingVC: CGFloat = 475
     var contentOffsets: [Int: CGFloat] = [:]
     let headerProfileCollectionView = UICollectionView(frame: .zero,
@@ -35,14 +35,6 @@ class ProfileController: UIViewController {
         return bottomTabTripController.currentCollectionView
     }
     
-    private lazy var logoutButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("Logout", for: .normal)
-        button.addTarget(self, action: #selector(handleLogoutButtonTapped), for: .touchUpInside)
-        return button
-    }()
-    
     private let shadowView: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -56,6 +48,8 @@ class ProfileController: UIViewController {
         super.viewDidLoad()
 
         configureUI()
+        configureTabTripController()
+        configureProperties()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -64,45 +58,19 @@ class ProfileController: UIViewController {
     
     //MARK: - Helpers
     func configureUI() {
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         self.navigationController?.navigationBar.isHidden = true
-        self.navigationController?.navigationBar.isTranslucent = true
-        let appearTabBar = UITabBarAppearance()
-        appearTabBar.backgroundColor = .white
-        tabBarController?.tabBar.standardAppearance = appearTabBar
-        tabBarController?.tabBar.scrollEdgeAppearance = appearTabBar
-
         
-        activeConstraint()
-        configureTabTripController()
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-            NSLayoutConstraint.deactivate([self.heightHeaderConstraint])
-            
-            self.heightHeaderConstraint = self.bottomTabTripView.topAnchor.constraint(equalTo: self.containerScrollView.topAnchor, constant: self.headerView.bounds.height)
-            NSLayoutConstraint.activate([
-                self.heightHeaderConstraint,
-            ])
-            self.containerScrollView.layoutIfNeeded()
-            self.overlayScrollView.contentSize = CGSize(width: 0, height: self.heightHeaderConstraint.constant + self.view.frame.height + 60)
-        }
-    }
-    
-    func activeConstraint() {
         view.addSubview(overlayScrollView)
         view.addSubview(containerScrollView)
         view.addSubview(shadowView)
-        view.backgroundColor = .systemBackground
+        containerScrollView.addSubview(headerProfileCollectionView)
         
         headerView.translatesAutoresizingMaskIntoConstraints = false
         containerScrollView.translatesAutoresizingMaskIntoConstraints = false
         overlayScrollView.translatesAutoresizingMaskIntoConstraints = false
         headerProfileCollectionView.translatesAutoresizingMaskIntoConstraints = false
-        overlayScrollView.delegate = self
         
-        containerScrollView.addSubview(headerProfileCollectionView)
-        containerScrollView.addGestureRecognizer(overlayScrollView.panGestureRecognizer)
-
         NSLayoutConstraint.activate([
             containerScrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             containerScrollView.leftAnchor.constraint(equalTo: view.leftAnchor),
@@ -124,6 +92,11 @@ class ProfileController: UIViewController {
             shadowView.rightAnchor.constraint(equalTo: view.rightAnchor),
             shadowView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
+    }
+    
+    func configureProperties() {
+        overlayScrollView.delegate = self
+        containerScrollView.addGestureRecognizer(overlayScrollView.panGestureRecognizer)
 
         headerProfileCollectionView.delegate = self
         headerProfileCollectionView.dataSource = self
@@ -132,7 +105,17 @@ class ProfileController: UIViewController {
                                              withReuseIdentifier: HeaderProfileView.identifier)
         headerProfileCollectionView.collectionViewLayout = self.createLayoutCollectionView()
         headerProfileCollectionView.isScrollEnabled = false
-        shadowView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(animationSettingProfileVC)))
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            NSLayoutConstraint.deactivate([self.heightHeaderConstraint])
+            
+            self.heightHeaderConstraint = self.bottomTabTripView.topAnchor.constraint(equalTo: self.containerScrollView.topAnchor, constant: self.headerView.bounds.height)
+            NSLayoutConstraint.activate([
+                self.heightHeaderConstraint,
+            ])
+            self.containerScrollView.layoutIfNeeded()
+            self.overlayScrollView.contentSize = CGSize(width: 0, height: self.heightHeaderConstraint.constant + self.view.frame.height + 60)
+        }
     }
     
     func createLayoutCollectionView() -> UICollectionViewLayout {
@@ -171,7 +154,8 @@ class ProfileController: UIViewController {
         containerScrollView.addSubview(bottomTabTripView)
         bottomTabTripView.translatesAutoresizingMaskIntoConstraints = false
         
-        self.heightHeaderConstraint = self.bottomTabTripView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: self.heightSelectedSettingVC)
+        self.heightHeaderConstraint = self.bottomTabTripView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor,
+                                                                                  constant: self.heightSelectedSettingVC)
         NSLayoutConstraint.activate([
             heightHeaderConstraint,
             bottomTabTripView.leftAnchor.constraint(equalTo: containerScrollView.leftAnchor),
@@ -191,69 +175,12 @@ class ProfileController: UIViewController {
         }
     }
     
-    func addChildController() {
-        addChild(selectedSettingVC)
-        view.addSubview(selectedSettingVC.view)
-        didMove(toParent: self)
-        selectedSettingVC.view.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(handleViewSelectedSettingVcMoved)))
-        selectedSettingVC.view.isUserInteractionEnabled = true
-        
-        guard let viewSelect = selectedSettingVC.view else {return}
-        viewSelect.translatesAutoresizingMaskIntoConstraints = false
-        selectSettingViewTopConstraint = viewSelect.topAnchor.constraint(equalTo: view.bottomAnchor)
-        NSLayoutConstraint.activate([
-            selectSettingViewTopConstraint,
-            viewSelect.widthAnchor.constraint(equalTo: view.widthAnchor),
-            viewSelect.heightAnchor.constraint(equalToConstant: self.view.frame.height),
-            viewSelect.leftAnchor.constraint(equalTo: view.leftAnchor)
-        ])
-        viewSelect.clipsToBounds = true
-        viewSelect.layer.cornerRadius = 20
-    }
-    
-    func removeChildController() {
-        selectedSettingVC.removeFromParent()
-        selectedSettingVC.view.removeFromSuperview()
-        didMove(toParent: self)
-    }
-
-    
     //MARK: - Selectors
     @objc func handleLogoutButtonTapped() {
         try? Auth.auth().signOut()
         let loginVC = LoginController()
         loginVC.modalPresentationStyle = .overFullScreen
         present(loginVC, animated: true, completion: .none)
-    }
-    
-    @objc func handleViewSelectedSettingVcMoved(sender: UIPanGestureRecognizer) {
-        let y = sender.translation(in: view).y
-        let veclocitY = sender.velocity(in: view).y
-        guard let viewSelected = selectedSettingVC.view else {return}
-        let heightView = self.view.frame.height
-
-         if sender.state == .changed {
-            if y > -110 {
-                UIView.animate(withDuration: 0.12) {
-                    let transform = CGAffineTransform(translationX: 0, y: y)
-                    viewSelected.transform = transform
-                }
-            }
-        } else if sender.state == .ended {
-            if veclocitY > 900 {
-                animationSettingProfileVC()
-                return
-            }
-            
-            if (heightView - viewSelected.frame.minY) > self.view.frame.height / 4 || y < -50 {
-                UIView.animate(withDuration: 0.12) {
-                    viewSelected.transform = .identity
-                }
-            } else {
-                animationSettingProfileVC()
-            }
-        }
-
     }
     
 }
@@ -281,12 +208,11 @@ extension ProfileController: UIScrollViewDelegate {
     }
     
     func updateContentSizeOverlay(collectionView: UICollectionView) {
-        let height = self.heightHeaderConstraint.constant + collectionView.contentSize.height
+        let height = self.heightHeaderConstraint.constant + collectionView.contentSize.height + 60
         if height > view.frame.height {
             self.overlayScrollView.contentSize = CGSize(width: self.view.frame.width, height: height)
         }
     }
-    
     
 }
 
@@ -322,31 +248,18 @@ extension ProfileController: UICollectionViewDelegate, UICollectionViewDataSourc
 
 extension ProfileController: HeaderProfileViewDelegate {
     func didTapthreeLineImageView() {
-        animationSettingProfileVC()
-    }
-    
-    @objc func animationSettingProfileVC() {
-        if !isPresentingSelectVC {
-            addChildController()
-            self.view.layoutIfNeeded()
-            UIView.animate(withDuration: 0.35) {
-                self.selectSettingViewTopConstraint.constant = -self.heightSelectedSettingVC
-                self.shadowView.alpha = 0.8
-                self.view.layoutIfNeeded()
-            }
-        } else {
-            UIView.animate(withDuration: 0.35) {
-                self.selectSettingViewTopConstraint.constant = 0
-                self.shadowView.alpha = 0
-                self.view.layoutIfNeeded()
-            } completion: { _ in
-                self.selectedSettingVC.view.transform = .identity
-            }
-
-            removeFromParent()
+        UIView.animate(withDuration: 0.2) {
+            self.shadowView.alpha = 0.8
         }
         
-        self.isPresentingSelectVC = !isPresentingSelectVC
+        let settingVC = SelectedSettingProfileController()
+        settingVC.modalPresentationStyle = .overFullScreen
+        settingVC.durationDismissing = {
+            UIView.animate(withDuration: 0.2) {
+                self.shadowView.alpha = 0
+            }
+        }
+        self.present(settingVC, animated: true, completion: .none)
     }
     
     func didSelectEditButton() {
@@ -355,7 +268,7 @@ extension ProfileController: HeaderProfileViewDelegate {
         self.present(editProfileVC, animated: true, completion: .none)
     }
     
-    func didTapReadMoreButton(oldHeight: CGFloat, newHeight: CGFloat) {
+    func didTapReadMoreButton() {
         headerProfileCollectionView.reloadData()
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
@@ -366,7 +279,8 @@ extension ProfileController: HeaderProfileViewDelegate {
                 self.heightHeaderConstraint,
             ])
             self.containerScrollView.layoutIfNeeded()
-            self.overlayScrollView.contentSize = CGSize(width: 0, height: self.heightHeaderConstraint.constant + self.view.frame.height + 60)
+            self.overlayScrollView.contentSize = CGSize(width: 0,
+                                                        height: self.heightHeaderConstraint.constant + self.view.frame.height + 60)
         }
     }
 }

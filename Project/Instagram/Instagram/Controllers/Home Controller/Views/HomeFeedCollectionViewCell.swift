@@ -10,7 +10,7 @@ import UIKit
 
 class HomeFeedCollectionViewCell: UICollectionViewCell {
     //MARK: - Properties
-    static let identifier = "ProfileCollectionViewCell"
+    static let identifier = "HomeFeedCollectionViewCell"
     var actionBar: NavigationCustomView!
     
     private lazy var avatarUserUpTusImageView: UIImageView = {

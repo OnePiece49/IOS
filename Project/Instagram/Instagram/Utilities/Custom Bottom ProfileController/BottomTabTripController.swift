@@ -27,11 +27,9 @@ class BottomTapTripController: UIViewController {
     var spacingControllers: CGFloat = 4
     var newestControllerContrainted = 0
     var rightConstraintScrollView: NSLayoutConstraint!
-
     
     private var currentXContentOffset: CGFloat = 0
     private var previousContentOffset: CGFloat = 0
-    
     var currentWidth: CGFloat = 0
     
     private let fakeView: UIView = {
@@ -97,7 +95,7 @@ class BottomTapTripController: UIViewController {
     //MARK: - Selectors
     func configureDivider() {
         self.view.addSubview(divider)
-        xAnchorDivider = divider.leftAnchor.constraint(equalTo: self.divider.leftAnchor)
+        xAnchorDivider = divider.leftAnchor.constraint(equalTo: self.view.leftAnchor)
         widthAnchorDivider = divider.widthAnchor.constraint(equalToConstant: 0)
         divider.backgroundColor = self.configureTabBar.dividerColor
 
@@ -139,7 +137,6 @@ class BottomTapTripController: UIViewController {
                         controllers[i].view.rightAnchor.constraint(equalTo: scrollView.rightAnchor, constant: (CGFloat(self.controllers.count - 1)) * self.spacingControllers)
                     ])
                     scrollView.layoutIfNeeded()
-                    print("DEBUG: \(self.scrollView.contentSize)")
                     self.fakeView.removeFromSuperview()
                 }
             }
@@ -173,9 +170,6 @@ class BottomTapTripController: UIViewController {
 
         
         scrollView.layoutIfNeeded()
-        print("DEBUG: \(scrollView.contentSize)")
-
-        
     }
     
     func configureChildController() {
@@ -226,8 +220,6 @@ class BottomTapTripController: UIViewController {
         }
     
     }
-    
-    
     
     func configureCollectionView() {
         view.addSubview(scrollView)

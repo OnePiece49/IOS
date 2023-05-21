@@ -116,7 +116,4 @@ class InstagramStoryLayer: CAGradientLayer {
         segmentLayer.removeAnimation(forKey: "end")
         segmentLayer.removeAnimation(forKey: "fade")
     }
-    
-    
-    
 }

@@ -12,7 +12,6 @@ struct SelectedTypeCellData {
     let image: UIImage?
 }
 
-
 enum SelectedSettingProfileType: Int, CaseIterable {
     case rays
     case sunmaxfill
@@ -127,11 +126,11 @@ class SelectedTypeTableViewCell: UITableViewCell {
     }
     
     func activeConstraint() {
-        backgroundColor = .systemGray2
-        addSubview(typePhotoImageView)
-        addSubview(mainLabel)
-        addSubview(divider)
-        addSubview(divider)
+        backgroundColor = .systemBackground
+        contentView.addSubview(typePhotoImageView)
+        contentView.addSubview(mainLabel)
+        contentView.addSubview(divider)
+        contentView.addSubview(divider)
         
         NSLayoutConstraint.activate([
             typePhotoImageView.topAnchor.constraint(equalTo: topAnchor, constant: 10),

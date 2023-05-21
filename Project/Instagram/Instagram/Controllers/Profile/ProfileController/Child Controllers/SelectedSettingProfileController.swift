@@ -8,16 +8,30 @@
 import UIKit
 
 
-class SelectedSettingProfileController: UIViewController {
+class SelectedSettingProfileController: BottomSheetViewCustomController {
     //MARK: - Properties
+    let containerView = UIView()
     let tableView = UITableView(frame: .zero, style: .plain)
     
-    private let divider: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .systemGray
-        return view
-    }()
+    override var heightBottomSheetView: CGFloat {
+        return 500
+    }
+    
+    override var maxHeightScrollTop: CGFloat {
+        return 50
+    }
+    
+    override var minHeightScrollBottom: CGFloat {
+        return 120
+    }
+    
+    override var maxVeclocity: CGFloat {
+        return 800
+    }
+
+    override var bottomSheetView: UIView {
+        return containerView
+    }
     
     private let scrollDivider: UIView = {
         let view = UIView()
@@ -31,10 +45,12 @@ class SelectedSettingProfileController: UIViewController {
     
     
     //MARK: - View Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         configureUI()
+        configureProperties()
     }
     
     deinit {
@@ -42,9 +58,8 @@ class SelectedSettingProfileController: UIViewController {
     }
     
     //MARK: - Helpers
-    func configureUI() {
-        view.backgroundColor = .systemGray2
-        tableView.backgroundColor = .systemGray2
+    func configureProperties() {
+        tableView.backgroundColor = .systemBackground
         tableView.delegate = self
         tableView.dataSource = self
         tableView.rowHeight = UITableView.automaticDimension
@@ -53,23 +68,24 @@ class SelectedSettingProfileController: UIViewController {
         tableView.register(SelectedTypeTableViewCell.self,
                            forCellReuseIdentifier: SelectedTypeTableViewCell.identifier)
         
-        
-        activeConstraint()
     }
     
-    func activeConstraint() {
-        view.addSubview(tableView)
-        view.addSubview(scrollDivider)
+    func configureUI() {
+        containerView.backgroundColor = .systemBackground
+        containerView.clipsToBounds = true
+        containerView.layer.cornerRadius = 25
+        containerView.addSubview(tableView)
+        containerView.addSubview(scrollDivider)
         tableView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
-            scrollDivider.topAnchor.constraint(equalTo: view.topAnchor, constant: 10),
-            scrollDivider.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            scrollDivider.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 10),
+            scrollDivider.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
             
             tableView.topAnchor.constraint(equalTo: scrollDivider.bottomAnchor, constant: 9),
-            tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            tableView.leftAnchor.constraint(equalTo: containerView.leftAnchor),
+            tableView.rightAnchor.constraint(equalTo: containerView.rightAnchor),
+            tableView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
         ])
     }
     
@@ -95,8 +111,4 @@ extension SelectedSettingProfileController: UITableViewDelegate, UITableViewData
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 48
     }
-
-    
-
-
 }

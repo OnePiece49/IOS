@@ -28,14 +28,16 @@ class NavigationCustomView: UIView {
     private var continueSpaceRight: CGFloat = 10
 
     private var centerTitle: String?
+    private var centertitleFont: UIFont = .systemFont(ofSize: 16, weight: .bold)
+    private var centerColor: UIColor = .label
     private var attributeLeftBarButtons: [AttibutesButton] = []
     private var attrubuteRightBarButtons: [AttibutesButton] = []
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = self.centerTitle
-        label.textColor = .label
-        label.font = UIFont.systemFont(ofSize: 16, weight: .bold)
+        label.textColor = self.centerColor
+        label.font = self.centertitleFont
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -49,6 +51,8 @@ class NavigationCustomView: UIView {
     
     //MARK: - View Lifecycle
     init(centerTitle: String? = nil,
+         centertitleFont: UIFont = .systemFont(ofSize: 16, weight: .bold),
+         centerColor: UIColor = .label,
          attributeLeftButtons: [AttibutesButton],
          attributeRightBarButtons: [AttibutesButton],
          isHiddenDivider: Bool = false,
@@ -61,6 +65,8 @@ class NavigationCustomView: UIView {
         self.attrubuteRightBarButtons = attributeRightBarButtons
         self.headerDivider.isHidden = isHiddenDivider
         self.centerTitle = centerTitle
+        self.centerColor = centerColor
+        self.centertitleFont = centertitleFont
         self.beginSpaceLeftButton = beginSpaceLeftButton
         self.beginSpaceRightButton = beginSpaceRightButton
         self.continueSpaceleft = continueSpaceleft
@@ -79,6 +85,7 @@ class NavigationCustomView: UIView {
     func configureUI() {
         addSubview(titleLabel)
         addSubview(headerDivider)
+        backgroundColor = .systemBackground
         
         for attribute in attributeLeftBarButtons {
             let button = UIButton(type: .system)

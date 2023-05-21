@@ -11,11 +11,8 @@ class EditProfileController: UIViewController {
     //MARK: - Properties
     private let tableView = UITableView(frame: .zero, style: .plain)
     let selectController = SelectTypePhotoController()
-    var selectViewTopConstraint: NSLayoutConstraint!
-    var isPresentingSelectVC = false
-    
+    var selectViewTopConstraint: NSLayoutConstraint!    
     var navigationBar: NavigationCustomView!
-    
     
     private lazy var avatarImageView: UIImageView = {
         let iv = UIImageView()
@@ -61,7 +58,9 @@ class EditProfileController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setupNavigationBar()
         configureUI()
+        configureProperties()
     }
     
     func setupNavigationBar() {
@@ -78,60 +77,21 @@ class EditProfileController: UIViewController {
         }
         
         self.navigationBar = NavigationCustomView(centerTitle: "Edit Profile",
-                                                        attributeLeftButtons: [attributeLeftButton],
-                                                        attributeRightBarButtons: [attributeRightButton])
+                                                  attributeLeftButtons: [attributeLeftButton],
+                                                  attributeRightBarButtons: [attributeRightButton])
     }
     
-    func addChildController() {
-        addChild(selectController)
-        view.addSubview(selectController.view)
-        didMove(toParent: self)
-        
-        guard let viewSelect = selectController.view else {return}
-        viewSelect.translatesAutoresizingMaskIntoConstraints = false
-        selectViewTopConstraint = viewSelect.topAnchor.constraint(equalTo: view.bottomAnchor)
-        NSLayoutConstraint.activate([
-            selectViewTopConstraint,
-            viewSelect.widthAnchor.constraint(equalTo: view.widthAnchor),
-            viewSelect.heightAnchor.constraint(equalToConstant: 300),
-            viewSelect.leftAnchor.constraint(equalTo: view.leftAnchor)
-        ])
-        viewSelect.clipsToBounds = true
-        viewSelect.layer.cornerRadius = 20
-    }
-    
-    func removeChildController() {
-        selectController.removeFromParent()
-        selectController.view.removeFromSuperview()
-        didMove(toParent: self)
-    }
 
     
     //MARK: - Helpers
     func configureUI() {
-        view.backgroundColor = .white
-        setupNavigationBar()
-        activeConstraint()
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.separatorStyle = .none
-        tableView.rowHeight = UITableView.automaticDimension
-        tableView.register(EditProfileTableViewCell.self,
-                           forCellReuseIdentifier: EditProfileTableViewCell.identifier)
-        shadowView.addGestureRecognizer(UITapGestureRecognizer(target: self,
-                                                               action: #selector(handleEditAvatarButtonTapped)))
-    }
-    
-    //MARK: - Selectors
-    func activeConstraint() {
-
+        view.backgroundColor = .systemBackground
         view.addSubview(navigationBar)
         view.addSubview(avatarImageView)
         view.addSubview(editAvatarButton)
         view.addSubview(avatarDivider)
         view.addSubview(tableView)
         view.addSubview(shadowView)
-        
 
         tableView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -163,31 +123,34 @@ class EditProfileController: UIViewController {
             shadowView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
         avatarImageView.setDimensions(width: 90, height: 90)
+    }
     
+    //MARK: - Selectors
+    func configureProperties() {
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.separatorStyle = .none
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.register(EditProfileTableViewCell.self,
+                           forCellReuseIdentifier: EditProfileTableViewCell.identifier)
+        shadowView.addGestureRecognizer(UITapGestureRecognizer(target: self,
+                                                               action: #selector(handleEditAvatarButtonTapped)))
     }
     
     
     @objc func handleEditAvatarButtonTapped() {
+        let selectedVC = SelectTypePhotoController()
+        selectedVC.modalPresentationStyle = .overFullScreen
         
-        if !isPresentingSelectVC {
-            addChildController()
-            self.view.layoutIfNeeded()
-            UIView.animate(withDuration: 0.35) {
-                self.selectViewTopConstraint.constant = -200
-                self.shadowView.alpha = 0.8
-                self.view.layoutIfNeeded()
-            }
-        } else {
-
-            UIView.animate(withDuration: 0.35) {
-                self.selectViewTopConstraint.constant = 0
-                self.shadowView.alpha = 0
-                self.view.layoutIfNeeded()
-            }
-            removeFromParent()
+        UIView.animate(withDuration: 0.2) {
+            self.shadowView.alpha = 0.8
         }
-        
-        self.isPresentingSelectVC = !isPresentingSelectVC
+        selectedVC.durationDismissing = {
+            UIView.animate(withDuration: 0.2) {
+                self.shadowView.alpha = 0.0
+            }
+        }
+        self.present(selectedVC, animated: true, completion: .none)
     }
     
 }
@@ -205,10 +168,12 @@ extension EditProfileController: UITableViewDelegate, UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: EditProfileTableViewCell.identifier, for: indexPath) as! EditProfileTableViewCell
         
         if indexPath.row == 0 {
-            cell.cellData = EditProfileCell(type: EditProfileCellType(rawValue: indexPath.row) ?? .fullname, data: "Trịnh Tiến việt")
+            cell.cellData = EditProfileCell(type: EditProfileCellType(rawValue: indexPath.row) ?? .fullname,
+                                            data: "Trịnh Tiến việt")
             
         } else if indexPath.row == 1 {
-            cell.cellData = EditProfileCell(type: EditProfileCellType(rawValue: indexPath.row) ?? .fullname, data: "m.d.garp.49")
+            cell.cellData = EditProfileCell(type: EditProfileCellType(rawValue: indexPath.row) ?? .fullname,
+                                            data: "m.d.garp.49")
         } else {
             cell.cellData = EditProfileCell(type: EditProfileCellType(rawValue: indexPath.row) ?? .fullname)
         }

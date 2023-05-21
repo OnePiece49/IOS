@@ -8,11 +8,27 @@
 import UIKit
 
 
-class SelectTypePhotoController: UIViewController {
+class SelectTypePhotoController: BottomSheetViewCustomController {
     //MARK: - Properties
     let tableView = UITableView(frame: .zero, style: .plain)
     
-    private lazy var avatarUserImageView: UIImageView = {
+    override var bottomSheetView: UIView {
+        return tableView
+    }
+    
+    override var heightBottomSheetView: CGFloat {
+        return 200
+    }
+    
+    override var maxHeightScrollTop: CGFloat {
+        return 40
+    }
+    
+    override var minHeightScrollBottom: CGFloat {
+        return 20
+    }
+    
+    private let avatarUserImageView: UIImageView = {
         let iv = UIImageView()
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.backgroundColor = .blue
@@ -34,6 +50,7 @@ class SelectTypePhotoController: UIViewController {
         super.viewDidLoad()
         
         configureUI()
+        configureProperties()
     }
     
     deinit {
@@ -42,33 +59,17 @@ class SelectTypePhotoController: UIViewController {
     
     //MARK: - Helpers
     func configureUI() {
-        view.backgroundColor = .systemGray2
-        tableView.backgroundColor = .systemGray2
-
+        tableView.backgroundColor = .systemBackground
+        tableView.layer.cornerRadius = 20
+    }
+    
+    func configureProperties() {
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.rowHeight = UITableView.automaticDimension
         tableView.separatorStyle = .none
         tableView.register(SelectedTypeTableViewCell.self,
                            forCellReuseIdentifier: SelectedTypeTableViewCell.identifier)
         tableView.isScrollEnabled = false
-        
-        
-        activeConstraint()
-    }
-    
-    func activeConstraint() {
-        view.addSubview(tableView)
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.topAnchor),
-            tableView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            tableView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            
- 
-        ])
     }
     
     //MARK: - Selectors
