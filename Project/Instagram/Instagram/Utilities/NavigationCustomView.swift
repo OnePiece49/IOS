@@ -33,6 +33,14 @@ class NavigationCustomView: UIView {
     private var attributeLeftBarButtons: [AttibutesButton] = []
     private var attrubuteRightBarButtons: [AttibutesButton] = []
     
+    var leftButtons: [UIButton] {
+        return leftBarButtons
+    }
+    
+    var rightButtons: [UIButton] {
+        return rightBarButtons
+    }
+    
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = self.centerTitle

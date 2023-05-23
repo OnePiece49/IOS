@@ -35,7 +35,7 @@ class LoginController: UIViewController {
         label.isUserInteractionEnabled = true
         return label
     }()
-    
+ 
     private lazy var dontHaveAccountButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -95,6 +95,8 @@ class LoginController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         navigationController?.navigationBar.isHidden = true
+        tabBarController?.tabBar.isHidden = true
+        self.errorLabel.isHidden = true
     }
     
     //MARK: - Helpers
@@ -113,48 +115,35 @@ class LoginController: UIViewController {
         NSLayoutConstraint.activate([
             titleImageView.topAnchor.constraint(equalTo: view.topAnchor, constant: 150),
             titleImageView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-        ])
-        
-        NSLayoutConstraint.activate([
+            
             userTextField.topAnchor.constraint(equalTo: titleImageView.bottomAnchor, constant: 50),
             userTextField.centerXAnchor.constraint(equalTo: titleImageView.centerXAnchor),
             userTextField.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 30),
             userTextField.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -30),
-        ])
-        
-        NSLayoutConstraint.activate([
+            
             passwordTextField.topAnchor.constraint(equalTo: userTextField.bottomAnchor, constant: 12),
             passwordTextField.centerXAnchor.constraint(equalTo: titleImageView.centerXAnchor),
             passwordTextField.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 30),
             passwordTextField.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -30),
-        ])
-        
-        NSLayoutConstraint.activate([
+            
             loginLabel.topAnchor.constraint(equalTo: passwordTextField.bottomAnchor, constant: 16),
             loginLabel.centerXAnchor.constraint(equalTo: titleImageView.centerXAnchor),
             loginLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 30),
             loginLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -30),
             loginLabel.heightAnchor.constraint(equalTo: passwordTextField.heightAnchor, constant: -9),
-        ])
-        
-        NSLayoutConstraint.activate([
+            
             divider.bottomAnchor.constraint(equalTo: dontHaveAccountButton.topAnchor, constant: -8),
             divider.leftAnchor.constraint(equalTo: view.leftAnchor),
             divider.heightAnchor.constraint(equalToConstant: 1),
             divider.widthAnchor.constraint(equalTo: view.widthAnchor),
-        ])
-        
-        NSLayoutConstraint.activate([
+            
             dontHaveAccountButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -15),
             dontHaveAccountButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-        ])
-        
-        NSLayoutConstraint.activate([
+            
             errorLabel.topAnchor.constraint(equalTo: loginLabel.bottomAnchor, constant: 10),
             errorLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 30),
             errorLabel.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -30),
         ])
-   
     }
     
     func activeErrorLabel(with text: String) {
@@ -176,11 +165,12 @@ class LoginController: UIViewController {
             return
         }
         
-        Auth.auth().signIn(withEmail: email, password: password) { auth, error in
+        AuthService.shared.loginUser(email: email, password: password) { auth, error in
             if let error = error {
                 self.activeErrorLabel(with: error.localizedDescription)
                 return
             }
+            
             
             self.errorLabel.isHidden = true
             let mainTBVC = MainTabBarController()

@@ -6,13 +6,22 @@
 //
 
 import UIKit
+import SDWebImage
+
+protocol EditProfileDelegate: AnyObject {
+    func didUpdateProfile(user: User, image: UIImage?)
+}
 
 class EditProfileController: UIViewController {
     //MARK: - Properties
+    var user: User
     private let tableView = UITableView(frame: .zero, style: .plain)
     let selectController = SelectTypePhotoController()
     var selectViewTopConstraint: NSLayoutConstraint!    
     var navigationBar: NavigationCustomView!
+    weak var delegate: EditProfileDelegate?
+    var oldImage: UIImage?
+    let oldUser: User
     
     private lazy var avatarImageView: UIImageView = {
         let iv = UIImageView()
@@ -22,7 +31,8 @@ class EditProfileController: UIViewController {
         iv.layer.cornerRadius = 90 / 2
         iv.layer.masksToBounds = true
         iv.isUserInteractionEnabled = true
-        iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleEditAvatarButtonTapped)))
+        iv.addGestureRecognizer(UITapGestureRecognizer(target: self,
+                                                       action: #selector(handleEditAvatarButtonTapped)))
         return iv
     }()
     
@@ -33,7 +43,8 @@ class EditProfileController: UIViewController {
         button.titleLabel?.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.isUserInteractionEnabled = true
-        button.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleEditAvatarButtonTapped)))
+        button.addGestureRecognizer(UITapGestureRecognizer(target: self,
+                                                           action: #selector(handleEditAvatarButtonTapped)))
         return button
     }()
     
@@ -54,6 +65,25 @@ class EditProfileController: UIViewController {
     }()
 
     //MARK: - View Lifecycle
+    init(user: User) {
+        self.user = user
+        self.oldUser = user
+        
+        super.init(nibName: nil, bundle: nil)
+        
+        let url = URL(string: user.profileImage ?? "")
+        self.avatarImageView.sd_setImage(with: url,
+                                        placeholderImage: UIImage(systemName: "person.circle"))
+        self.oldImage = avatarImageView.image
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        print("DEBUG: EditProfileController deinit")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -63,17 +93,22 @@ class EditProfileController: UIViewController {
         configureProperties()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        self.navigationController?.navigationBar.isHidden = true
+    }
+    
     func setupNavigationBar() {
         view.backgroundColor = .systemBackground
         let attributeLeftButton = AttibutesButton(tilte: "Cancel",
-                                                  font: UIFont.systemFont(ofSize: 16)) {
-            self.dismiss(animated: true, completion: .none)
+                                                  font: UIFont.systemFont(ofSize: 16)) { [weak self] in
+            self?.navigationController?.popViewController(animated: true)
         }
 
         let attributeRightButton = AttibutesButton(tilte: "Done",
                                                    font: UIFont.systemFont(ofSize: 16, weight: .semibold),
-                                                   titleColor: .systemBlue) {
-            self.dismiss(animated: true, completion: .none)
+                                                   titleColor: .systemBlue) { [weak self] in
+
+            self?.updateInfo()
         }
         
         self.navigationBar = NavigationCustomView(centerTitle: "Edit Profile",
@@ -141,16 +176,53 @@ class EditProfileController: UIViewController {
     @objc func handleEditAvatarButtonTapped() {
         let selectedVC = SelectTypePhotoController()
         selectedVC.modalPresentationStyle = .overFullScreen
+        selectedVC.delegate = self
         
-        UIView.animate(withDuration: 0.2) {
+        UIView.animate(withDuration: 0.23) {
             self.shadowView.alpha = 0.8
         }
         selectedVC.durationDismissing = {
-            UIView.animate(withDuration: 0.2) {
+            UIView.animate(withDuration: 0.23) {
                 self.shadowView.alpha = 0.0
             }
         }
-        self.present(selectedVC, animated: true, completion: .none)
+        self.present(selectedVC, animated: false, completion: .none)
+    }
+    
+    func hasChangeOtherInfo() -> Bool {
+        if oldUser.fullname != user.fullname || oldUser.bio != user.bio || oldUser.username != user.username {
+            return false
+        }
+        
+        return true
+    }
+    
+    func hasChangeAvatar() -> Bool {
+        if self.oldImage != self.avatarImageView.image {
+            return false
+        }
+        
+        return true
+    }
+    
+    func updateInfo() {
+        if !hasChangeAvatar() && !hasChangeOtherInfo() {
+            navigationController?.popViewController(animated: true)
+        }
+        
+        if hasChangeAvatar() && hasChangeOtherInfo() {
+            UserService.shared.updateInfoUser(user: user, image: avatarImageView.image) {
+                self.delegate?.didUpdateProfile(user: self.user, image: self.avatarImageView.image)
+                self.navigationController?.popViewController(animated: true)
+            }
+        }
+        
+        if !hasChangeAvatar() && hasChangeOtherInfo() {
+            UserService.shared.updateInfoUser(user: user, image: nil) {
+                self.delegate?.didUpdateProfile(user: self.user, image: self.avatarImageView.image)
+                self.navigationController?.popViewController(animated: true)
+            }
+        }
     }
     
 }
@@ -168,14 +240,18 @@ extension EditProfileController: UITableViewDelegate, UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: EditProfileTableViewCell.identifier, for: indexPath) as! EditProfileTableViewCell
         
         if indexPath.row == 0 {
-            cell.cellData = EditProfileCell(type: EditProfileCellType(rawValue: indexPath.row) ?? .fullname,
-                                            data: "Trịnh Tiến việt")
+            cell.cellData = EditProfileCellData(type: EditProfileCellType(rawValue: indexPath.row) ?? .fullname,
+                                            data: user.fullname)
             
         } else if indexPath.row == 1 {
-            cell.cellData = EditProfileCell(type: EditProfileCellType(rawValue: indexPath.row) ?? .fullname,
-                                            data: "m.d.garp.49")
+            cell.cellData = EditProfileCellData(type: EditProfileCellType(rawValue: indexPath.row) ?? .username,
+                                            data: user.username)
+        } else if indexPath.row == 2 {
+            cell.cellData = EditProfileCellData(type: EditProfileCellType(rawValue: indexPath.row) ?? .bio,
+                                            data: user.bio ?? "")
         } else {
-            cell.cellData = EditProfileCell(type: EditProfileCellType(rawValue: indexPath.row) ?? .fullname)
+            cell.cellData = EditProfileCellData(type: EditProfileCellType(rawValue: indexPath.row) ?? .link,
+                                            data: user.link ?? "")
         }
         return cell
     }
@@ -186,14 +262,83 @@ extension EditProfileController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.row == 2 {
-            let bioVC = EditBioProfileController()
-            bioVC.modalPresentationStyle = .fullScreen
-            present(bioVC, animated: true, completion: .none)
+            let bioVC = EditBioProfileController(bio: user.bio ?? "")
+            bioVC.delegate = self
+            self.navigationController?.pushViewController(bioVC, animated: true)
         } else {
-            let editInfoVC = EditDetailProfileViewController(type: EđitDetailProfileType(rawValue: indexPath.row) ?? .username)
-            editInfoVC.modalPresentationStyle = .fullScreen
-            present(editInfoVC, animated: true, completion: .none)
+            var row: Int = indexPath.row
+            if indexPath.row == 3 {
+                row -= 1
+            }
+            let editInfoVC = EditDetailProfileViewController(type: EđitDetailProfileType(rawValue: row)!,
+                                                             user: self.user)
+            editInfoVC.delegate = self
+            self.navigationController?.pushViewController(editInfoVC, animated: true)
 
         }
     }
+}
+
+
+extension EditProfileController: SelectTypePhotoDelegate {
+    func didSelectChooseLibrary(_ viewController: BottomSheetViewCustomController) {
+        let pickVC = PickPhotoController(type: .changeAvatar)
+        pickVC.delegate = self
+        navigationController?.pushViewController(pickVC, animated: true)
+        viewController.animationDismiss()
+    }
+    
+    func didSelectChooseTakePicture(_ viewController: BottomSheetViewCustomController) {
+        let camVC = CameraController()
+        navigationController?.pushViewController(camVC, animated: true)
+        viewController.animationDismiss()
+    }
+}
+
+extension EditProfileController: PickPhotoDelegate {
+    func didSelectNextButton(image: UIImage?) {
+        self.avatarImageView.image = image
+    }
+}
+
+
+extension EditProfileController: EditBioDelegate {
+    func didSelectDoneButton(text: String) {
+        user.bio = text
+        
+        let indexPath = IndexPath(row: 2, section: 0)
+        let cell = tableView.cellForRow(at: indexPath) as! EditProfileTableViewCell
+        cell.cellData = EditProfileCellData(type: .bio, data: text)
+        tableView.reloadRows(at: [indexPath], with: .none)
+    }
+}
+
+extension EditProfileController: EditDetailDelegate {
+    func didSelectDoneButton(type: EđitDetailProfileType, text: String) {
+        let indexPath: IndexPath
+        switch type {
+        case .fullname:
+            indexPath = IndexPath(row: 0, section: 0)
+            self.user.fullname = text
+        case .username:
+            indexPath = IndexPath(row: 1, section: 0)
+            self.user.username = text
+        case .link:
+            indexPath = IndexPath(row: 3, section: 0)
+            self.user.link = text
+        }
+    
+        let cell = tableView.cellForRow(at: indexPath) as! EditProfileTableViewCell
+        
+        switch type {
+        case .fullname:
+            cell.cellData = EditProfileCellData(type: .fullname, data: text)
+        case .username:
+            cell.cellData = EditProfileCellData(type: .username, data: text)
+        case .link:
+            cell.cellData = EditProfileCellData(type: .link, data: text)
+        }
+    }
+    
+    
 }

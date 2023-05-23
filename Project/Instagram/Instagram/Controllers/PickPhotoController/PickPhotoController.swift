@@ -9,6 +9,15 @@ import Foundation
 import UIKit
 import Photos
 
+enum UsingPickPhoto {
+    case uploadTus
+    case changeAvatar
+}
+
+protocol PickPhotoDelegate: AnyObject {
+    func didSelectNextButton(image: UIImage?)
+}
+
 class PickPhotoController: UIViewController {
     //MARK: - Properties
     var fetchResult = PHFetchResult<PHAsset>()
@@ -21,6 +30,8 @@ class PickPhotoController: UIViewController {
     var widthCropViewConstraint: NSLayoutConstraint!
     var latestYCropView: CGFloat = 0
     var expectePhotodRatio: Float = 0.75
+    weak var delegate: PickPhotoDelegate?
+    var type: UsingPickPhoto
     
     private var heightImageHeader: CGFloat {
         return self.headerPhotoView.photoImageView.frame.height
@@ -41,6 +52,15 @@ class PickPhotoController: UIViewController {
     }
     
     //MARK: - View Lifecycle
+    init(type: UsingPickPhoto) {
+        self.type = type
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -56,7 +76,7 @@ class PickPhotoController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         self.tabBarController?.tabBar.isHidden = false
-
+        
         requestImageQueue.async {
             self.shouldInsetCell = false
         }
@@ -139,10 +159,6 @@ class PickPhotoController: UIViewController {
             case .authorized:
                 self.loadImage()
             case .denied:
-                return
-            case .restricted:
-                return
-            case .limited:
                 return
             default:
                 return
@@ -331,10 +347,16 @@ extension PickPhotoController: UICollectionViewDataSource, UICollectionViewDeleg
 
 extension PickPhotoController: PickHeaderPhotoDelegate {
     func didSelectbackButtonTapped() {
-        self.tabBarController?.selectedViewController = self.tabBarController?.viewControllers?.first
+        navigationController?.popViewController(animated: true)
     }
     
     func didSelectNexButton() {
+        if self.type == .changeAvatar {
+            self.delegate?.didSelectNextButton(image: self.headerPhotoView.photoImageView.image)
+            navigationController?.popViewController(animated: true)
+            return
+        }
+        
         guard let image = self.headerPhotoView.photoImageView.image else {return}
         
         let ratio = image.size.width / image.size.height

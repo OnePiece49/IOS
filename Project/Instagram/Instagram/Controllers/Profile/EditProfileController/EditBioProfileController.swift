@@ -7,9 +7,15 @@
 
 import UIKit
 
+protocol EditBioDelegate: AnyObject {
+    func didSelectDoneButton(text: String)
+}
+
 class EditBioProfileController: UIViewController {
     //MARK: - Properties
     var naviationBar: NavigationCustomView!
+    let bio: String
+    weak var delegate: EditBioDelegate?
     
     lazy var bioTextView: UITextView = {
         let iv = UITextView()
@@ -18,6 +24,7 @@ class EditBioProfileController: UIViewController {
         iv.isUserInteractionEnabled = true
         iv.isScrollEnabled = false
         iv.font = UIFont.systemFont(ofSize: 16)
+        iv.text = self.bio
         iv.becomeFirstResponder()
         return iv
     }()
@@ -30,11 +37,28 @@ class EditBioProfileController: UIViewController {
     }()
     
     //MARK: - View Lifecycle
+    init(bio: String) {
+        self.bio = bio
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    deinit {
+        print("DEBUG: EditBio deinit")
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         configureUI()
         setupAttributes()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        self.navigationController?.navigationBar.isHidden = true
     }
     
     //MARK: - Helpers
@@ -70,19 +94,20 @@ class EditBioProfileController: UIViewController {
     func setupNaviationbar() {
         let attributeLeftButton = AttibutesButton(image: UIImage(systemName: "lessthan"),
                                                   sizeImage: CGSize(width: 18, height: 25),
-                                                  tincolor: .label) {
-            self.dismiss(animated: true, completion: .none)
+                                                  tincolor: .label) { [weak self] in
+            self?.navigationController?.popViewController(animated: true)
         }
         
         let attributeRightButton = AttibutesButton(tilte: "Done",
                                                    font: UIFont.systemFont(ofSize: 16, weight: .semibold),
-                                                   titleColor: .systemBlue) {
-            self.dismiss(animated: true, completion: .none)
+                                                   titleColor: .systemBlue) { [weak self] in
+            self?.delegate?.didSelectDoneButton(text: self?.bioTextView.text ?? "")
+            self?.navigationController?.popViewController(animated: true)
         }
         
         self.naviationBar = NavigationCustomView(centerTitle: "Bio",
-                                                        attributeLeftButtons: [attributeLeftButton],
-                                                        attributeRightBarButtons: [attributeRightButton])
+                                                attributeLeftButtons: [attributeLeftButton],
+                                                attributeRightBarButtons: [attributeRightButton])
     }
     //MARK: - Selectors
     @objc func handelScreenTouched() {

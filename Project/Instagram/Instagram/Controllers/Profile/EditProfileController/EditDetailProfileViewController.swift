@@ -7,10 +7,13 @@
 
 import UIKit
 
+protocol EditDetailDelegate: AnyObject {
+    func didSelectDoneButton(type: EđitDetailProfileType, text: String)
+}
+
 enum EđitDetailProfileType: Int, CaseIterable {
     case fullname
     case username
-    case bio
     case link
     
     var description: String {
@@ -19,8 +22,6 @@ enum EđitDetailProfileType: Int, CaseIterable {
             return "Fullname"
         case .username:
             return "Username"
-        case .bio:
-            return "Bio"
         case .link:
             return "Link"
         }
@@ -31,6 +32,19 @@ class EditDetailProfileViewController: UIViewController {
     //MARK: - Properties
     var naviationBar: NavigationCustomView!
     let typeEdit: EđitDetailProfileType
+    weak var delegate: EditDetailDelegate?
+    let user: User
+    
+    var infoUser: String? {
+        switch typeEdit {
+        case .fullname:
+            return user.fullname
+        case .username:
+            return user.username
+        case .link:
+            return user.link
+        }
+    }
     
     private lazy var usernameLabel: UILabel = {
         let label = UILabel()
@@ -41,11 +55,12 @@ class EditDetailProfileViewController: UIViewController {
         return label
     }()
     
-    private lazy var usernameTextField: UITextField = {
+    private lazy var enterInfoTextField: UITextField = {
         let tf = UITextField()
         tf.font = UIFont.systemFont(ofSize: 16)
         tf.translatesAutoresizingMaskIntoConstraints = false
         tf.becomeFirstResponder()
+        tf.text = self.infoUser
         return tf
     }()
     
@@ -57,13 +72,18 @@ class EditDetailProfileViewController: UIViewController {
     }()
     
     //MARK: - View Lifecycle
-    init(type: EđitDetailProfileType) {
+    init(type: EđitDetailProfileType, user: User) {
         self.typeEdit = type
+        self.user = user
         super.init(nibName: nil, bundle: nil)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        print("DEBUG: EditDetail deinit")
     }
     
     override func viewDidLoad() {
@@ -73,13 +93,17 @@ class EditDetailProfileViewController: UIViewController {
         setupAttributes()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        self.navigationController?.navigationBar.isHidden = true
+    }
+    
     //MARK: - Helpers
     func configureUI() {
         setupNaviationbar()
         view.backgroundColor = .systemBackground
         view.addSubview(naviationBar)
         view.addSubview(usernameLabel)
-        view.addSubview(usernameTextField)
+        view.addSubview(enterInfoTextField)
         view.addSubview(divider)
         
         NSLayoutConstraint.activate([
@@ -91,11 +115,11 @@ class EditDetailProfileViewController: UIViewController {
             usernameLabel.topAnchor.constraint(equalTo: naviationBar.bottomAnchor, constant: 6),
             usernameLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 18),
             
-            usernameTextField.topAnchor.constraint(equalTo: usernameLabel.bottomAnchor, constant: 8),
-            usernameTextField.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 18),
-            usernameTextField.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -13),
+            enterInfoTextField.topAnchor.constraint(equalTo: usernameLabel.bottomAnchor, constant: 8),
+            enterInfoTextField.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 18),
+            enterInfoTextField.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -13),
             
-            divider.topAnchor.constraint(equalTo: usernameTextField.bottomAnchor, constant: 6),
+            divider.topAnchor.constraint(equalTo: enterInfoTextField.bottomAnchor, constant: 6),
             divider.leftAnchor.constraint(equalTo: view.leftAnchor),
             divider.rightAnchor.constraint(equalTo: view.rightAnchor),
             divider.heightAnchor.constraint(equalToConstant: 0.5),
@@ -111,14 +135,15 @@ class EditDetailProfileViewController: UIViewController {
     func setupNaviationbar() {
         let attributeLeftButton = AttibutesButton(image: UIImage(systemName: "lessthan"),
                                                   sizeImage: CGSize(width: 18, height: 25),
-                                                  tincolor: .label) {
-            self.dismiss(animated: true, completion: .none)
+                                                  tincolor: .label) { [weak self] in
+            self?.navigationController?.popViewController(animated: true)
         }
         
         let attributeRightButton = AttibutesButton(tilte: "Done",
                                                    font: UIFont.systemFont(ofSize: 16, weight: .semibold),
-                                                   titleColor: .systemBlue) {
-            self.dismiss(animated: true, completion: .none)
+                                                   titleColor: .systemBlue) { [weak self] in
+            self?.delegate?.didSelectDoneButton(type: self?.typeEdit ?? .fullname, text: self?.enterInfoTextField.text ?? "")
+            self?.navigationController?.popViewController(animated: true)
         }
         
         self.naviationBar = NavigationCustomView(centerTitle: self.typeEdit.description,
@@ -127,7 +152,7 @@ class EditDetailProfileViewController: UIViewController {
     }
     //MARK: - Selectors
     @objc func handelScreenTouched() {
-        self.usernameTextField.endEditing(true)
+        self.enterInfoTextField.endEditing(true)
     }
     
 }

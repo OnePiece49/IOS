@@ -8,7 +8,7 @@
 import UIKit
 
 
-class SelectedSettingProfileController: BottomSheetViewCustomController {
+class SettingProfileController: BottomSheetViewCustomController {
     //MARK: - Properties
     let containerView = UIView()
     let tableView = UITableView(frame: .zero, style: .plain)
@@ -26,7 +26,7 @@ class SelectedSettingProfileController: BottomSheetViewCustomController {
     }
     
     override var maxVeclocity: CGFloat {
-        return 800
+        return 900
     }
 
     override var bottomSheetView: UIView {
@@ -93,7 +93,7 @@ class SelectedSettingProfileController: BottomSheetViewCustomController {
     
 }
 //MARK: - delegate
-extension SelectedSettingProfileController: UITableViewDelegate, UITableViewDataSource {
+extension SettingProfileController: UITableViewDelegate, UITableViewDataSource {
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -111,4 +111,9 @@ extension SelectedSettingProfileController: UITableViewDelegate, UITableViewData
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 48
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        self.animationDismiss()
+    }
+    
 }

@@ -84,7 +84,11 @@ class RegisterController: UIViewController {
         configureUI()
     }
     
-    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        self.errorLabel.isHidden = true
+    }
     
     //MARK: - Helpers
     func configureUI() {
@@ -145,27 +149,20 @@ class RegisterController: UIViewController {
             return
         }
         
-        let dicionary = ["email": email, "fullname": fullname, "password": password, "username": usermame]
+        let auth = AuthCrentials(email: email,
+                                 password: password,
+                                 fullName: fullname,
+                                 userName: usermame)
         
-        Auth.auth().createUser(withEmail: email, password: password) { auth, error in
+        AuthService.shared.registerUser(authCretical: auth) { error in
             if let error = error {
-                print("DEBUG: \(error.localizedDescription)")
                 self.activeErrorLabel(with: error.localizedDescription)
                 return
             }
-            
-            guard let auth = auth else {return}
-            
-            self.db.collection("users").document(auth.user.uid).setData(dicionary) { error in
-                if let error = error {
-                    print("DEBUG: \(error.localizedDescription)")
-                    self.activeErrorLabel(with: error.localizedDescription)
-                }
-            }
-            
             self.errorLabel.isHidden = true
             self.navigationController?.popViewController(animated: true)
         }
     }
+    
 }
 //MARK: - delegate

@@ -27,30 +27,23 @@ enum EditProfileCellType: Int, CaseIterable {
     }
 }
 
-class EditProfileCell {
+class EditProfileCellData {
     private var type: EditProfileCellType
-    private var data: String? = nil
+    private var data: String
     
-    var mainTitle: String? {
-        guard let data = data else {
-            switch type {
-            case .bio:
-                return "Bio"
-            case .link:
-                return "Add link"
-            default:
-                return ""
-            }
+    var mainTitle: String {
+        if data == "" {
+            return type.description
         }
         
         return data
     }
     
-    var subTitle: String? {
+    var subTitle: String {
         return type.description
     }
     
-    init(type: EditProfileCellType, data: String? = nil) {
+    init(type: EditProfileCellType, data: String) {
         self.type = type
         self.data = data
     }
@@ -59,7 +52,7 @@ class EditProfileCell {
 class EditProfileTableViewCell: UITableViewCell {
     //MARK: - Properties
     static let identifier = "EditProfileTableViewCell"
-    var cellData: EditProfileCell? {
+    var cellData: EditProfileCellData? {
         didSet {
             self.updateUI()
         }
@@ -78,6 +71,7 @@ class EditProfileTableViewCell: UITableViewCell {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.systemFont(ofSize: 16)
         label.textColor = .label
+        label.numberOfLines = 0
         return label
     }()
     
@@ -135,8 +129,10 @@ class EditProfileTableViewCell: UITableViewCell {
             return
         }
         
-        if cellData.mainTitle == "Bio" || cellData.mainTitle == "Add link" {
+        if cellData.mainTitle == "Bio" || cellData.mainTitle == "Link" {
             self.mainLabel.textColor = .systemGray
+        } else {
+            self.mainLabel.textColor = .label
         }
         self.mainLabel.text = cellData.mainTitle
         self.subLabel.text = cellData.subTitle

@@ -7,9 +7,14 @@
 
 import UIKit
 
+protocol SelectTypePhotoDelegate: AnyObject {
+    func didSelectChooseLibrary(_ viewController: BottomSheetViewCustomController)
+    func didSelectChooseTakePicture(_ viewController: BottomSheetViewCustomController)
+}
 
 class SelectTypePhotoController: BottomSheetViewCustomController {
     //MARK: - Properties
+    weak var delegate: SelectTypePhotoDelegate?
     let tableView = UITableView(frame: .zero, style: .plain)
     
     override var bottomSheetView: UIView {
@@ -117,5 +122,12 @@ extension SelectTypePhotoController: UITableViewDelegate, UITableViewDataSource 
         return 48
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if indexPath.row == 0 {
+            delegate?.didSelectChooseLibrary(self)
+        } else if indexPath.row == 1 {
+            delegate?.didSelectChooseTakePicture(self)
+        }
+    }
 
 }

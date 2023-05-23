@@ -54,6 +54,7 @@ class InstagramStoryLayer: CAGradientLayer {
         segmentLayer.lineCap = CAShapeLayerLineCap.round
         segmentLayer.fillColor = nil
         replicatorLayer.addSublayer(segmentLayer)
+        
         replicatorLayer.frame = self.bounds
         let angle = 2 * CGFloat.pi / CGFloat(numSegments)
         replicatorLayer.instanceCount = numSegments

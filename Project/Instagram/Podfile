@@ -9,4 +9,7 @@ target 'Instagram' do
 	pod 'FirebaseCore'
 	pod 'FirebaseFirestore'
 	pod 'FirebaseAuth'
+  pod 'FirebaseStorage'
+  
+  pod 'SDWebImage'
 end

@@ -14,6 +14,12 @@ class HomeController: UIViewController {
     let heightHeaderView: CGFloat = 60
     var currentYContentOffset: CGFloat = 0
     
+    var user: User? {
+        didSet {
+    
+        }
+    }
+    
     private lazy var instagramHeaderView: InstagramHeaderView = {
         let header = InstagramHeaderView()
         header.translatesAutoresizingMaskIntoConstraints = false

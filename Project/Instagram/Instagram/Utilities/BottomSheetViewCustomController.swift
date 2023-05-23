@@ -11,8 +11,7 @@ import UIKit
 class BottomSheetViewCustomController: UIViewController {
     //MARK: - Properties
     private var isPresentingSelectVC: Bool = true
-    private var bottomSheetViewConstraint: NSLayoutConstraint!
-    
+    private var topBottomSheetViewConstraint: NSLayoutConstraint!
     var bottomSheetView: UIView {
         fatalError("Subclasses are not ovveride 'bottomSheetView'")
     }
@@ -22,6 +21,7 @@ class BottomSheetViewCustomController: UIViewController {
     }
     
     var durationDismissing: (() -> Void)?
+    var willEndDissmiss: (() -> Void)?
     
     var durationAnimation: CGFloat {
         return 0.2
@@ -61,6 +61,15 @@ class BottomSheetViewCustomController: UIViewController {
         self.configureBottomSheetView()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        UIView.animate(withDuration: durationAnimation) {
+            self.topBottomSheetViewConstraint.constant = -self.heightBottomSheetView
+            self.view.layoutIfNeeded()
+        }
+    }
+
     
     //MARK: - Helpers
     func configureBottomSheetView() {
@@ -73,10 +82,9 @@ class BottomSheetViewCustomController: UIViewController {
             bottomSheetView.isUserInteractionEnabled = true
         }
 
-        bottomSheetViewConstraint = bottomSheetView.topAnchor.constraint(equalTo: view.bottomAnchor,
-                                                                         constant: -self.heightBottomSheetView)
+        topBottomSheetViewConstraint = bottomSheetView.topAnchor.constraint(equalTo: view.bottomAnchor, constant: 0)
         NSLayoutConstraint.activate([
-            bottomSheetViewConstraint,
+            topBottomSheetViewConstraint,
             bottomSheetView.heightAnchor.constraint(equalTo: view.heightAnchor),
             bottomSheetView.leftAnchor.constraint(equalTo: view.leftAnchor),
             bottomSheetView.rightAnchor.constraint(equalTo: view.rightAnchor),
@@ -88,6 +96,7 @@ class BottomSheetViewCustomController: UIViewController {
         view.addSubview(shadowView)
         shadowView.backgroundColor = .clear
         shadowView.translatesAutoresizingMaskIntoConstraints = false
+        
         NSLayoutConstraint.activate([
             shadowView.topAnchor.constraint(equalTo: view.topAnchor),
             shadowView.leftAnchor.constraint(equalTo: view.leftAnchor),
@@ -96,7 +105,7 @@ class BottomSheetViewCustomController: UIViewController {
         ])
         
         self.shadowView.addGestureRecognizer(UITapGestureRecognizer(target: self,
-                                                               action: #selector(animationCustomViewMoved)))
+                                                                    action: #selector(animationDismiss)))
         self.shadowView.isUserInteractionEnabled = true
     }
     
@@ -115,7 +124,7 @@ class BottomSheetViewCustomController: UIViewController {
             }
         } else if sender.state == .ended {
             if veclocitY > self.maxVeclocity {
-                animationCustomViewMoved()
+                animationDismiss()
                 return
             }
             
@@ -124,25 +133,25 @@ class BottomSheetViewCustomController: UIViewController {
                     self.bottomSheetView.transform = .identity
                 }
             } else {
-                animationCustomViewMoved()
+                animationDismiss()
             }
         }
     }
     
-    @objc func animationCustomViewMoved() {
+    @objc func animationDismiss() {
         if isPresentingSelectVC {
             self.view.layoutIfNeeded()
             UIView.animate(withDuration: self.durationAnimation) {
-                self.bottomSheetViewConstraint.constant = 0
+                self.topBottomSheetViewConstraint.constant = 0
                 self.view.layoutIfNeeded()
                 self.durationDismissing?()
             } completion: { _ in
+                self.willEndDissmiss?()
                 self.dismiss(animated: true, completion: .none)
             }
             
         } else {
             UIView.animate(withDuration: self.durationAnimation) {
-                self.bottomSheetViewConstraint.constant = -self.heightBottomSheetView
                 self.view.layoutIfNeeded()
             }
         }

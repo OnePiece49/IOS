@@ -105,7 +105,7 @@ class BottomSheetViewControllerCustomController: UIViewController {
         ])
         
         self.shadowView.addGestureRecognizer(UITapGestureRecognizer(target: self,
-                                                               action: #selector(animationCustomViewMoved)))
+                                                               action: #selector(animationDismiss)))
         self.shadowView.isUserInteractionEnabled = true
     }
     
@@ -124,7 +124,7 @@ class BottomSheetViewControllerCustomController: UIViewController {
             }
         } else if sender.state == .ended {
             if veclocitY > self.maxVeclocity {
-                self.animationCustomViewMoved()
+                self.animationDismiss()
                 return
             }
             
@@ -133,12 +133,12 @@ class BottomSheetViewControllerCustomController: UIViewController {
                     self.bottomSheetView.transform = .identity
                 }
             } else {
-                self.animationCustomViewMoved()
+                self.animationDismiss()
             }
         }
     }
     
-    @objc func animationCustomViewMoved() {
+    @objc func animationDismiss() {
         if isPresentingSelectVC {
             self.view.layoutIfNeeded()
             UIView.animate(withDuration: self.durationAnimation) {
