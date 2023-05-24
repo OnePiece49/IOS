@@ -47,7 +47,7 @@ class MainTabBarController: UITabBarController {
     }
     
     private func configureUI() {
-        let searchNaVc = templateNavigationController(rootViewController: SearchController(), namedImage: "search")
+        let searchNaVc = templateNavigationController(rootViewController: ExploreController(), namedImage: "search")
         let uploadFeedNavc = templateNavigationController(rootViewController: PickPhotoController(type: .uploadTus),
                                                           namedImage: "Add")
         let shortVideoNaVc = templateNavigationController(rootViewController: ShortVideoController(), namedImage: "video")
@@ -90,7 +90,7 @@ extension MainTabBarController: UITabBarControllerDelegate {
             guard let homeVC =  self.homeNaVc.viewControllers.first as? HomeController,
                   homeVC.isPresenting else {return}
             
-            UIView.animate(withDuration: 0.4) {
+            UIView.animate(withDuration: 0.3) {
                 homeVC.collectionView.setContentOffset(CGPoint(x: 0, y: 0), animated: true)
             }
         }

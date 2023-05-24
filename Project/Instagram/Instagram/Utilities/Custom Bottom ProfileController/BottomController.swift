@@ -7,15 +7,35 @@
 
 import UIKit
 
+enum BottomControllerType {
+    case image
+    case video
+    case tag
+}
+
 class BottomController: UIViewController {
     //MARK: - Properties
-    private var numberRowInSection: Int!
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     let titleImage: UIImage?
+    let type: BottomControllerType
+    var status: [InstaStatus] = []
+    var user: User? {
+        didSet {
+            guard let user = user else {
+                return
+            }
+
+            StatusService.shared.fetchTusUser(uid: user.uid) { status in
+                self.status.append(status!)
+                self.collectionView.reloadData()
+            }
+        }
+    }
+    
     
     //MARK: - View Lifecycle
-    init(numberRow: Int, image: UIImage?) {
-        self.numberRowInSection = numberRow
+    init(image: UIImage?, type: BottomControllerType) {
+        self.type = type
         self.titleImage = image
         super.init(nibName: nil, bundle: nil)
     }
@@ -78,12 +98,13 @@ extension BottomController: UICollectionViewDelegate, UICollectionViewDataSource
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return self.numberRowInSection
+        return status.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BottomCollectionViewCell.identifier, for: indexPath) as! BottomCollectionViewCell
-        cell.testLabel.text = String(indexPath.row)
+        let url = URL(string: self.status[indexPath.row].postImage.imageURL)
+        cell.photoImage.sd_setImage(with: url)
         return cell
     }
 }

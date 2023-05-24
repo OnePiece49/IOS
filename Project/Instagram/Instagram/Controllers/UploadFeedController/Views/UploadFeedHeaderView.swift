@@ -53,7 +53,7 @@ class UploadFeedHeaderView: UIView {
      let shadowView: UIView = {
         let view = UIView(frame: .zero)
         view.alpha = 0.0
-        view.layer.backgroundColor = UIColor.white.cgColor
+        view.layer.backgroundColor = UIColor.systemBackground.cgColor
         return view
     }()
     
@@ -76,7 +76,7 @@ class UploadFeedHeaderView: UIView {
     func configureUI() {
         setupNavigation()
         
-        backgroundColor = .white
+        backgroundColor = .systemBackground
         addSubview(placeHolderLabel)
         addSubview(statusTextView)
         addSubview(shadowView)
@@ -95,12 +95,12 @@ class UploadFeedHeaderView: UIView {
             imageUploadImageView.leftAnchor.constraint(equalTo: leftAnchor, constant: 10),
             
             statusTextView.leftAnchor.constraint(equalTo: imageUploadImageView.rightAnchor, constant: 8),
-            statusTextView.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 1),
+            statusTextView.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 4),
             statusTextView.rightAnchor.constraint(equalTo: rightAnchor, constant: -10),
             statusTextView.heightAnchor.constraint(equalToConstant: 87),
             
             placeHolderLabel.leftAnchor.constraint(equalTo: statusTextView.leftAnchor, constant: 3),
-            placeHolderLabel.topAnchor.constraint(equalTo: statusTextView.topAnchor, constant: 30)
+            placeHolderLabel.topAnchor.constraint(equalTo: statusTextView.topAnchor, constant: 12)
         ])
 
         imageUploadImageView.setDimensions(width: 70, height: 70 / ratio)
@@ -115,14 +115,14 @@ class UploadFeedHeaderView: UIView {
     func setupNavigation() {
         let leftButtonAttribute = AttibutesButton(image: UIImage(systemName: "chevron.backward"),
                                                   sizeImage: CGSize(width: 20, height: 20),
-                                                  tincolor: .label) {
-            self.delegate?.didSelectBackButton()
+                                                  tincolor: .label) { [weak self] in
+            self?.delegate?.didSelectBackButton()
         }
         
         let rightButtonAttribute = AttibutesButton(tilte: "Share", 
                                                    font: .systemFont(ofSize: 18, weight: .semibold),
-                                                   titleColor: .systemBlue) {
-            self.delegate?.didSelectShareButton()
+                                                   titleColor: .systemBlue) {  [weak self] in
+            self?.delegate?.didSelectShareButton()
         }
         
         self.navigationBar = NavigationCustomView(centerTitle: "New Post",
@@ -130,6 +130,10 @@ class UploadFeedHeaderView: UIView {
                                                   attributeLeftButtons: [leftButtonAttribute],
                                                   attributeRightBarButtons: [rightButtonAttribute],
                                                   beginSpaceLeftButton: 9, beginSpaceRightButton: 9)
+    }
+    
+    func getSatusUpload() -> String {
+        return self.statusTextView.text
     }
     
     //MARK: - Selectors

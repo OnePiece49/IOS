@@ -15,6 +15,7 @@ protocol EditProfileDelegate: AnyObject {
 class EditProfileController: UIViewController {
     //MARK: - Properties
     var user: User
+    let loadingIndicator = UIActivityIndicatorView()
     private let tableView = UITableView(frame: .zero, style: .plain)
     let selectController = SelectTypePhotoController()
     var selectViewTopConstraint: NSLayoutConstraint!    
@@ -65,16 +66,14 @@ class EditProfileController: UIViewController {
     }()
 
     //MARK: - View Lifecycle
-    init(user: User) {
+    init(user: User, image: UIImage?) {
         self.user = user
         self.oldUser = user
         
         super.init(nibName: nil, bundle: nil)
         
-        let url = URL(string: user.profileImage ?? "")
-        self.avatarImageView.sd_setImage(with: url,
-                                        placeholderImage: UIImage(systemName: "person.circle"))
-        self.oldImage = avatarImageView.image
+        self.avatarImageView.image = image
+        self.oldImage = image
     }
     
     required init?(coder: NSCoder) {
@@ -127,8 +126,11 @@ class EditProfileController: UIViewController {
         view.addSubview(avatarDivider)
         view.addSubview(tableView)
         view.addSubview(shadowView)
+        view.addSubview(loadingIndicator)
 
         tableView.translatesAutoresizingMaskIntoConstraints = false
+        loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
+        loadingIndicator.layer.zPosition = .greatestFiniteMagnitude
         
         NSLayoutConstraint.activate([
             navigationBar.leftAnchor.constraint(equalTo: view.leftAnchor),
@@ -156,6 +158,9 @@ class EditProfileController: UIViewController {
             shadowView.leftAnchor.constraint(equalTo: view.leftAnchor),
             shadowView.rightAnchor.constraint(equalTo: view.rightAnchor),
             shadowView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            loadingIndicator.rightAnchor.constraint(equalTo: navigationBar.rightAnchor, constant: -12),
+            loadingIndicator.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 12),
         ])
         avatarImageView.setDimensions(width: 90, height: 90)
     }
@@ -191,36 +196,45 @@ class EditProfileController: UIViewController {
     
     func hasChangeOtherInfo() -> Bool {
         if oldUser.fullname != user.fullname || oldUser.bio != user.bio || oldUser.username != user.username {
-            return false
+            return true
         }
         
-        return true
+        return false
     }
     
     func hasChangeAvatar() -> Bool {
         if self.oldImage != self.avatarImageView.image {
-            return false
+            return true
         }
         
-        return true
+        return false
     }
     
     func updateInfo() {
         if !hasChangeAvatar() && !hasChangeOtherInfo() {
             navigationController?.popViewController(animated: true)
+            return
         }
         
-        if hasChangeAvatar() && hasChangeOtherInfo() {
+        if hasChangeAvatar() {
+            self.loadingIndicator.startAnimating()
+            self.navigationBar.rightButtons[0].isHidden = true
             UserService.shared.updateInfoUser(user: user, image: avatarImageView.image) {
                 self.delegate?.didUpdateProfile(user: self.user, image: self.avatarImageView.image)
+                self.loadingIndicator.stopAnimating()
                 self.navigationController?.popViewController(animated: true)
+                return
             }
         }
         
         if !hasChangeAvatar() && hasChangeOtherInfo() {
+            self.loadingIndicator.startAnimating()
+            self.navigationBar.rightButtons[0].isHidden = true
             UserService.shared.updateInfoUser(user: user, image: nil) {
                 self.delegate?.didUpdateProfile(user: self.user, image: self.avatarImageView.image)
                 self.navigationController?.popViewController(animated: true)
+                self.loadingIndicator.stopAnimating()
+                return
             }
         }
     }
@@ -289,18 +303,24 @@ extension EditProfileController: SelectTypePhotoDelegate {
     }
     
     func didSelectChooseTakePicture(_ viewController: BottomSheetViewCustomController) {
-        let camVC = CameraController()
+        let camVC = CameraController(type: .changeAvatar)
+        camVC.delegate = self
         navigationController?.pushViewController(camVC, animated: true)
         viewController.animationDismiss()
     }
 }
 
-extension EditProfileController: PickPhotoDelegate {
+extension EditProfileController: PickPhotoDelegate, CameraDelegate {
+    func didCapturePhoto(image: UIImage?) {
+        self.avatarImageView.image = image
+    }
+    
     func didSelectNextButton(image: UIImage?) {
         self.avatarImageView.image = image
     }
-}
+    
 
+}
 
 extension EditProfileController: EditBioDelegate {
     func didSelectDoneButton(text: String) {

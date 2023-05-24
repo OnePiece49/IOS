@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import Photos
 
-enum UsingPickPhoto {
+enum UsingPickPhotoType {
     case uploadTus
     case changeAvatar
 }
@@ -31,7 +31,7 @@ class PickPhotoController: UIViewController {
     var latestYCropView: CGFloat = 0
     var expectePhotodRatio: Float = 0.75
     weak var delegate: PickPhotoDelegate?
-    var type: UsingPickPhoto
+    var type: UsingPickPhotoType
     
     private var heightImageHeader: CGFloat {
         return self.headerPhotoView.photoImageView.frame.height
@@ -52,7 +52,7 @@ class PickPhotoController: UIViewController {
     }
     
     //MARK: - View Lifecycle
-    init(type: UsingPickPhoto) {
+    init(type: UsingPickPhotoType) {
         self.type = type
         super.init(nibName: nil, bundle: nil)
     }
@@ -310,7 +310,7 @@ extension PickPhotoController: UICollectionViewDataSource, UICollectionViewDeleg
         }
         
         manager.requestImage(for: asset,
-                            targetSize: CGSize(width: Int(1000 * ratio), height: 1000),
+                            targetSize: CGSize(width: Int(600 * ratio), height: 600),
                             contentMode: .aspectFit,
                             options: requestOption()) { image, _ in
             self.headerPhotoView.photoImageView.image = image
@@ -347,7 +347,12 @@ extension PickPhotoController: UICollectionViewDataSource, UICollectionViewDeleg
 
 extension PickPhotoController: PickHeaderPhotoDelegate {
     func didSelectbackButtonTapped() {
-        navigationController?.popViewController(animated: true)
+        if self.type == .changeAvatar {
+            self.navigationController?.popViewController(animated: true)
+            return
+        }
+        
+        self.tabBarController?.selectedViewController = self.tabBarController?.viewControllers?.first
     }
     
     func didSelectNexButton() {
@@ -370,8 +375,16 @@ extension PickPhotoController: PickHeaderPhotoDelegate {
     }
     
     func didSelectCamera() {
-        let camVC = CameraController()
+        let camVC = CameraController(type: self.type)
+        camVC.delegate = self
         navigationController?.pushViewController(camVC, animated: false)
     }
 }
 
+extension PickPhotoController: CameraDelegate {
+    func didCapturePhoto(image: UIImage?) {
+        self.delegate?.didSelectNextButton(image: image)
+    }
+    
+    
+}

@@ -138,9 +138,14 @@ class ProfileController: UIViewController {
 
     
     func configureTabTripController() {
-        let bottomVC1 = BottomController(numberRow: 80, image: UIImage(named: "Grid Icon"))
-        let bottomVC2 = BottomController(numberRow: 60, image: UIImage(named: "Tags Icon"))
-        let bottomVC3 = BottomController(numberRow: 40, image: UIImage(named: "Grid Icon"))
+        let bottomVC1 = BottomController(image: UIImage(named: "Grid Icon"), type: .image)
+        let bottomVC2 = BottomController(image: UIImage(named: "Tags Icon"),  type: .image)
+        let bottomVC3 = BottomController(image: UIImage(named: "Grid Icon"), type: .image)
+        bottomVC1.user = self.user
+        bottomVC2.user = self.user
+        bottomVC3.user = self.user
+
+        
         let configureTabBar = ConfigureTabBar(backgroundColor: .white,
                                               dividerColor: .black,
                                               selectedBarColor: .green,
@@ -234,7 +239,7 @@ extension ProfileController: HeaderProfileViewDelegate {
         viewTransform = CGAffineTransform(scaleX: 0.88, y: 0.88)
         self.containerScrollView.layer.cornerRadius = 20
         
-        let switchAccountVC = SwitchAccountController()
+        let switchAccountVC = SwitchAccountController(imageUser: self.headerViewController.getAvatarImage())
         switchAccountVC.modalPresentationStyle = .overFullScreen
         switchAccountVC.delegate = self
         switchAccountVC.durationDismissing = {
@@ -273,7 +278,7 @@ extension ProfileController: HeaderProfileViewDelegate {
     }
     
     func didSelectEditButton() {
-        let editProfileVC = EditProfileController(user: self.user)
+        let editProfileVC = EditProfileController(user: self.user, image: headerViewController.getAvatarImage())
         editProfileVC.delegate = self
         self.navigationController?.pushViewController(editProfileVC, animated: true)
     }

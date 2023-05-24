@@ -8,9 +8,14 @@
 import UIKit
 import Photos
 
+protocol CapturePhotoDelegate: AnyObject {
+    func didSlectSaveButton(image: UIImage?)
+}
+
 class CapturePhotoController: UIViewController {
     //MARK: - Properties
-
+    let type: UsingPickPhotoType
+    weak var delegate: CapturePhotoDelegate?
 
     private lazy var photoImageView: UIImageView = {
         let iv = UIImageView(image: UIImage(named: "jennie"))
@@ -62,6 +67,7 @@ class CapturePhotoController: UIViewController {
     
     
     //MARK: - View Lifecycle
+
     
     override func viewDidAppear(_ animated: Bool) {
         self.tabBarController?.tabBar.isHidden = true
@@ -71,7 +77,8 @@ class CapturePhotoController: UIViewController {
         self.tabBarController?.tabBar.isHidden = false
     }
     
-    init(image: UIImage?) {
+    init(image: UIImage?, type: UsingPickPhotoType) {
+        self.type = type
         super.init(nibName: nil, bundle: nil)
         self.photoImageView.image = image
     }
@@ -127,13 +134,19 @@ class CapturePhotoController: UIViewController {
                     print("DEBUG: save image success")
                 }
                 DispatchQueue.main.async {
-                    self.navigationController?.popToRootViewController(animated: true)
+                    if self.type == .uploadTus {
+                        self.navigationController?.popToRootViewController(animated: true)
+                        return
+                    }
+                    
+                    self.delegate?.didSlectSaveButton(image: image)
+                    self.navigationController?.popToViewController(self.navigationController!.viewControllers[1], animated: true)
                 }
             }
     }
     
     @objc func handleBackImageTapped() {
-        navigationController?.popViewController(animated: true)
+        self.navigationController?.popViewController(animated: true)
 
     }
     

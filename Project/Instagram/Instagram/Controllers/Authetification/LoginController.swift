@@ -157,25 +157,29 @@ class LoginController: UIViewController {
     }
     
     @objc func handleLoginLabelTapped() {
+        loginLabel.isUserInteractionEnabled = false
         guard let email = userTextField.text,
               let password = passwordTextField.text else {return}
         
         if email == "" || password == "" {
             self.activeErrorLabel(with: "Username(email) and password must not be empty")
+            loginLabel.isUserInteractionEnabled = true
             return
         }
         
         AuthService.shared.loginUser(email: email, password: password) { auth, error in
             if let error = error {
                 self.activeErrorLabel(with: error.localizedDescription)
+                self.loginLabel.isUserInteractionEnabled = true
                 return
             }
-            
             
             self.errorLabel.isHidden = true
             let mainTBVC = MainTabBarController()
             mainTBVC.modalPresentationStyle = .fullScreen
+
             self.present(mainTBVC, animated: true, completion: .none)
+            self.loginLabel.isUserInteractionEnabled = true
         }
     }
     

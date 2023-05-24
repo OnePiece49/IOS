@@ -16,18 +16,22 @@ class UserService {
     private let db = Firestore.firestore()
     
     func fetchUser(uid: String, completion: @escaping (User? ,Error?) -> Void) {
-        db.collection("users").document(uid).getDocument { documentSnap, error in
-            if let error = error {
-                completion(nil ,error)
+        let queue = DispatchQueue(label: "fetching user")
+        queue.async {
+            FirebaseRef.ref_user.document(uid).getDocument { documentSnap, error in
+                if let error = error {
+                    completion(nil ,error)
+                }
+                
+                guard let dictionary = documentSnap?.data() else {
+                    return
+                }
+                
+                let user = User(uid: uid, dictionary: dictionary)
+                completion(user, nil)
             }
-            
-            guard let dictionary = documentSnap?.data() else {
-                return
-            }
-            
-            let user = User(uid: uid, dictionary: dictionary)
-            completion(user, nil)
         }
+
     }
     
     func updateInfoUser(user: User, image: UIImage?, completion: @escaping () -> Void) {

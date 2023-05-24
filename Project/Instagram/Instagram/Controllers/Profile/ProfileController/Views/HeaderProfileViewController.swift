@@ -202,7 +202,7 @@ class HeaderProfileViewController: UIViewController {
             infoStackView.leftAnchor.constraint(equalTo: avartImageView.rightAnchor, constant: 38),
             infoStackView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
             
-            fullnameLabel.centerXAnchor.constraint(equalTo: avartImageView.centerXAnchor),
+            fullnameLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 13),
             fullnameLabel.topAnchor.constraint(equalTo: avartImageView.bottomAnchor, constant: 12),
             fullnameLabel.widthAnchor.constraint(equalToConstant: 120),
             
@@ -243,6 +243,10 @@ class HeaderProfileViewController: UIViewController {
         if let image = image {
             self.avartImageView.image = image
         }
+    }
+    
+    func getAvatarImage() -> UIImage? {
+        self.avartImageView.image
     }
     
     func createStorySection() -> NSCollectionLayoutSection {

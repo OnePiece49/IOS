@@ -13,10 +13,12 @@ class HomeController: UIViewController {
     var isPresenting: Bool = true
     let heightHeaderView: CGFloat = 60
     var currentYContentOffset: CGFloat = 0
+    var instagramStatus: [InstaStatus] = []
+    var numberStatus = 0
     
     var user: User? {
         didSet {
-    
+            self.fetchStatus()
         }
     }
     
@@ -31,7 +33,6 @@ class HomeController: UIViewController {
     //MARK: - View Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-            
         configureUI()
         configureProperties()
     }
@@ -79,6 +80,7 @@ class HomeController: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.bounces = false
+        collectionView.collectionViewLayout = self.createLayoutCollectionView()
         collectionView.register(StoryHomeCollectionViewCell.self,
                                 forCellWithReuseIdentifier: StoryHomeCollectionViewCell.identifier)
         collectionView.register(HomeFeedCollectionViewCell.self,
@@ -86,33 +88,40 @@ class HomeController: UIViewController {
         collectionView.register(FooterStoryCollectionView.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
                                 withReuseIdentifier: FooterStoryCollectionView.identifier)
-        collectionView.collectionViewLayout = self.createLayoutCollectionView()
     }
     
     func createStorySection() -> NSCollectionLayoutSection {
-        let item = ComposionalLayout.createItem(layoutSize: .init(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0)))
-        let group = ComposionalLayout.createGroup(axis:
-                                                        .horizontal,
-                                                  layoutSize:
-                                                        .init(widthDimension: .absolute(82), heightDimension: .absolute(100)),
-                                                  item: item, count: 1)
-        let section = ComposionalLayout.createSectionWithouHeader(group: group)
+        let sizeItem: NSCollectionLayoutSize = .init(widthDimension: .fractionalWidth(1.0),
+                                                     heightDimension: .fractionalHeight(1.0))
+        let item = ComposionalLayout.createItem(layoutSize: sizeItem)
         
+        let sizeGroup: NSCollectionLayoutSize = .init(widthDimension: .absolute(82),
+                                                      heightDimension: .absolute(100))
+        let group = ComposionalLayout.createGroup(axis: .horizontal,
+                                                  layoutSize: sizeGroup,
+                                                  item: item, count: 1)
+        
+        let section = ComposionalLayout.createSectionWithouHeader(group: group)
         section.interGroupSpacing = 2
         section.orthogonalScrollingBehavior = .continuous
-        let footer = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(0.5)), elementKind: UICollectionView.elementKindSectionFooter, alignment: .bottom)
+        
+        let sizeFooter = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                                heightDimension: .absolute(0.5))
+        let footer = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: sizeFooter,
+                                                                 elementKind: UICollectionView.elementKindSectionFooter,
+                                                                 alignment: .bottom)
         section.boundarySupplementaryItems = [footer]
         return section
     }
     
     func createFeedSection() -> NSCollectionLayoutSection {
-        let item = ComposionalLayout.createItem(layoutSize: .init(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(400)))
+        let item = ComposionalLayout.createItem(layoutSize: .init(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(600)))
         let group = ComposionalLayout.createGroup(axis: .horizontal,
-                                                  layoutSize: .init(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(400)),
+                                                  layoutSize: .init(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(600)),
                                                   item: item,
                                                   count: 1)
         let section = ComposionalLayout.createSectionWithouHeader(group: group)
-        section.interGroupSpacing = 25
+        section.interGroupSpacing = 22
         return section
     }
     
@@ -130,6 +139,25 @@ class HomeController: UIViewController {
         
         return layout
     }
+    
+    func fetchStatus() {
+        guard let uid = user?.uid else {return}
+        StatusService.shared.fetchTusUser(uid: uid) { status in
+            guard let status = status else {
+                return
+            }
+            
+            self.instagramStatus.append(status)
+            self.insertStatus()
+//            self.collectionView.reloadData()
+        }
+    }
+    
+    func insertStatus() {
+        let numberStatus = self.collectionView.numberOfItems(inSection: 1)
+        let indexPath = IndexPath(item: numberStatus, section: 1)
+        self.collectionView.insertItems(at: [indexPath])
+    }
     //MARK: - Selectors
     
 }
@@ -137,14 +165,17 @@ class HomeController: UIViewController {
 extension HomeController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if indexPath.section == 0 {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: StoryHomeCollectionViewCell.identifier, for: indexPath) as! StoryHomeCollectionViewCell
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: StoryHomeCollectionViewCell.identifier,
+                                                          for: indexPath) as! StoryHomeCollectionViewCell
             if  indexPath.row == 0 {
                 cell.storyLabel.text = "Tin của bạn"
                 cell.plusStoryImageView.isHidden = false
             }
             return cell
         } else {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeFeedCollectionViewCell.identifier, for: indexPath) as! HomeFeedCollectionViewCell
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeFeedCollectionViewCell.identifier,
+                                                          for: indexPath) as! HomeFeedCollectionViewCell
+            cell.status = instagramStatus[indexPath.row]
             return cell
         }
     }
@@ -154,11 +185,17 @@ extension HomeController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 20
+        if section == 0 {
+            return 20
+        } else {
+            return instagramStatus.count
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
-        let footer = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: FooterStoryCollectionView.identifier, for: indexPath)
+        let footer = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionFooter,
+                                                                     withReuseIdentifier: FooterStoryCollectionView.identifier,
+                                                                     for: indexPath)
         return footer
     }
     
@@ -192,7 +229,6 @@ extension HomeController: UICollectionViewDelegate {
                 self.view.layoutIfNeeded()
             }
         }
-        
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {

@@ -1,15 +1,17 @@
 //
-//  BottomTableViewCell.swift
+//  ExploreCollectionViewCell.swift
 //  Instagram
 //
-//  Created by Long Bảo on 11/05/2023.
+//  Created by Long Bảo on 24/05/2023.
 //
 
 import UIKit
 
-class BottomCollectionViewCell: UICollectionViewCell {
+class ExploreCollectionViewCell: UICollectionViewCell {
     //MARK: - Properties
-    static let identifier = "BottomCollectionViewCell"
+    static let identifier = "ExploreCollectionViewCell"
+    
+    
     
     lazy var photoImage: UIImageView = {
         let iv = UIImageView()
@@ -33,6 +35,7 @@ class BottomCollectionViewCell: UICollectionViewCell {
     
     //MARK: - Helpers
     func configureUI() {
+        backgroundColor = .red
         addSubview(photoImage)
         
         NSLayoutConstraint.activate([
@@ -47,4 +50,3 @@ class BottomCollectionViewCell: UICollectionViewCell {
     
 }
 //MARK: - delegate
-

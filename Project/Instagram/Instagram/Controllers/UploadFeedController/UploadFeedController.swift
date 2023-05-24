@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 class UploadFeedController: UIViewController {
     //MARK: - Properties
@@ -40,7 +41,7 @@ class UploadFeedController: UIViewController {
     
     //MARK: - Helpers
     func configureUI() {
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         view.addGestureRecognizer(UITapGestureRecognizer(target: self,
                                                          action: #selector(handleDidTouchScreen)))
         view.isUserInteractionEnabled = true
@@ -58,6 +59,18 @@ class UploadFeedController: UIViewController {
             headerView.rightAnchor.constraint(equalTo: view.rightAnchor),
             headerView.heightAnchor.constraint(equalToConstant: 300),
         ])
+    }
+    
+    func uploadStatus() {
+        guard let uid = Auth.auth().currentUser?.uid else {return}
+        let status = headerView.getSatusUpload()
+        
+        StatusService.shared.uploadStatus(image: imageUpload,
+                                          uid: uid,
+                                          status: status) { [weak self] _ in
+            self?.tabBarController?.selectedViewController = self?.tabBarController?.viewControllers?.first
+            self?.navigationController?.popToRootViewController(animated: false)
+        }
     }
     
     //MARK: - Selectors
@@ -78,8 +91,7 @@ class UploadFeedController: UIViewController {
 //MARK: - delegate
 extension UploadFeedController: UploadFeedHeaderDelegate {
     func didSelectShareButton() {
-        self.tabBarController?.selectedViewController = self.tabBarController?.viewControllers?.first
-        navigationController?.popViewController(animated: false)
+        uploadStatus()
     }
     
     func didSelectBackButton() {

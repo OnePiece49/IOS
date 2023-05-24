@@ -8,6 +8,10 @@
 import UIKit
 import AVFoundation
 
+protocol CameraDelegate: AnyObject {
+    func didCapturePhoto(image: UIImage?)
+}
+
 class CameraController: UIViewController {
     //MARK: - Properties
     var captureSession: AVCaptureSession = AVCaptureSession()
@@ -20,6 +24,8 @@ class CameraController: UIViewController {
     var isCapurePhoto = false
     var beingBackCamera = true
     var onFlash: Bool = false
+    let type: UsingPickPhotoType
+    weak var delegate: CameraDelegate?
     
     
     private lazy var switchCamImageView: UIImageView = {
@@ -66,6 +72,19 @@ class CameraController: UIViewController {
     }()
     
     //MARK: - View Lifecycle
+    init(type: UsingPickPhotoType) {
+        self.type = type
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        print("DEBUG: CameraController deinit")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -282,9 +301,16 @@ extension CameraController: AVCaptureVideoDataOutputSampleBufferDelegate {
         let uiImage = UIImage(cgImage: cgImage)
         
         DispatchQueue.main.async {
-            let captureVC = CapturePhotoController(image: uiImage)
+            let captureVC = CapturePhotoController(image: uiImage, type: self.type)
+            captureVC.delegate = self
             self.navigationController?.pushViewController(captureVC, animated: false)
         }
   
+    }
+}
+
+extension CameraController: CapturePhotoDelegate {
+    func didSlectSaveButton(image: UIImage?) {
+        self.delegate?.didCapturePhoto(image: image)
     }
 }
