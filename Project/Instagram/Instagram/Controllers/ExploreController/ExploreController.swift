@@ -10,6 +10,7 @@ import UIKit
 
 class ExploreController: UIViewController {
     //MARK: - Properties
+    let viewModel = ExploreViewModel()
     let searchBar = CustomSearchBarView(frame: .zero)
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     let searchTableView = UITableView(frame: .zero, style: .plain)
@@ -20,6 +21,7 @@ class ExploreController: UIViewController {
         
         configureUI()
         configureProperties()
+        fetchOtherUsers()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -94,6 +96,10 @@ class ExploreController: UIViewController {
         return layout
     }
     
+    func fetchOtherUsers() {
+        viewModel.fetchOtherUsers()
+    }
+    
     //MARK: - Selectors
 
     
@@ -119,23 +125,26 @@ extension ExploreController: UICollectionViewDelegate, UICollectionViewDataSourc
 
 extension ExploreController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+        return viewModel.numberUserFounded
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ExploreSearchBarTableViewCell.identifier,
                                                  for: indexPath) as! ExploreSearchBarTableViewCell
+        cell.user = viewModel.userAtIndexPath(indexPath: indexPath)
         return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 58
+        return 55
     }
 }
 
 extension ExploreController: CustomSearchBarDelegate {
     func didChangedSearchTextFiled(textField: UITextField) {
-        
+        guard let name = textField.text else {return}
+        viewModel.searchUsers(name: name)
+        searchTableView.reloadData()
     }
     
     func didBeginEdittingSearchField(textField: UITextField) {

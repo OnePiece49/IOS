@@ -18,6 +18,7 @@
 		6E1B6D8D2A1DB2EA0032AE8B /* CustomSearchBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E1B6D8C2A1DB2EA0032AE8B /* CustomSearchBarView.swift */; };
 		6E1B6D8F2A1DC0230032AE8B /* ExploreCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E1B6D8E2A1DC0230032AE8B /* ExploreCollectionViewCell.swift */; };
 		6E1B6D912A1DC2E10032AE8B /* ExploreSearchBarTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E1B6D902A1DC2E10032AE8B /* ExploreSearchBarTableViewCell.swift */; };
+		6E1B6D942A1E60240032AE8B /* ExploreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E1B6D932A1E60220032AE8B /* ExploreViewModel.swift */; };
 		6E2EDF092A0F760A000C62EB /* InstagramStoryLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E2EDF082A0F760A000C62EB /* InstagramStoryLayer.swift */; };
 		6E3201892A0D417D00D707E8 /* BottomController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3201882A0D417D00D707E8 /* BottomController.swift */; };
 		6E32018B2A0D418F00D707E8 /* BottomTabTripController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E32018A2A0D418F00D707E8 /* BottomTabTripController.swift */; };
@@ -81,6 +82,7 @@
 		6E1B6D8C2A1DB2EA0032AE8B /* CustomSearchBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomSearchBarView.swift; sourceTree = "<group>"; };
 		6E1B6D8E2A1DC0230032AE8B /* ExploreCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreCollectionViewCell.swift; sourceTree = "<group>"; };
 		6E1B6D902A1DC2E10032AE8B /* ExploreSearchBarTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreSearchBarTableViewCell.swift; sourceTree = "<group>"; };
+		6E1B6D932A1E60220032AE8B /* ExploreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreViewModel.swift; sourceTree = "<group>"; };
 		6E2EDF082A0F760A000C62EB /* InstagramStoryLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramStoryLayer.swift; sourceTree = "<group>"; };
 		6E3201882A0D417D00D707E8 /* BottomController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomController.swift; sourceTree = "<group>"; };
 		6E32018A2A0D418F00D707E8 /* BottomTabTripController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomTabTripController.swift; sourceTree = "<group>"; };
@@ -204,6 +206,14 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		6E1B6D922A1E5FD40032AE8B /* View Model */ = {
+			isa = PBXGroup;
+			children = (
+				6E1B6D932A1E60220032AE8B /* ExploreViewModel.swift */,
+			);
+			path = "View Model";
+			sourceTree = "<group>";
+		};
 		6E2EDF0A2A0FD7ED000C62EB /* Home Controller */ = {
 			isa = PBXGroup;
 			children = (
@@ -249,6 +259,7 @@
 				6E1B6D842A1C76050032AE8B /* Constants */,
 				6E1AC0932A1B1376004E81D9 /* Models */,
 				6E7F1C982A026A61008BD8B0 /* Utilities */,
+				6E1B6D922A1E5FD40032AE8B /* View Model */,
 				6E34720B29EEA02F003CB6AA /* Extenstion */,
 				6E3471FE29EE8640003CB6AA /* Controllers */,
 				6E3471F329EE8564003CB6AA /* Assets.xcassets */,
@@ -604,6 +615,7 @@
 				6E7F1C9C2A02705B008BD8B0 /* ExtensionColor.swift in Sources */,
 				6E8E84202A16094F0023529A /* EditProfileTableViewCell.swift in Sources */,
 				6EDEF4942A1A0F3200E47EF7 /* TextField.swift in Sources */,
+				6E1B6D942A1E60240032AE8B /* ExploreViewModel.swift in Sources */,
 				6E1B6D912A1DC2E10032AE8B /* ExploreSearchBarTableViewCell.swift in Sources */,
 				6E3471EB29EE8562003CB6AA /* AppDelegate.swift in Sources */,
 				6E4E81612A15E31B00CD4584 /* EditProfileController.swift in Sources */,

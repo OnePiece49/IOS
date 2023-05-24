@@ -57,7 +57,6 @@ class StatusService {
         FirebaseRef.ref_userStatus.document(uid).getDocument { documentSnap, error in
             guard let documentSnap = documentSnap else { return }
             guard let dictionary = documentSnap.data() as? [String: String] else {return}
-            print("DEBUG: begin \(Date.now)")
 
             let queue = DispatchQueue(label: "fectching Tus")
             for document in dictionary {

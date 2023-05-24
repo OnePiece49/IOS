@@ -42,7 +42,7 @@ class CustomSearchBarView: UIView {
         view.addSubview(searchLogoImageView)
         view.addSubview(searchTextFiled)
         view.backgroundColor = UIColor(red: 0.463, green: 0.463, blue: 0.502, alpha: 0.12)
-        view.layer.cornerRadius = 8
+        view.layer.cornerRadius = 11
         
         NSLayoutConstraint.activate([
             searchLogoImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
@@ -135,7 +135,6 @@ extension CustomSearchBarView: UITextFieldDelegate {
     }
     
     func textFieldDidChangeSelection(_ textField: UITextField) {
-        print("DEBUG: \(String(describing: textField.text))")
         self.delegate?.didChangedSearchTextFiled(textField: textField)
     }
 }

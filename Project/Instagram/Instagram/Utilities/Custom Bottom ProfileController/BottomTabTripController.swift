@@ -248,7 +248,7 @@ extension BottomTapTripController: UIScrollViewDelegate {
            temp != 0 || self.spacingControllers == 0  {
                 let xCOntentOffset = scrollView.contentOffset.x
                 let currentIndexPath = IndexPath(row: self.currentIndex, section: 0)
-            let currentCell = collectionView.cellForItem(at: currentIndexPath)
+                let currentCell = collectionView.cellForItem(at: currentIndexPath)
                 
                 let nexPosition = getNextFrameCell(xContentOffset: xCOntentOffset)
                 NSLayoutConstraint.deactivate([self.widthAnchorDivider, self.xAnchorDivider])
@@ -272,7 +272,7 @@ extension BottomTapTripController: UIScrollViewDelegate {
         var percentProgress: CGFloat = 0
         var progressWidth: Float = 0
         let previousIndexPath: IndexPath!
-        
+        print("DEBUG: \(xContentOffset - previousContentOffset) > 0")
         if xContentOffset - previousContentOffset > 0 {
             percentProgress = CGFloat(xContentOffset.truncatingRemainder(dividingBy: view.frame.width) / view.frame.width)
             previousIndexPath = IndexPath(row: nextRow, section: 0)
@@ -289,7 +289,7 @@ extension BottomTapTripController: UIScrollViewDelegate {
         let nextCell = collectionView.cellForItem(at: nextIndexPath)
         let previousCell = collectionView.cellForItem(at: previousIndexPath)
         
-        guard let nextX = nextCell?.frame.origin.x else {
+        guard let nextX = nextCell?.frame.origin.x, let nextWidth = nextCell?.frame.width else {
             if xContentOffset - previousContentOffset > 0 {
                 return (Float(previousCell?.frame.width ?? 0) * Float(percentProgress),
                         Float(previousCell!.frame.width  * (1 - percentProgress)))
@@ -297,13 +297,7 @@ extension BottomTapTripController: UIScrollViewDelegate {
                 return (0, Float(previousCell!.frame.width  * (1 - percentProgress)))
             }
         }
-        guard let nextWidth = nextCell?.frame.width else {
-            if xContentOffset - previousContentOffset > 0 {
-                return (Float(previousCell?.frame.width ?? 0), Float(previousCell!.frame.width  * (1 - percentProgress)))
-            } else {
-                return (0, Float(previousCell!.frame.width  * (1 - percentProgress)))
-            }
-        }
+
         
         if nextWidth > currentWidth {                             //Kiểm tra width cell trước > hay < size cell tiếp the0
             progressWidth = abs(Float(self.currentWidth) + Float(percentProgress) * Float(nextWidth - currentWidth))
@@ -332,11 +326,12 @@ extension BottomTapTripController: UIScrollViewDelegate {
         
         UIView.animate(withDuration: 0.13) {
             self.widthAnchorDivider.constant = self.currentWidth
-            self.xAnchorDivider = self.divider.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: cell.frame.origin.x )
+            self.xAnchorDivider = self.divider.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: cell.frame.origin.x)
             NSLayoutConstraint.activate([
                 self.widthAnchorDivider,
                 self.xAnchorDivider,
             ])
+            
             self.updateTabarView()
             self.view.layoutIfNeeded()
         }
@@ -345,11 +340,11 @@ extension BottomTapTripController: UIScrollViewDelegate {
             scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x + CGFloat(self.currentIndex) * self.spacingControllers, y: 0)
         }
 
-                if self.currentXContentOffset != scrollView.contentOffset.x {
+        if self.currentXContentOffset != scrollView.contentOffset.x {
             delegate?.didMoveToNextController(collectionView: self.currentCollectionView,
-                                         currentIndex: self.currentIndex)
+                                     currentIndex: self.currentIndex)
             self.currentXContentOffset = scrollView.contentOffset.x
-            
+        
         }
     }
     

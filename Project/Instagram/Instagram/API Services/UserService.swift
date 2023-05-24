@@ -31,7 +31,26 @@ class UserService {
                 completion(user, nil)
             }
         }
-
+    }
+    
+    func fetchOtherUsers(completion: @escaping ([User]) -> Void) {
+        guard let currentUid = Auth.auth().currentUser?.uid else {return}
+        var users: [User] = []
+        
+        FirebaseRef.ref_user.getDocuments { querySnap, _ in
+            guard let documents = querySnap?.documents else { return }
+            
+            for document in documents {
+                let dictionary = document.data()
+                let uid = document.documentID
+                if uid == currentUid {continue}
+                let user = User(uid: uid, dictionary: dictionary)
+                users.append(user)
+            }
+            
+            completion(users)
+            
+        }
     }
     
     func updateInfoUser(user: User, image: UIImage?, completion: @escaping () -> Void) {

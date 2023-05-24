@@ -27,6 +27,7 @@ class ProfileController: UIViewController {
     var user: User! {
         didSet {
             updateUI()
+            configureTabTripController()
         }
     }
     
@@ -63,7 +64,6 @@ class ProfileController: UIViewController {
         super.viewDidLoad()
         
         configureUI()
-        configureTabTripController()
         configureProperties()
         setupNotification()
     }
