@@ -9,15 +9,20 @@
 import UIKit
 import SDWebImage
 
+protocol HomeFeedCollectionViewCellDelegate: AnyObject {
+    func didSelectAvatar(status: InstaStatus)
+    func didSelectLikeButton(button: UIButton)
+    func didSelectCommentButton(status: InstaStatus)
+}
+
 class HomeFeedCollectionViewCell: UICollectionViewCell {
     //MARK: - Properties
     private var heightImageConstraint: NSLayoutConstraint!
     static let identifier = "HomeFeedCollectionViewCell"
     var actionBar: NavigationCustomView!
-    var status: InstaStatus? {
-        didSet {
-            updateUI()
-        }
+    weak var delegate: HomeFeedCollectionViewCellDelegate?
+    var viewModel: HomeFeedCellViewModel? {
+        didSet {updateUI()}
     }
     
     private lazy var avatarUserUpTusImageView: UIImageView = {
@@ -26,6 +31,9 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         iv.backgroundColor = .blue
         iv.clipsToBounds = true
         iv.layer.cornerRadius = 36 / 2
+        iv.addGestureRecognizer(UITapGestureRecognizer(target: self,
+                                                       action: #selector(handleAvatarImageTapped)))
+        iv.isUserInteractionEnabled = true
         return iv
     }()
     
@@ -35,6 +43,9 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         label.text = "black_pink"
         label.textColor = .label
         label.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
+        label.addGestureRecognizer(UITapGestureRecognizer(target: self,
+                                                       action: #selector(handleAvatarImageTapped)))
+        label.isUserInteractionEnabled = true
         return label
     }()
     
@@ -155,10 +166,14 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
     
     func setupNavigationBar() {
         let attributeFirstLeftButton = AttibutesButton(image: UIImage(named: "like1"),
-                                                  sizeImage: CGSize(width: 23, height: 23))
+                                                       sizeImage: CGSize(width: 23, height: 23)) {
+            self.delegate?.didSelectLikeButton(button: self.actionBar.leftButtons[0])
+        }
                                                    
-        let attributeSecondLeftButton = AttibutesButton(image: UIImage(named: "comment"),
-                                                        sizeImage: CGSize(width: 23, height: 23))
+        let attributeSecondLeftButton = AttibutesButton(image: UIImage(named: "comment-1"),
+                                                        sizeImage: CGSize(width: 23, height: 23)) {
+            self.delegate?.didSelectCommentButton(status: self.viewModel?.status)
+        }
                                                         
         let attributeThreeLeftButton = AttibutesButton(image: UIImage(named: "share"),
                                                   sizeImage: CGSize(width: 28, height: 28))
@@ -167,39 +182,39 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
                                                   sizeImage: CGSize(width: 36, height: 32))
                                                    
         self.actionBar = NavigationCustomView(attributeLeftButtons: [attributeFirstLeftButton,
-                                                                         attributeSecondLeftButton,
-                                                                         attributeThreeLeftButton],
-                                                  attributeRightBarButtons: [attributeFirstRightButton],
-                                                  isHiddenDivider: true,
-                                                  beginSpaceLeftButton: 12,
-                                                  beginSpaceRightButton: 13,
-                                                  continueSpaceleft: 12)
+                                                                    attributeSecondLeftButton,
+                                                                    attributeThreeLeftButton],
+                                              attributeRightBarButtons: [attributeFirstRightButton],
+                                              isHiddenDivider: true,
+                                              beginSpaceLeftButton: 15,
+                                              beginSpaceRightButton: 24,
+                                              continueSpaceleft: 12)
     }
     
     func updateUI() {
-        let avatarImageUrl = URL(string: status?.user.profileImage ?? "")
-        let photoImageUrl = URL(string: status?.postImage.imageURL ?? "")
-        
+
         NSLayoutConstraint.deactivate([heightImageConstraint])
         
-        let ratio: CGFloat = CGFloat(1.0 / ( status?.postImage.aspectRatio ?? 1.0))
+        let ratio: CGFloat = viewModel?.ratioImage ?? 1
         heightImageConstraint = self.photoImageView.heightAnchor.constraint(equalTo: self.photoImageView.widthAnchor, multiplier: ratio)
         NSLayoutConstraint.activate([
             heightImageConstraint,
         ])
         
-        avatarUserUpTusImageView.sd_setImage(with: avatarImageUrl, placeholderImage: UIImage(systemName: "person.circle"))
-        photoImageView.sd_setImage(with: photoImageUrl)
-        usernameLabel.text = status?.user.username
-
-        let formatter = DateFormatter()
-        formatter.dateFormat = "h:mm a • MM/dd/yyyy"
-        self.timePostTusLabel.text = formatter.string(from: self.status!.timeStamp)
+        avatarUserUpTusImageView.sd_setImage(with: viewModel?.avatarURL, placeholderImage: UIImage(systemName: "person.circle"))
+        photoImageView.sd_setImage(with: viewModel?.photoURL)
+        usernameLabel.text = viewModel?.username
+        statusLabel.attributedText = viewModel?.attributedCaptionLabel
+        self.timePostTusLabel.text = viewModel?.dateString
         layoutIfNeeded()
     }
     
     
     //MARK: - Selectors
+    @objc func handleAvatarImageTapped() {
+        guard let status = viewModel?.status else {return}
+        self.delegate?.didSelectAvatar(status: status)
+    }
     
 }
 //MARK: - delegate

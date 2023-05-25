@@ -15,6 +15,7 @@ class BottomTabBarCollectionViewCell: UICollectionViewCell {
         let iv = UIImageView()
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.clipsToBounds = true
+        iv.contentMode = .scaleAspectFit
         return iv
     }()
     
@@ -38,7 +39,7 @@ class BottomTabBarCollectionViewCell: UICollectionViewCell {
             optionImage.centerXAnchor.constraint(equalTo: centerXAnchor),
             optionImage.centerYAnchor.constraint(equalTo: centerYAnchor),
         ])
-        optionImage.setDimensions(width: 30, height: 26)
+        optionImage.setDimensions(width: 24, height: 24)
     }
     
     //MARK: - Selectors

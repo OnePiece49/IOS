@@ -32,4 +32,6 @@ struct FirebaseRef {
     static let ref_user = Firestore.firestore().collection("users")
     static let ref_uploadStatus = Firestore.firestore().collection("status")
     static let ref_userStatus = Firestore.firestore().collection("users-status")
+    static let ref_followUser = Firestore.firestore().collection("follow-users")                //Check những ai đang follow 1 người
+    static let ref_followingUser = Firestore.firestore().collection("following-users")          //Check 1 người đang following những ai
 }

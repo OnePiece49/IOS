@@ -27,10 +27,13 @@ class Utilites {
         infoLabel.text = type.rawValue
         infoLabel.textColor = .label
         infoLabel.translatesAutoresizingMaskIntoConstraints = false
-        let attributedText = NSMutableAttributedString(attributedString: NSAttributedString(string: "\(number)\n", attributes: [.font: UIFont.systemFont(ofSize: 16, weight: .semibold), .foregroundColor: UIColor.label]))
-        attributedText.append(NSAttributedString(string: type.rawValue, attributes: [.font: UIFont.systemFont(ofSize: 15), .foregroundColor: UIColor.label]))
+        let attributedText = NSMutableAttributedString(attributedString: NSAttributedString(string: "\(number)\n",
+                                                       attributes: [.font: UIFont.systemFont(ofSize: 16, weight: .semibold),
+                                                                    .foregroundColor: UIColor.label]))
+        attributedText.append(NSAttributedString(string: type.rawValue,
+                                                 attributes: [.font: UIFont.systemFont(ofSize: 15), .foregroundColor: UIColor.label]))
         infoLabel.attributedText = attributedText
-        infoLabel.numberOfLines = 0
+        infoLabel.numberOfLines = 2
         infoLabel.textAlignment = .center
         return infoLabel
     }
@@ -57,6 +60,7 @@ class Utilites {
         return label
     }
     
+
     
 }
 

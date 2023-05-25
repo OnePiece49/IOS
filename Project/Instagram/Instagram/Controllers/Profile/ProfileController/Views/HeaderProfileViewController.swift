@@ -17,18 +17,18 @@ protocol HeaderProfileViewDelegate: AnyObject {
     func didSelectEditButton()
     func didTapthreeLineImageView()
     func didSelectUsernameButton()
+    func didSeclectFollowButton()
 }
 
 class HeaderProfileViewController: UIViewController {
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     private var leftAnchorDivider: NSLayoutConstraint!
     weak var delegate: HeaderProfileViewDelegate?
-    var heightBioConstraint: NSLayoutConstraint!
     var storyAvatarLayer: InstagramStoryLayer!
     var isRunningAnimationStory = false
-    
-    var user: User! {
+    var viewModel: HeaderProfileViewModel? {
         didSet {
+            configureUI()
             updateUI()
         }
     }
@@ -36,48 +36,73 @@ class HeaderProfileViewController: UIViewController {
     private lazy var postLabel = Utilites.createHeaderProfileInfoLabel(type: .posts, with: "80")
     private lazy var followersLabel = Utilites.createHeaderProfileInfoLabel(type: .followers, with: "428.5k")
     private lazy var followingLabel = Utilites.createHeaderProfileInfoLabel(type: .following, with: "60k")
-    private lazy var editButton = Utilites.createHeaderProfileButton(with: "Edit")
+    lazy var editButton = Utilites.createHeaderProfileButton(with: "Loading")
     private lazy var shareButton = Utilites.createHeaderProfileButton(with: "Share")
     
     private lazy var navigationBar: NavigationCustomView = {
-        let attributeFirstLeftButton = AttibutesButton(image: UIImage(systemName: "lock"),
-                                                       sizeImage: CGSize(width: 15, height: 15),
-                                                       tincolor: .label) {
-            self.delegate?.didSelectUsernameButton()
-        }
-        let attributeSecondLeftButton = AttibutesButton(tilte: "",
-                                                        font: UIFont.systemFont(ofSize: 23, weight: .bold),
-                                                        titleColor: .label) {
-            self.delegate?.didSelectUsernameButton()
-        }
-        let attributeThreeLeftButton = AttibutesButton(image: UIImage(systemName: "chevron.down"),
-                                                       sizeImage: CGSize(width: 13, height: 10),
-                                                       tincolor: .label) {
-            self.delegate?.didSelectUsernameButton()
-        }
-        
-        let attributeFirstRightButton = AttibutesButton(image: UIImage(systemName: "line.3.horizontal"),
-                                                        sizeImage: CGSize(width: 28, height: 25),
-                                                        tincolor: .label) {
-            self.delegate?.didTapthreeLineImageView()
-        }
-        let attributeSecondRightButton = AttibutesButton(image: UIImage(systemName: "plus.app"),
-                                                         sizeImage: CGSize(width: 28, height: 27),
-                                                         tincolor: .label) {
-            self.delegate?.didTapthreeLineImageView()
+        guard let viewModel = viewModel else {
+            return NavigationCustomView(attributeLeftButtons: [],
+                                        attributeRightBarButtons: [])
         }
 
-        let navigationBar = NavigationCustomView(attributeLeftButtons: [attributeFirstLeftButton,
-                                                                         attributeSecondLeftButton,
-                                                                         attributeThreeLeftButton],
-                                                  attributeRightBarButtons: [attributeFirstRightButton,
-                                                                             attributeSecondRightButton],
-                                                  isHiddenDivider: true,
-                                                  beginSpaceLeftButton: 12,
-                                                  beginSpaceRightButton: 13,
-                                                  continueSpaceleft: 5,
-                                                  continueSpaceRight: 15)
-        return navigationBar
+        if viewModel.isCurrentUser {
+            let attributeFirstLeftButton = AttibutesButton(image: UIImage(systemName: "lock"),
+                                                           sizeImage: CGSize(width: 15, height: 15),
+                                                           tincolor: .label) {  [weak self] in
+                self?.delegate?.didSelectUsernameButton()
+            }
+            let attributeSecondLeftButton = AttibutesButton(tilte: "",
+                                                            font: UIFont.systemFont(ofSize: 23, weight: .bold),
+                                                            titleColor: .label) {
+                self.delegate?.didSelectUsernameButton()
+            }
+            let attributeThreeLeftButton = AttibutesButton(image: UIImage(systemName: "chevron.down"),
+                                                           sizeImage: CGSize(width: 13, height: 10),
+                                                           tincolor: .label) { [weak self] in
+                self?.delegate?.didSelectUsernameButton()
+            }
+            
+            let attributeFirstRightButton = AttibutesButton(image: UIImage(systemName: "line.3.horizontal"),
+                                                            sizeImage: CGSize(width: 28, height: 25),
+                                                            tincolor: .label) { [weak self] in
+                self?.delegate?.didTapthreeLineImageView()
+            }
+            let attributeSecondRightButton = AttibutesButton(image: UIImage(systemName: "plus.app"),
+                                                             sizeImage: CGSize(width: 28, height: 27),
+                                                             tincolor: .label) { [weak self] in
+                self?.delegate?.didTapthreeLineImageView()
+            }
+
+            let navigationBar = NavigationCustomView(attributeLeftButtons: [attributeFirstLeftButton,
+                                                                             attributeSecondLeftButton,
+                                                                             attributeThreeLeftButton],
+                                                      attributeRightBarButtons: [attributeFirstRightButton,
+                                                                                 attributeSecondRightButton],
+                                                      isHiddenDivider: true,
+                                                      beginSpaceLeftButton: 12,
+                                                      beginSpaceRightButton: 13,
+                                                      continueSpaceleft: 5,
+                                                      continueSpaceRight: 15)
+            return navigationBar
+        } else {
+            let attributeFirstLeftButton = AttibutesButton(image: UIImage(systemName: "chevron.backward"),
+                                                           sizeImage: CGSize(width: 20, height: 25),
+                                                           tincolor: .label) { [weak self] in
+                self?.navigationController?.popViewController(animated: true)
+            }
+            
+            let attributeFirstRightButton = AttibutesButton(image: UIImage(named: "3cham"),
+                                                           sizeImage: CGSize(width: 26, height: 25),
+                                                           tincolor: .label)
+
+            let navigationBar = NavigationCustomView(centerTitle: viewModel.username,
+                                                     attributeLeftButtons: [attributeFirstLeftButton],
+                                                     attributeRightBarButtons: [attributeFirstRightButton],
+                                                     isHiddenDivider: true,
+                                                     beginSpaceLeftButton: 12,
+                                                     beginSpaceRightButton: 12)
+            return navigationBar
+        }
     }()
 
     private lazy var infoStackView: UIStackView = {
@@ -85,7 +110,7 @@ class HeaderProfileViewController: UIViewController {
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .horizontal
         stackView.distribution = .equalSpacing
-        stackView.alignment = .fill
+        stackView.spacing = -3
         return stackView
     }()
     
@@ -167,8 +192,7 @@ class HeaderProfileViewController: UIViewController {
     //MARK: - View Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        editButton.addTarget(self, action: #selector(handleEditButtonTapped), for: .touchUpInside)
-        configureUI()
+        configureProperties()
     }
     
     deinit {
@@ -183,24 +207,22 @@ class HeaderProfileViewController: UIViewController {
         view.addSubview(stackViewLabel)
         view.addSubview(containerButtonView)
         view.addSubview(collectionView)
-        
         view.backgroundColor = .systemBackground
         view.addSubview(navigationBar)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         
-        self.heightBioConstraint = bioLabel.heightAnchor.constraint(equalToConstant: 34)
         NSLayoutConstraint.activate([
             navigationBar.topAnchor.constraint(equalTo: view.topAnchor),
             navigationBar.leftAnchor.constraint(equalTo: view.leftAnchor),
             navigationBar.rightAnchor.constraint(equalTo: view.rightAnchor),
-            navigationBar.heightAnchor.constraint(equalToConstant: 50),
+            navigationBar.heightAnchor.constraint(equalToConstant: 40),
             
             avartImageView.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 11),
             avartImageView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 23),
             
             infoStackView.centerYAnchor.constraint(equalTo: avartImageView.centerYAnchor),
-            infoStackView.leftAnchor.constraint(equalTo: avartImageView.rightAnchor, constant: 38),
-            infoStackView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20),
+            infoStackView.leftAnchor.constraint(equalTo: avartImageView.rightAnchor, constant: 31),
+            infoStackView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -22),
             
             fullnameLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 13),
             fullnameLabel.topAnchor.constraint(equalTo: avartImageView.bottomAnchor, constant: 12),
@@ -223,17 +245,54 @@ class HeaderProfileViewController: UIViewController {
         ])
         avartImageView.setDimensions(width: 90, height: 90)
         view.layoutIfNeeded()
-        
         self.storyAvatarLayer = InstagramStoryLayer(centerPoint: CGPoint(x: avartImageView.frame.midX,
                                                                          y: avartImageView.frame.midY),
-                                                    width: avartImageView.frame.width + 14, lineWidth: 3.5)
+                                                    width: avartImageView.frame.width + 14,
+                                                    lineWidth: 3.5)
         view.layer.addSublayer(storyAvatarLayer)
-        
+    }
+    
+    func configureProperties() {
         collectionView.collectionViewLayout = createLayoutCollectionView()
-        collectionView.register(StoryCollectionViewCell.self, forCellWithReuseIdentifier: StoryCollectionViewCell.identifier)
+        collectionView.register(StoryCollectionViewCell.self,
+                                forCellWithReuseIdentifier: StoryCollectionViewCell.identifier)
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.isScrollEnabled = false
+    }
+    
+    func updateUI() {
+        guard let viewModel = viewModel else {
+            return
+        }
+
+        if viewModel.isCurrentUser {
+            self.navigationBar.leftButtons[1].setTitle(viewModel.username, for: .normal)
+        }
+        
+        self.fullnameLabel.text = viewModel.fullname
+        self.bioLabel.text = viewModel.bio
+        self.avartImageView.sd_setImage(with: viewModel.imageAvatarUrl,
+                                        placeholderImage: UIImage(systemName: "person.circle"))
+
+        if viewModel.isCurrentUser {
+            editButton.setTitle("Edit", for: .normal)
+            editButton.addTarget(self, action: #selector(handleEditButtonTapped), for: .touchUpInside)
+        } else {
+            editButton.addTarget(self, action: #selector(handleFollowButtonTapped), for: .touchUpInside)
+            if viewModel.isFollowed {
+                editButton.setTitle("Following", for: .normal)
+            } else {
+                editButton.setTitle("Follow", for: .normal)
+            }
+
+        }
+
+        postLabel.attributedText = viewModel.attributedPosts
+        followersLabel.attributedText  = viewModel.attributedFollowers
+        followingLabel.attributedText = viewModel.attributedFollowings
+        
+        view.layoutIfNeeded()
         if bioLabel.isTruncated {
             readMoreButton.isHidden = false
         }
@@ -250,12 +309,17 @@ class HeaderProfileViewController: UIViewController {
     }
     
     func createStorySection() -> NSCollectionLayoutSection {
-        let item = ComposionalLayout.createItem(layoutSize: .init(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0)))
-        let group = ComposionalLayout.createGroup(axis:
-                                                        .horizontal,
-                                                  layoutSize:
-                                                        .init(widthDimension: .absolute(60), heightDimension: .absolute(100)),
-                                                  item: item, count: 1)
+        let itemSize: NSCollectionLayoutSize = .init(widthDimension: .fractionalWidth(1.0),
+                                                    heightDimension: .fractionalHeight(1.0))
+        let item = ComposionalLayout.createItem(layoutSize: itemSize)
+        
+        let groupSize: NSCollectionLayoutSize = .init(widthDimension: .absolute(60),
+                                                      heightDimension: .absolute(100))
+        let group = ComposionalLayout.createGroup(axis:.horizontal,
+                                                  layoutSize: groupSize,
+                                                  item: item,
+                                                  count: 1)
+        
         let section = ComposionalLayout.createSectionWithouHeader(group: group)
         section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0)
         section.interGroupSpacing = 25
@@ -267,19 +331,6 @@ class HeaderProfileViewController: UIViewController {
         let layout = UICollectionViewCompositionalLayout(section: createStorySection())
         layout.configuration.interSectionSpacing = 10
         return layout
-    }
-    
-    func updateUI() {
-        self.navigationBar.leftButtons[1].setTitle(user.username, for: .normal)
-        self.fullnameLabel.text = user.fullname
-        self.bioLabel.text = user.bio
-        let url = URL(string: user.profileImage ?? "")
-        self.avartImageView.sd_setImage(with: url,
-                                        placeholderImage: UIImage(systemName: "person.circle"))
-
-        if bioLabel.isTruncated {
-            readMoreButton.isHidden = false
-        }
     }
     
     //MARK: - Selectors
@@ -302,6 +353,10 @@ class HeaderProfileViewController: UIViewController {
     
     @objc func handleEditButtonTapped() {
         delegate?.didSelectEditButton()
+    }
+    
+    @objc func handleFollowButtonTapped() {
+        delegate?.didSeclectFollowButton()
     }
     
     

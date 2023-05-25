@@ -14,7 +14,7 @@ struct PostImage {
 
 struct InstaStatus {
     let user: User
-    let caption: String?
+    let caption: String
     let postImage: PostImage
     var timeStamp: Date!
     let statusId: String

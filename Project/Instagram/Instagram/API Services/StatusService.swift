@@ -52,35 +52,58 @@ class StatusService {
         }
     }
     
-    func fetchTusUser(uid: String,
-                      completion: @escaping(InstaStatus?) -> Void) {
+    func fetchStatusUser(uid: String,
+                         completion: @escaping([InstaStatus]) -> Void) {
         FirebaseRef.ref_userStatus.document(uid).getDocument { documentSnap, error in
-            guard let documentSnap = documentSnap else { return }
-            guard let dictionary = documentSnap.data() as? [String: String] else {return}
-
-            let queue = DispatchQueue(label: "fectching Tus")
+            guard let documentSnap = documentSnap else {
+                completion([])
+                return
+            }
+            guard let dictionary = documentSnap.data() as? [String: String] else {
+                completion([])
+                return
+            }
+            
+            var statuses: [InstaStatus] = []
+            let dispathGroup = DispatchGroup()
+            
             for document in dictionary {
                 let statusID = document.key
-                queue.async {
-                    FirebaseRef.ref_uploadStatus.document(statusID).getDocument { documentSnap, _ in
-                        guard let documentSnap = documentSnap else { return }
-                        guard let dictionary = documentSnap.data()  else {return}
-                        guard let uid = dictionary[UsersConstant.uid] as? String else {return}
-                        
-                        UserService.shared.fetchUser(uid: uid) { user, _ in
-                            guard let user = user else {return}
-                            
-                            let status = InstaStatus(user: user, statusId: statusID, dictionary: dictionary)
-                            DispatchQueue.main.async {
-                                completion(status)
-
-                            }
-                        }
+                dispathGroup.enter()
+                FirebaseRef.ref_uploadStatus.document(statusID).getDocument { documentSnap, _ in
+                    guard let documentSnap = documentSnap else { return }
+                    guard let dictionary = documentSnap.data()  else {return}
+                    guard let uid = dictionary[UsersConstant.uid] as? String else {return}
+                    
+                    UserService.shared.fetchUser(uid: uid) { user in
+                        let status = InstaStatus(user: user, statusId: statusID, dictionary: dictionary)
+                        statuses.append(status)
+                        dispathGroup.leave()
                     }
                 }
-
-                
+            }
+            
+            dispathGroup.notify(queue: .main) {
+                completion(statuses)
             }
         }
     }
+    
+    func fetchStatusUserAndFollowing(users: [User],
+                                     completion: @escaping([InstaStatus]) -> Void) {
+        var numberUsers = 0
+        var statues: [InstaStatus] = []
+
+        for user in users {
+            self.fetchStatusUser(uid: user.uid) { userStatuses in
+                statues.append(contentsOf: userStatuses)
+                numberUsers += 1
+                if numberUsers == users.count {
+                    statues = statues.shuffled()  //Random statues
+                    completion(statues)
+                }
+             }
+        }
+    }
+
 }

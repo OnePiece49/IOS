@@ -21,7 +21,7 @@ class ExploreController: UIViewController {
         
         configureUI()
         configureProperties()
-        fetchOtherUsers()
+        fetchData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -75,6 +75,9 @@ class ExploreController: UIViewController {
         searchTableView.alpha = 0
         searchTableView.backgroundColor = .systemBackground
         searchTableView.separatorColor = .clear
+        viewModel.completion = {
+            self.collectionView.reloadData()
+        }
     }
     
     func createLayoutCollectionView() -> UICollectionViewLayout {
@@ -83,7 +86,7 @@ class ExploreController: UIViewController {
         let item = ComposionalLayout.createItem(layoutSize: itemSize)
         
         let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                               heightDimension: .fractionalWidth(1 / 3 ))
+                                               heightDimension: .fractionalWidth(1 / 3))
         let group = ComposionalLayout.createGroup(axis: .horizontal,
                                                   layoutSize: groupSize,
                                                   item: item,
@@ -96,7 +99,7 @@ class ExploreController: UIViewController {
         return layout
     }
     
-    func fetchOtherUsers() {
+    func fetchData() {
         viewModel.fetchOtherUsers()
     }
     
@@ -111,14 +114,14 @@ extension ExploreController: UICollectionViewDelegate, UICollectionViewDataSourc
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 15
+        return viewModel.numberStatuses
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ExploreCollectionViewCell.identifier,
                                                       for: indexPath) as! ExploreCollectionViewCell
-        cell.backgroundColor = .red
         
+        cell.imageURL = viewModel.imageUrlAtIndexpath(indexPath: indexPath)
         return cell
     }
 }
@@ -138,6 +141,12 @@ extension ExploreController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 55
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let profileVC = ProfileController(user: viewModel.userAtIndexPath(indexPath: indexPath))
+
+        navigationController?.pushViewController(profileVC, animated: true)
+    }
 }
 
 extension ExploreController: CustomSearchBarDelegate {
@@ -151,7 +160,6 @@ extension ExploreController: CustomSearchBarDelegate {
         UIView.animate(withDuration: 0.25) {
             self.searchTableView.alpha = 1
         }
-
     }
     
     func didSelectCancelButton() {

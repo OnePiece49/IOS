@@ -19,6 +19,7 @@ extension UILabel {
             attributes: [.font: font ?? .systemFont(ofSize: 15)],
             context: nil).size
 
+//        print("DEBUG: \(labelTextSize.height) and \(frame.size.height) and \(labelText))")
         return labelTextSize.height > bounds.size.height
     }
 }

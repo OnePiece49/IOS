@@ -6,12 +6,17 @@
 //
 
 import UIKit
+import SDWebImage
 
 class ExploreCollectionViewCell: UICollectionViewCell {
     //MARK: - Properties
     static let identifier = "ExploreCollectionViewCell"
     
-    
+    var imageURL: URL? {
+        didSet {
+            updateUI()
+        }
+    }
     
     lazy var photoImage: UIImageView = {
         let iv = UIImageView()
@@ -46,6 +51,9 @@ class ExploreCollectionViewCell: UICollectionViewCell {
         ])
     }
     
+    func updateUI() {
+        photoImage.sd_setImage(with: imageURL)
+    }
     //MARK: - Selectors
     
 }

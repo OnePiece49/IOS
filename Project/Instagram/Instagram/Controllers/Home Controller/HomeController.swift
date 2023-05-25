@@ -10,17 +10,12 @@ import UIKit
 
 class HomeController: UIViewController {
     //MARK: - Properties
+    var viewModel = HomeViewModel()
     var isPresenting: Bool = true
     let heightHeaderView: CGFloat = 60
     var currentYContentOffset: CGFloat = 0
-    var instagramStatus: [InstaStatus] = []
     var numberStatus = 0
-    
-    var user: User? {
-        didSet {
-            self.fetchStatus()
-        }
-    }
+    let refreshControl = UIRefreshControl()
     
     private lazy var instagramHeaderView: InstagramHeaderView = {
         let header = InstagramHeaderView()
@@ -33,8 +28,11 @@ class HomeController: UIViewController {
     //MARK: - View Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        fetchData()
         configureUI()
         configureProperties()
+        configureRefreshControl()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -50,6 +48,13 @@ class HomeController: UIViewController {
     }
     
     //MARK: - Helpers
+    func fetchData() {
+        viewModel.fetchDataUsers()
+        viewModel.completion = {
+            self.collectionView.reloadData()
+        }
+    }
+    
     func configureUI() {
         view.backgroundColor = .systemBackground
         let appearTabBar = UITabBarAppearance()
@@ -76,11 +81,15 @@ class HomeController: UIViewController {
         ])
     }
     
+    func configureRefreshControl () {
+        refreshControl.addTarget(self, action: #selector(handleRefreshControl), for: .valueChanged)
+    }
+    
     func configureProperties() {
         collectionView.delegate = self
         collectionView.dataSource = self
-        collectionView.bounces = false
         collectionView.collectionViewLayout = self.createLayoutCollectionView()
+        collectionView.refreshControl = refreshControl
         collectionView.register(StoryHomeCollectionViewCell.self,
                                 forCellWithReuseIdentifier: StoryHomeCollectionViewCell.identifier)
         collectionView.register(HomeFeedCollectionViewCell.self,
@@ -139,26 +148,11 @@ class HomeController: UIViewController {
         
         return layout
     }
-    
-    func fetchStatus() {
-        guard let uid = user?.uid else {return}
-        StatusService.shared.fetchTusUser(uid: uid) { status in
-            guard let status = status else {
-                return
-            }
-            
-            self.instagramStatus.append(status)
-            self.insertStatus()
-//            self.collectionView.reloadData()
-        }
-    }
-    
-    func insertStatus() {
-        let numberStatus = self.collectionView.numberOfItems(inSection: 1)
-        let indexPath = IndexPath(item: numberStatus, section: 1)
-        self.collectionView.insertItems(at: [indexPath])
-    }
     //MARK: - Selectors
+    @objc func handleRefreshControl() {
+        self.viewModel.referchData()
+        self.refreshControl.endRefreshing()
+    }
     
 }
 //MARK: - delegate
@@ -175,7 +169,8 @@ extension HomeController: UICollectionViewDataSource {
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeFeedCollectionViewCell.identifier,
                                                           for: indexPath) as! HomeFeedCollectionViewCell
-            cell.status = instagramStatus[indexPath.row]
+            cell.viewModel = HomeFeedCellViewModel(status: self.viewModel.statusAtIndexPath(indexPath: indexPath))
+            cell.delegate = self
             return cell
         }
     }
@@ -188,7 +183,7 @@ extension HomeController: UICollectionViewDataSource {
         if section == 0 {
             return 20
         } else {
-            return instagramStatus.count
+            return viewModel.numberStatuses
         }
     }
     
@@ -201,37 +196,35 @@ extension HomeController: UICollectionViewDataSource {
     
 }
 
-extension HomeController: UICollectionViewDelegate {
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let yContentOffset = scrollView.contentOffset.y
-        let transform: CGAffineTransform
-        var alpha: CGFloat = 1
 
-        if yContentOffset < heightHeaderView {
-            transform = CGAffineTransform(translationX: 0, y: -yContentOffset)
-            alpha = 1 - CGFloat(yContentOffset) / CGFloat(heightHeaderView)
-            
-        } else {
-            transform = CGAffineTransform(translationX: 0, y: -heightHeaderView )
-            alpha = 0
-        }
-
-            self.collectionView.transform = transform
-            self.instagramHeaderView.transform = transform
-            self.instagramHeaderView.alpha = alpha
-            self.view.layoutIfNeeded()
-
-        if yContentOffset < 3 {
-            UIView.animate(withDuration: 0.3) {
-                self.instagramHeaderView.transform = .identity
-                self.collectionView.transform = .identity
-                self.instagramHeaderView.alpha = 1
-                self.view.layoutIfNeeded()
-            }
+extension HomeController: HomeFeedCollectionViewCellDelegate {
+    func didSelectCommentButton(status: InstaStatus) {
+        
+    }
+    
+    func didSelectLikeButton(button: UIButton) {
+        let transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+        button.tintColor = .red
+        UIView.animate(withDuration: 0.15) {
+            button.transform = transform
+            button.setImage(UIImage(named: "heart-red"), for: .normal)
+        } completion: { _ in
+            button.transform = .identity
         }
     }
     
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        self.currentYContentOffset = scrollView.contentOffset.y
+
+    
+    func didSelectAvatar(status: InstaStatus) {
+        let profileVC = ProfileController(user: status.user)
+
+        navigationController?.pushViewController(profileVC, animated: true)
     }
+    
+    
+}
+
+
+extension HomeController: UICollectionViewDelegate {
+
 }

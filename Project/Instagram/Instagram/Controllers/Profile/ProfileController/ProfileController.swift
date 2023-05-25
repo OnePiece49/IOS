@@ -11,11 +11,13 @@ import SDWebImage
 
 class ProfileController: UIViewController {
     //MARK: - Properties
+    let viewModel = ProfileViewModel()
     var headerViewController = HeaderProfileViewController()
     let selectedSettingVC = SettingProfileController()
     let overlayScrollView = UIScrollView()
     let containerScrollView = UIScrollView()
     var bottomTabTripController: BottomTapTripController!
+    let refreshControl = UIRefreshControl()
     var selectSettingViewTopConstraint: NSLayoutConstraint!
     
     var beganPresentSettingVC = false
@@ -24,15 +26,9 @@ class ProfileController: UIViewController {
     var isSelectingUsername: Bool = false
     var viewTransform: CGAffineTransform = .identity
     
-    var user: User! {
-        didSet {
-            updateUI()
-            configureTabTripController()
-        }
-    }
-    
     func updateUI() {
-        self.headerViewController.user = user
+        guard let user = self.viewModel.user else {return}
+        self.headerViewController.viewModel = HeaderProfileViewModel(user: user)
     }
     
     var heightHeaderView: CGFloat {
@@ -60,12 +56,33 @@ class ProfileController: UIViewController {
     }()
     
     //MARK: - View Lifecycle
+    init(user: User) {
+        super.init(nibName: nil, bundle: nil)
+        self.viewModel.user = user
+        self.fetchDataForAnotherUser()
+        self.configureUI()
+        self.setupNotification()
+    }
+    
+    init() {
+        super.init(nibName: nil, bundle: nil)
+        fetchDataForCurrentUser()
+        configureUI()
+        setupNotification()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        print("DEBUG: ProfileController deinit")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        configureUI()
-        configureProperties()
-        setupNotification()
+        self.view.backgroundColor = .systemBackground
+
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -82,7 +99,6 @@ class ProfileController: UIViewController {
     
     //MARK: - Helpers
     func configureUI() {
-        view.backgroundColor = .systemBackground
         self.navigationController?.navigationBar.isHidden = true
         addChild(headerViewController)
         containerScrollView.addSubview(headerViewController.view)
@@ -124,27 +140,27 @@ class ProfileController: UIViewController {
         containerScrollView.addGestureRecognizer(overlayScrollView.panGestureRecognizer)
         overlayScrollView.showsVerticalScrollIndicator = false
         containerScrollView.showsVerticalScrollIndicator = false
-
+        overlayScrollView.refreshControl = refreshControl
         self.containerScrollView.layoutIfNeeded()
         self.overlayScrollView.contentSize = CGSize(width: 0,
                                                     height: self.heightHeaderView + self.view.frame.height + 60)
-        
+        refreshControl.addTarget(self, action: #selector(handleRefreshControl), for: .valueChanged)
     }
     
     func setupNotification() {
-        NotificationCenter.default.addObserver(self, selector: #selector(didEnterBackground),
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(didEnterBackground),
                                                name: UIApplication.didEnterBackgroundNotification, object: nil)
     }
 
     
     func configureTabTripController() {
-        let bottomVC1 = BottomController(image: UIImage(named: "Grid Icon"), type: .image)
-        let bottomVC2 = BottomController(image: UIImage(named: "Tags Icon"),  type: .image)
-        let bottomVC3 = BottomController(image: UIImage(named: "Grid Icon"), type: .image)
-        bottomVC1.user = self.user
-        bottomVC2.user = self.user
-        bottomVC3.user = self.user
-
+        let bottomVC1 = BottomController(image: UIImage(named: "grid"), type: .image)
+        let bottomVC2 = BottomController(image: UIImage(named: "video-1"),  type: .image)
+        let bottomVC3 = BottomController(image: UIImage(named: "tag-black"), type: .image)
+        bottomVC1.user = viewModel.user
+        bottomVC2.user = viewModel.user
+        bottomVC3.user = viewModel.user
         
         let configureTabBar = ConfigureTabBar(backgroundColor: .white,
                                               dividerColor: .black,
@@ -160,7 +176,6 @@ class ProfileController: UIViewController {
         containerScrollView.addSubview(bottomTabTripView)
         bottomTabTripView.translatesAutoresizingMaskIntoConstraints = false
         
-
         NSLayoutConstraint.activate([
             bottomTabTripView.topAnchor.constraint(equalTo: headerViewController.view.bottomAnchor),
             bottomTabTripView.leftAnchor.constraint(equalTo: containerScrollView.leftAnchor),
@@ -178,14 +193,37 @@ class ProfileController: UIViewController {
         for i in 0..<bottomTabTripController.controllers.count {
             self.contentOffsets[i] = 0
         }
+
+    }
+    
+    func fetchDataForAnotherUser() {
+        self.viewModel.hasFollowedUser()
+        self.viewModel.completion = {
+            self.updateUI()
+            self.configureProperties()
+            self.configureTabTripController()
+        }
+    }
+    
+    func fetchDataForCurrentUser() {
+        viewModel.fetchUser()
+        viewModel.completion = {
+            self.updateUI()
+            self.configureProperties()
+            self.configureTabTripController()
+        }
     }
     
     //MARK: - Selectors
     @objc func didEnterBackground() {
         if isSelectingUsername {
             self.view.backgroundColor = .clear
-            
         }
+    }
+    
+    @objc func handleRefreshControl() {
+        self.viewModel.referchData()
+        self.refreshControl.endRefreshing()
     }
     
 }
@@ -278,9 +316,23 @@ extension ProfileController: HeaderProfileViewDelegate {
     }
     
     func didSelectEditButton() {
-        let editProfileVC = EditProfileController(user: self.user, image: headerViewController.getAvatarImage())
+        guard let user = viewModel.user else {return}
+        let editProfileVC = EditProfileController(user: user, image: headerViewController.getAvatarImage())
         editProfileVC.delegate = self
         self.navigationController?.pushViewController(editProfileVC, animated: true)
+    }
+    
+    func didSeclectFollowButton() {
+        guard let user = viewModel.user else {
+            return}
+        print("DEBUG: \(user.isFollowed)")
+        if user.isFollowed {
+            viewModel.unfollowUser()
+            self.headerViewController.editButton.setTitle("Follow", for: .normal)
+        } else {
+            viewModel.followUser()
+            self.headerViewController.editButton.setTitle("Following", for: .normal)
+        }
     }
 }
 
@@ -301,12 +353,9 @@ extension ProfileController: SwitchAccountDelegate {
 
 extension ProfileController: EditProfileDelegate {
     func didUpdateProfile(user: User, image: UIImage?) {
-        self.user = user
+        self.viewModel.user = user
         self.headerViewController.updateAvatar(image: image)
         
     }
-    
 
-    
-    
 }

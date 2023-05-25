@@ -25,8 +25,8 @@ class BottomController: UIViewController {
                 return
             }
 
-            StatusService.shared.fetchTusUser(uid: user.uid) { status in
-                self.status.append(status!)
+            StatusService.shared.fetchStatusUser(uid: user.uid) { status in
+                self.status.append(contentsOf: status)
                 self.collectionView.reloadData()
             }
         }
@@ -42,6 +42,10 @@ class BottomController: UIViewController {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        print("DEBUG: BottomController deinit")
     }
     
     override func viewDidLoad() {

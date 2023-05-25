@@ -16,6 +16,7 @@ class BottomCollectionViewCell: UICollectionViewCell {
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.contentMode = .scaleAspectFill
         iv.layer.masksToBounds = true
+        iv.tintColor = .gray
         return iv
     }()
     

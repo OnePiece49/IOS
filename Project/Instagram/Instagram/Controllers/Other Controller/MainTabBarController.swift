@@ -10,18 +10,6 @@ import FirebaseAuth
 
 class MainTabBarController: UITabBarController {
     //MARK: - Properties
-    var user: User! {
-        didSet {
-            guard let naviHome = viewControllers?[0] as? UINavigationController else {return}
-            guard let homeVC = naviHome.viewControllers.first as? HomeController else {return}
-            homeVC.user = user
-            
-            guard let profileNav = viewControllers?.last as? UINavigationController else {return}
-            guard let profile = profileNav.viewControllers.first as? ProfileController else {return}
-            profile.user = user
-        }
-    }
-    
     private lazy var homeNaVc = templateNavigationController(rootViewController: HomeController(), namedImage: "home")
     
     //MARK: - View Lifecycle
@@ -43,7 +31,7 @@ class MainTabBarController: UITabBarController {
         }
         
         self.configureUI()
-        self.fetchUser()
+        
     }
     
     private func configureUI() {
@@ -65,18 +53,6 @@ class MainTabBarController: UITabBarController {
         nav.navigationBar.barTintColor = .white
         nav.tabBarItem.image = UIImage(named: namedImage)?.withTintColor(.black)
         return nav
-    }
-    
-    func fetchUser() {
-        guard let uid = Auth.auth().currentUser?.uid else {return}
-        UserService.shared.fetchUser(uid: uid) { user, error in
-            if let error = error {
-                print("DEBUG: \(error.localizedDescription)")
-                return
-            }
-    
-            self.user = user
-        }
     }
 
     //MARK: - Selectors

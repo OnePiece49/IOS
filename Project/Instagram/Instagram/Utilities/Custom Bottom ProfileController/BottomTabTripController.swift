@@ -15,13 +15,17 @@ struct ConfigureTabBar {
     var selectedBackgroundColor: UIColor = .systemYellow
 }
 
+protocol BottomTapTripControllerDelegate: AnyObject {
+    func didMoveToNextController(collectionView: UICollectionView, currentIndex: Int)
+}
+
 class BottomTapTripController: UIViewController {
     //MARK: - Properties
     let scrollView = UIScrollView()
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     let heightBarView: CGFloat = 44
     var configureTabBar = ConfigureTabBar()
-    var delegate: BottomTapTripControllerDelegate?
+    weak var delegate: BottomTapTripControllerDelegate?
     var xAnchorDivider: NSLayoutConstraint!
     var widthAnchorDivider: NSLayoutConstraint!
     var spacingControllers: CGFloat = 1
@@ -69,6 +73,10 @@ class BottomTapTripController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        print("DEBUG: BottomTaptripController deinit")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -79,13 +87,11 @@ class BottomTapTripController: UIViewController {
     func configureUI() {
         view.backgroundColor = .white
         self.configureCollectionView()
-//        self.configureChildController()
         self.addFirstChildController()
         
         scrollView.backgroundColor = .white
         scrollView.layoutIfNeeded()
         scrollView.contentInsetAdjustmentBehavior = .never
-//        scrollView.bounces = false
         scrollView.contentSize.height = 0
         scrollView.isPagingEnabled = true
         scrollView.showsHorizontalScrollIndicator = false
@@ -167,7 +173,6 @@ class BottomTapTripController: UIViewController {
             fakeView.heightAnchor.constraint(equalToConstant: 50),
         ])
 
-        
         scrollView.layoutIfNeeded()
     }
     
@@ -199,6 +204,7 @@ class BottomTapTripController: UIViewController {
         ])
         collectionView.isPrefetchingEnabled = true
         collectionView.showsHorizontalScrollIndicator = false
+        collectionView.isScrollEnabled = false
         
         let indexPath = IndexPath(row: 0, section: 0)
         
@@ -272,7 +278,7 @@ extension BottomTapTripController: UIScrollViewDelegate {
         var percentProgress: CGFloat = 0
         var progressWidth: Float = 0
         let previousIndexPath: IndexPath!
-        print("DEBUG: \(xContentOffset - previousContentOffset) > 0")
+        
         if xContentOffset - previousContentOffset > 0 {
             percentProgress = CGFloat(xContentOffset.truncatingRemainder(dividingBy: view.frame.width) / view.frame.width)
             previousIndexPath = IndexPath(row: nextRow, section: 0)
@@ -355,8 +361,13 @@ extension BottomTapTripController: UIScrollViewDelegate {
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if !decelerate {
-            UIView.animate(withDuration: 0.1, delay: 0.0, usingSpringWithDamping: 1.0, initialSpringVelocity: 0.8, options: .curveLinear) {
-                scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x + CGFloat(self.currentIndex) * self.spacingControllers, y: 0)
+            UIView.animate(withDuration: 0.1,
+                           delay: 0.0,
+                           usingSpringWithDamping: 1.0,
+                           initialSpringVelocity: 0.8,
+                           options: .curveLinear) {
+                scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x + CGFloat(self.currentIndex) * self.spacingControllers,
+                                                   y: 0)
             }
         }
     }
@@ -379,10 +390,6 @@ extension BottomTapTripController: UIScrollViewDelegate {
             }
         }
     }
-}
-
-protocol BottomTapTripControllerDelegate {
-    func didMoveToNextController(collectionView: UICollectionView, currentIndex: Int)
 }
 
 
@@ -429,7 +436,7 @@ extension BottomTapTripController: UICollectionViewDelegate, UICollectionViewDat
         
         self.addConstraintChildController(index: indexPath.row)
         delegate?.didMoveToNextController(collectionView: self.currentCollectionView,
-                                     currentIndex: self.currentIndex)
+                                          currentIndex: self.currentIndex)
         
     }
     
