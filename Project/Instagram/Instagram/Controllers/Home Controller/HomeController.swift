@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import FirebaseAuth
 
 class HomeController: UIViewController {
     //MARK: - Properties
@@ -16,11 +17,23 @@ class HomeController: UIViewController {
     var currentYContentOffset: CGFloat = 0
     var numberStatus = 0
     let refreshControl = UIRefreshControl()
+    var observer: NSObjectProtocol!
+    var isLikedTus: Bool = false
     
     private lazy var instagramHeaderView: InstagramHeaderView = {
         let header = InstagramHeaderView()
         header.translatesAutoresizingMaskIntoConstraints = false
         return header
+    }()
+    
+    private lazy var cancelButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Cancel", for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 15)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(hanldeCancelButtonTapped), for: .touchUpInside)
+        button.setTitleColor(.label, for: .normal)
+        return button
     }()
     
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
@@ -33,18 +46,30 @@ class HomeController: UIViewController {
         configureUI()
         configureProperties()
         configureRefreshControl()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        self.isPresenting = true
+        setupNotification()
         self.navigationController?.navigationBar.isHidden = true
         
     }
     
+    deinit {
+        NotificationCenter.default.removeObserver(observer!)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.isPresenting = true
+
+        self.navigationController?.navigationBar.isHidden = true
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        self.navigationController?.navigationBar.isHidden = true
+    }
+
     override func viewDidDisappear(_ animated: Bool) {
         self.isPresenting = false
-        self.tabBarController?.tabBar.isHidden = false
     }
     
     //MARK: - Helpers
@@ -52,6 +77,14 @@ class HomeController: UIViewController {
         viewModel.fetchDataUsers()
         viewModel.completion = {
             self.collectionView.reloadData()
+        }
+    }
+    
+    func setupNotification() {
+         observer = NotificationCenter.default.addObserver(forName: Notification.Name(NotificationConstant.commentVcDisappear),                                                     object: nil,
+                                                           queue: nil) { notification in
+             
+            self.tabBarController?.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
         }
     }
     
@@ -86,6 +119,7 @@ class HomeController: UIViewController {
     }
     
     func configureProperties() {
+        instagramHeaderView.delegate = self
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.collectionViewLayout = self.createLayoutCollectionView()
@@ -154,6 +188,11 @@ class HomeController: UIViewController {
         self.refreshControl.endRefreshing()
     }
     
+    @objc func hanldeCancelButtonTapped() {
+        self.navigationController?.pushViewController(CommentController(), animated: true)
+
+    }
+    
 }
 //MARK: - delegate
 extension HomeController: UICollectionViewDataSource {
@@ -199,26 +238,19 @@ extension HomeController: UICollectionViewDataSource {
 
 extension HomeController: HomeFeedCollectionViewCellDelegate {
     func didSelectCommentButton(status: InstaStatus) {
-        
+        let commentVC = CommentController()
+        commentVC.modalPresentationStyle = .overFullScreen
+        self.tabBarController?.navigationController?.pushViewController(commentVC, animated: true)
     }
     
-    func didSelectLikeButton(button: UIButton) {
-        let transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
-        button.tintColor = .red
-        UIView.animate(withDuration: 0.15) {
-            button.transform = transform
-            button.setImage(UIImage(named: "heart-red"), for: .normal)
-        } completion: { _ in
-            button.transform = .identity
-        }
-    }
-    
-
     
     func didSelectAvatar(status: InstaStatus) {
         let profileVC = ProfileController(user: status.user)
-
-        navigationController?.pushViewController(profileVC, animated: true)
+        let com = CommentController()
+        
+        com.navigationController?.navigationBar.isHidden = true
+        self.navigationController?.navigationBar.isHidden = true
+        self.navigationController?.pushViewController(profileVC, animated: true)
     }
     
     
@@ -227,4 +259,10 @@ extension HomeController: HomeFeedCollectionViewCellDelegate {
 
 extension HomeController: UICollectionViewDelegate {
 
+}
+
+extension HomeController: InstagramHeaderViewDelegate {
+    func didSelectInstagramLabel() {
+        self.navigationController?.pushViewController(CommentController(), animated: true)
+    }
 }

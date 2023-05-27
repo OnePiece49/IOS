@@ -9,7 +9,7 @@ import UIKit
 import FirebaseAuth
 
 class HeaderProfileViewModel {
-    let user: User
+    var user: User
     
     var attributedFollowers: NSAttributedString {
         let attributedText = NSMutableAttributedString(attributedString: NSAttributedString(string: "\(user.stats?.followers ?? 0) \n",
@@ -60,6 +60,20 @@ class HeaderProfileViewModel {
     
     var isCurrentUser: Bool {
         return user.uid == Auth.auth().currentUser?.uid
+    }
+    
+    func followUser(completion: @escaping: ()-> Void) {
+        UserService.shared.followUser(uid: user.uid) {
+            self.user.isFollowed = true
+            completion()
+        }
+    }
+    
+    func unfollowUser(completion: @escaping: ()-> Void) {
+        UserService.shared.unfollowUser(uid: user.uid) {
+            self.user.isFollowed = false
+            completion()
+        }
     }
     
     init(user: User) {

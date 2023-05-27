@@ -7,33 +7,158 @@
 
 import UIKit
 
+enum CommentType {
+    case caption
+    case comment
+}
+
 class CommentController: UIViewController {
     //MARK: - Properties
     var navigationbar: NavigationCustomView!
+    var collectionView: UICollectionView!
+    var bottomContainerViewConstraint: NSLayoutConstraint!
+    var heightContainerInputViewConstraint: NSLayoutConstraint!
+    var spacingCommentToBottom: CGFloat = 0
+    private let containerInputView = ContainerInputCustomView()
+    private let beginHeightContainerInputView: CGFloat = 43
+    private let plusHeightTextView: CGFloat = 28
+    
+    private let avatarImageView: UIImageView = {
+        let iv = UIImageView(image: UIImage(named: "emoji-smileHeart"))
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        iv.backgroundColor = .blue
+        iv.clipsToBounds = true
+        iv.layer.cornerRadius = 38 / 2
+        return iv
+    }()
+    
+    private let divider: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .systemGray
+        view.alpha = 0.5
+        return view
+    }()
+    
+    private lazy var containerView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .systemBackground
+        view.addSubview(avatarImageView)
+        view.addSubview(divider)
+        view.addSubview(containerInputView)
+        containerInputView.backgroundColor = .systemBackground
+        containerInputView.translatesAutoresizingMaskIntoConstraints = false
+        
+        self.heightContainerInputViewConstraint = containerInputView.heightAnchor.constraint(equalToConstant: beginHeightContainerInputView)
+        NSLayoutConstraint.activate([
+            avatarImageView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -12),
+            avatarImageView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 12),
+            
+            containerInputView.bottomAnchor.constraint(equalTo: avatarImageView.bottomAnchor),
+            containerInputView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -10),
+            containerInputView.leftAnchor.constraint(equalTo: avatarImageView.rightAnchor, constant: 10),
+            containerInputView.topAnchor.constraint(equalTo: view.topAnchor, constant: 12),
+            heightContainerInputViewConstraint,
+            
+            divider.topAnchor.constraint(equalTo: view.topAnchor),
+            divider.leftAnchor.constraint(equalTo: view.leftAnchor),
+            divider.rightAnchor.constraint(equalTo: view.rightAnchor),
+            divider.heightAnchor.constraint(equalToConstant: 0.5),
+        ])
+        avatarImageView.setDimensions(width: 38, height: 38)
+        return view
+    }()
     
     //MARK: - View Lifecycle
+    deinit {
+        print("DEBUG: CommentVC deinit")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         configureUI()
         configureProperties()
+        addNotification()
     }
     
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.navigationController?.navigationBar.isHidden = true
+        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        postNotification()
+    }
     
     //MARK: - Helpers
     func configureUI() {
+        setupNavigationBar()
+        view.backgroundColor = .systemBackground
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: self.createLayoutCollectionView())
+        view.addSubview(navigationbar)
+        view.addSubview(collectionView)
+        view.addSubview(containerView)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        navigationbar.translatesAutoresizingMaskIntoConstraints = false
+        containerView.backgroundColor = .systemBackground
         
+        bottomContainerViewConstraint = containerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,
+                                                                                   constant: -spacingCommentToBottom)
+        NSLayoutConstraint.activate([
+            navigationbar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            navigationbar.leftAnchor.constraint(equalTo: view.leftAnchor),
+            navigationbar.rightAnchor.constraint(equalTo: view.rightAnchor),
+            navigationbar.heightAnchor.constraint(equalToConstant: 50),
+            
+            collectionView.topAnchor.constraint(equalTo: navigationbar.bottomAnchor),
+            collectionView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            collectionView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: containerView.topAnchor),
+            
+            bottomContainerViewConstraint,
+            containerView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            containerView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            
+        ])
     }
     
+
+    
     func configureProperties() {
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleDidEndEditing)))
+        containerInputView.delegate = self
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.register(CommentCollectionViewCell.self,
+                                forCellWithReuseIdentifier: CommentCollectionViewCell.identifier)
+    }
+    
+    func postNotification() {
+        NotificationCenter.default.post(name: NSNotification.Name(NotificationConstant.commentVcDisappear),
+                                        object: .none, userInfo: [:])
+    }
+    
+    func addNotification() {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(handleKeyBoardWillAppearce),
+                                               name: UIApplication.keyboardWillShowNotification,
+                                               object: nil)
         
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(handleKeyBoardWillHide),
+                                               name: UIApplication.keyboardWillHideNotification,
+                                               object: nil)
     }
     
     func setupNavigationBar() {
-        let attributeFirstLeftButton = AttibutesButton(image: UIImage(named: "like1"),
-                                                       sizeImage: CGSize(width: 23, height: 23)) {
-            self.navigationController?.popViewController(animated: true)
+        let attributeFirstLeftButton = AttibutesButton(image: UIImage(named: "arrow-left"),
+                                                       sizeImage: CGSize(width: 26, height: 26)) { [weak self] in
+            self?.navigationController?.popViewController(animated: true)
         }
                                                    
         let attributeFirstRightButton = AttibutesButton(image: UIImage(named: "share"),
@@ -42,12 +167,103 @@ class CommentController: UIViewController {
         self.navigationbar = NavigationCustomView(centerTitle: "Comment",
                                               attributeLeftButtons: [attributeFirstLeftButton],
                                               attributeRightBarButtons: [attributeFirstRightButton],
-                                              isHiddenDivider: true,
                                               beginSpaceLeftButton: 15,
-                                              beginSpaceRightButton: 20)
+                                              beginSpaceRightButton: 15)
+    }
+    
+    func createLayoutCollectionView() -> UICollectionViewLayout {
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
+                                              heightDimension: .estimated(300))
+        let item = ComposionalLayout.createItem(layoutSize: itemSize)
+        
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                               heightDimension: .estimated(300))
+        let group = ComposionalLayout.createGroup(axis: .horizontal,
+                                                  layoutSize: groupSize,
+                                                  item: item,
+                                                  count: 1)
+        
+        let section = ComposionalLayout.createSectionWithouHeader(group: group)
+        section.interGroupSpacing = 2
+        let layout = UICollectionViewCompositionalLayout(section: section)
+        return layout
     }
     
     //MARK: - Selectors
+    @objc func handleDidEndEditing() {
+        self.containerInputView.inputTextView.endEditing(true)
+    }
+    
+    @objc func handleKeyBoardWillAppearce(_ notification: Notification) {
+        if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
+              let keyboardHeight = keyboardSize.height
+            UIView.animate(withDuration: 0.2) {
+                self.bottomContainerViewConstraint.constant = -keyboardHeight - self.spacingCommentToBottom
+                self.view.layoutIfNeeded()
+            }
+          }
+    }
+    
+    @objc func handleKeyBoardWillHide() {
+        UIView.animate(withDuration: 0.2) {
+            self.bottomContainerViewConstraint.constant = -self.spacingCommentToBottom
+            self.view.layoutIfNeeded()
+        }
+    }
     
 }
 //MARK: - delegate
+extension CommentController: UICollectionViewDelegate, UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CommentCollectionViewCell.identifier
+                                                      , for: indexPath) as! CommentCollectionViewCell
+        if indexPath.row == 0 {
+            cell.type = .caption
+        } else {
+            cell.type = .comment
+        }
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 12
+    }
+}
+
+extension CommentController: ContainerInputDelegate {
+    func didTapPostButton(text: String) {
+        print("DEBUG: \(text)")
+    }
+    
+    func didChangeEditTextView(textView: UITextView) {
+        if textView.isTruncated(with: self.containerInputView.heightInputTextView)
+            && self.heightContainerInputViewConstraint.constant < self.beginHeightContainerInputView + self.plusHeightTextView * 2 + 2 {
+            UIView.animate(withDuration: 0.1) {
+                self.heightContainerInputViewConstraint.constant += self.plusHeightTextView
+                self.containerInputView.heightInputTextView += self.plusHeightTextView
+                self.containerInputView.layoutIfNeeded()
+                self.view.layoutIfNeeded()
+            }
+        } else if !textView.isTruncated(with: self.containerInputView.heightInputTextView - self.plusHeightTextView)
+                    && self.heightContainerInputViewConstraint.constant != self.beginHeightContainerInputView  {
+            UIView.animate(withDuration: 0.1) {
+                self.heightContainerInputViewConstraint.constant -= self.plusHeightTextView
+                self.containerInputView.heightInputTextView -= self.plusHeightTextView
+                self.containerInputView.layoutIfNeeded()
+                self.view.layoutIfNeeded()
+            }
+        }
+        
+        if textView.text == "" {
+            UIView.animate(withDuration: 0.1) {
+                self.heightContainerInputViewConstraint.constant = self.beginHeightContainerInputView
+                self.containerInputView.heightInputTextView = 19
+                self.containerInputView.layoutIfNeeded()
+                self.view.layoutIfNeeded()
+            }
+        }
+
+    }
+    
+    
+}

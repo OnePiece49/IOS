@@ -50,7 +50,6 @@ class BottomSheetViewCustomController: UIViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
-
     
     //MARK: - View Lifecycle
     

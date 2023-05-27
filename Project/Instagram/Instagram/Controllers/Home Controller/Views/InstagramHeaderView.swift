@@ -10,6 +10,10 @@ import UIKit
 
 import UIKit
 
+protocol InstagramHeaderViewDelegate: AnyObject {
+    func didSelectInstagramLabel()
+}
+
 class BadgeValueLabel: UILabel {
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -32,6 +36,7 @@ class InstagramHeaderView: UIView {
     //MARK: - Properties
     lazy var messageBadgeValueLabel = BadgeValueLabel(frame: .zero)
     lazy var likeBadgeValueLabel = BadgeValueLabel(frame: .zero)
+    weak var delegate: InstagramHeaderViewDelegate?
     
     private lazy var logoButton: UIButton = {
         let button = UIButton(type: .system)
@@ -40,6 +45,7 @@ class InstagramHeaderView: UIView {
         button.tintColor = .label
         button.contentVerticalAlignment = .fill
         button.contentHorizontalAlignment = .fill
+        button.addTarget(self, action: #selector(handleLogoButtonTapped), for: .touchUpInside)
         return button
     }()
     
@@ -117,6 +123,9 @@ class InstagramHeaderView: UIView {
     }
     
     //MARK: - Selectors
+    @objc func  handleLogoButtonTapped() {
+        self.delegate?.didSelectInstagramLabel()
+    }
     
 }
 //MARK: - delegate

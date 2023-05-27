@@ -13,17 +13,16 @@ enum HeaderType: String {
     case following
 }
 
-protocol HeaderProfileViewDelegate: AnyObject {
+protocol HeaderProfileDelegate: AnyObject {
     func didSelectEditButton()
     func didTapthreeLineImageView()
     func didSelectUsernameButton()
-    func didSeclectFollowButton()
 }
 
 class HeaderProfileViewController: UIViewController {
     private lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     private var leftAnchorDivider: NSLayoutConstraint!
-    weak var delegate: HeaderProfileViewDelegate?
+    weak var delegate: HeaderProfileDelegate?
     var storyAvatarLayer: InstagramStoryLayer!
     var isRunningAnimationStory = false
     var viewModel: HeaderProfileViewModel? {
@@ -53,8 +52,8 @@ class HeaderProfileViewController: UIViewController {
             }
             let attributeSecondLeftButton = AttibutesButton(tilte: "",
                                                             font: UIFont.systemFont(ofSize: 23, weight: .bold),
-                                                            titleColor: .label) {
-                self.delegate?.didSelectUsernameButton()
+                                                            titleColor: .label) { [weak self] in
+                self?.delegate?.didSelectUsernameButton()
             }
             let attributeThreeLeftButton = AttibutesButton(image: UIImage(systemName: "chevron.down"),
                                                            sizeImage: CGSize(width: 13, height: 10),
@@ -282,10 +281,11 @@ class HeaderProfileViewController: UIViewController {
             editButton.addTarget(self, action: #selector(handleFollowButtonTapped), for: .touchUpInside)
             if viewModel.isFollowed {
                 editButton.setTitle("Following", for: .normal)
+                editButton.backgroundColor = .systemGray3
             } else {
                 editButton.setTitle("Follow", for: .normal)
+                editButton.backgroundColor = . systemBlue
             }
-
         }
 
         postLabel.attributedText = viewModel.attributedPosts
@@ -295,6 +295,8 @@ class HeaderProfileViewController: UIViewController {
         view.layoutIfNeeded()
         if bioLabel.isTruncated {
             readMoreButton.isHidden = false
+        } else {
+            readMoreButton.isHidden = true
         }
     }
     
@@ -303,11 +305,7 @@ class HeaderProfileViewController: UIViewController {
             self.avartImageView.image = image
         }
     }
-    
-    func getAvatarImage() -> UIImage? {
-        self.avartImageView.image
-    }
-    
+        
     func createStorySection() -> NSCollectionLayoutSection {
         let itemSize: NSCollectionLayoutSize = .init(widthDimension: .fractionalWidth(1.0),
                                                     heightDimension: .fractionalHeight(1.0))
@@ -333,6 +331,28 @@ class HeaderProfileViewController: UIViewController {
         return layout
     }
     
+    func updateDataFollowing(isFollowed: Bool) {
+        guard let viewModel = viewModel else {
+            return
+        }
+
+        viewModel.user.stats?.followers += isFollowed ? -1 : +1
+        followersLabel.attributedText  = viewModel.attributedFollowers
+
+        if isFollowed {
+            self.editButton.setTitle("Follow", for: .normal)
+            
+        } else {
+            self.editButton.setTitle("Following", for: .normal)
+        }
+        
+    }
+    
+    func getAvatarImage() -> UIImage? {
+        self.avartImageView.image
+    }
+
+    
     //MARK: - Selectors
     @objc func handleDidTapReadMoreButton() {
         self.bioLabel.numberOfLines = 0
@@ -356,7 +376,7 @@ class HeaderProfileViewController: UIViewController {
     }
     
     @objc func handleFollowButtonTapped() {
-        delegate?.didSeclectFollowButton()
+        
     }
     
     
@@ -375,6 +395,4 @@ extension HeaderProfileViewController: UICollectionViewDataSource, UICollectionV
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return 20
     }
-    
-
 }

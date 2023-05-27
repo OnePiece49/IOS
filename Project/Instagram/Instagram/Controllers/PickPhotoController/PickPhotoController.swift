@@ -67,6 +67,7 @@ class PickPhotoController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        self.tabBarController?.tabBar.isHidden = true
         shouldInsetCell = true
         configureUI()
         configureProperties()
@@ -281,11 +282,20 @@ extension PickPhotoController: UICollectionViewDataSource, UICollectionViewDeleg
                 view.layoutIfNeeded()
             }
 
-            manager.requestImage(for: asset,
-                                targetSize: CGSize(width: Int(1000 * ratio), height: 1000),
-                                contentMode: .aspectFit,
-                                options: requestOption()) { image, _ in
-                self.headerPhotoView.photoImageView.image = image
+            if type == .uploadTus {
+                manager.requestImage(for: asset,
+                                    targetSize: CGSize(width: Int(800 * ratio), height: 800),
+                                    contentMode: .aspectFit,
+                                    options: self.requestOption()) { image, _ in
+                    self.headerPhotoView.photoImageView.image = image
+                }
+            } else {
+                manager.requestImage(for: asset,
+                                    targetSize: CGSize(width: Int(200 * ratio), height: 200),
+                                    contentMode: .aspectFit,
+                                    options: self.requestOption()) { image, _ in
+                    self.headerPhotoView.photoImageView.image = image
+                }
             }
         }
         return cell
@@ -309,11 +319,20 @@ extension PickPhotoController: UICollectionViewDataSource, UICollectionViewDeleg
             view.layoutIfNeeded()
         }
         
-        manager.requestImage(for: asset,
-                            targetSize: CGSize(width: Int(600 * ratio), height: 600),
-                            contentMode: .aspectFit,
-                            options: requestOption()) { image, _ in
-            self.headerPhotoView.photoImageView.image = image
+        if type == .uploadTus {
+            manager.requestImage(for: asset,
+                                targetSize: CGSize(width: Int(800 * ratio), height: 800),
+                                contentMode: .aspectFit,
+                                options: self.requestOption()) { image, _ in
+                self.headerPhotoView.photoImageView.image = image
+            }
+        } else {
+            manager.requestImage(for: asset,
+                                targetSize: CGSize(width: Int(250 * ratio), height: 250),
+                                contentMode: .aspectFit,
+                                options: self.requestOption()) { image, _ in
+                self.headerPhotoView.photoImageView.image = image
+            }
         }
     }
     

@@ -60,15 +60,11 @@ class ProfileController: UIViewController {
         super.init(nibName: nil, bundle: nil)
         self.viewModel.user = user
         self.fetchDataForAnotherUser()
-        self.configureUI()
-        self.setupNotification()
     }
     
     init() {
         super.init(nibName: nil, bundle: nil)
         fetchDataForCurrentUser()
-        configureUI()
-        setupNotification()
     }
     
     required init?(coder: NSCoder) {
@@ -82,6 +78,9 @@ class ProfileController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .systemBackground
+        self.navigationController?.navigationBar.isHidden = true
+        self.configureUI()
+        print("DEBUG: \(self) profile")
 
     }
     
@@ -93,17 +92,14 @@ class ProfileController: UIViewController {
 
     override func viewWillDisappear(_ animated: Bool) {
         self.tabBarController?.tabBar.isHidden = false
-        
-
     }
     
     //MARK: - Helpers
     func configureUI() {
-        self.navigationController?.navigationBar.isHidden = true
         addChild(headerViewController)
         containerScrollView.addSubview(headerViewController.view)
         didMove(toParent: self)
-        
+        view.backgroundColor = .systemBackground
         view.addSubview(overlayScrollView)
         view.addSubview(containerScrollView)
         view.addSubview(shadowView)
@@ -145,12 +141,6 @@ class ProfileController: UIViewController {
         self.overlayScrollView.contentSize = CGSize(width: 0,
                                                     height: self.heightHeaderView + self.view.frame.height + 60)
         refreshControl.addTarget(self, action: #selector(handleRefreshControl), for: .valueChanged)
-    }
-    
-    func setupNotification() {
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(didEnterBackground),
-                                               name: UIApplication.didEnterBackgroundNotification, object: nil)
     }
 
     
@@ -195,32 +185,34 @@ class ProfileController: UIViewController {
         }
 
     }
-    
+
     func fetchDataForAnotherUser() {
         self.viewModel.hasFollowedUser()
-        self.viewModel.completion = {
-            self.updateUI()
-            self.configureProperties()
-            self.configureTabTripController()
+        self.viewModel.completionFetchMainInfo = { [weak self] in
+            self?.updateUI()
+            self?.configureProperties()
+            self?.configureTabTripController()
+        }
+        
+        self.viewModel.completionFetchSubInfo = { [weak self] in
+            self?.updateUI()
         }
     }
     
     func fetchDataForCurrentUser() {
         viewModel.fetchUser()
-        viewModel.completion = {
-            self.updateUI()
-            self.configureProperties()
-            self.configureTabTripController()
+        viewModel.completionFetchMainInfo = { [weak self] in
+            self?.updateUI()
+            self?.configureProperties()
+            self?.configureTabTripController()
+        }
+        
+        self.viewModel.completionFetchSubInfo = { [weak self] in
+            self?.updateUI()
         }
     }
     
     //MARK: - Selectors
-    @objc func didEnterBackground() {
-        if isSelectingUsername {
-            self.view.backgroundColor = .clear
-        }
-    }
-    
     @objc func handleRefreshControl() {
         self.viewModel.referchData()
         self.refreshControl.endRefreshing()
@@ -272,31 +264,27 @@ extension ProfileController: BottomTapTripControllerDelegate {
 }
 
 
-extension ProfileController: HeaderProfileViewDelegate {
+extension ProfileController: HeaderProfileDelegate {
     func didSelectUsernameButton() {
-        viewTransform = CGAffineTransform(scaleX: 0.88, y: 0.88)
-        self.containerScrollView.layer.cornerRadius = 20
+        let viewTransform = CGAffineTransform(scaleX: 0.88, y: 0.88)
+        self.tabBarController?.view.clipsToBounds = true
         
         let switchAccountVC = SwitchAccountController(imageUser: self.headerViewController.getAvatarImage())
         switchAccountVC.modalPresentationStyle = .overFullScreen
         switchAccountVC.delegate = self
         switchAccountVC.durationDismissing = {
             UIView.animate(withDuration: 0.2) {
-                self.viewTransform = .identity
-                self.containerScrollView.transform = .identity
+                self.tabBarController?.view.layer.cornerRadius = 0
+                self.tabBarController?.navigationController?.view.transform = .identity
                 self.shadowView.alpha = 0
-                self.containerScrollView.layer.cornerRadius = 0
-                self.view.backgroundColor = .systemBackground
-                self.isSelectingUsername = false
             }
         }
         self.present(switchAccountVC, animated: false, completion: .none)
-        self.view.backgroundColor = .clear
         UIView.animate(withDuration: 0.2) {
-            self.containerScrollView.transform = self.viewTransform
+            self.tabBarController?.navigationController?.view.transform = viewTransform
             self.shadowView.alpha = 0.8
+            self.tabBarController?.view.layer.cornerRadius = 20
         }
-        self.isSelectingUsername = true
     }
     
     func didTapthreeLineImageView() {
@@ -325,14 +313,12 @@ extension ProfileController: HeaderProfileViewDelegate {
     func didSeclectFollowButton() {
         guard let user = viewModel.user else {
             return}
-        print("DEBUG: \(user.isFollowed)")
         if user.isFollowed {
             viewModel.unfollowUser()
-            self.headerViewController.editButton.setTitle("Follow", for: .normal)
         } else {
             viewModel.followUser()
-            self.headerViewController.editButton.setTitle("Following", for: .normal)
         }
+        self.headerViewController.updateDataFollowing(isFollowed: user.isFollowed)
     }
 }
 

@@ -11,7 +11,6 @@ import SDWebImage
 
 protocol HomeFeedCollectionViewCellDelegate: AnyObject {
     func didSelectAvatar(status: InstaStatus)
-    func didSelectLikeButton(button: UIButton)
     func didSelectCommentButton(status: InstaStatus)
 }
 
@@ -22,7 +21,11 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
     var actionBar: NavigationCustomView!
     weak var delegate: HomeFeedCollectionViewCellDelegate?
     var viewModel: HomeFeedCellViewModel? {
-        didSet {updateUI()}
+        didSet {
+            updateUI()
+            viewModel?.hasLikedStatus()
+            configureProperties()
+        }
     }
     
     private lazy var avatarUserUpTusImageView: UIImageView = {
@@ -66,22 +69,26 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
-    private lazy var statusLabel: UILabel = Utilites.createStatusFeedLabel(username: "black_pink", status: "Happy birthday Blackpink, have a good day, wish you have all lucky :))")
+    private lazy var statusLabel: UILabel = Utilites.createStatusFeedLabel(username: "black_pink",
+                                                                           status: "Happy birthday Blackpink, have a good day, wish you have all lucky :))")
     
-    private lazy var getCommentLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "Xem 1531 bình luận"
-        label.font = .systemFont(ofSize: 14, weight: .regular)
-        label.textColor = .gray
-        return label
+    private lazy var allCommentsButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Xem 1311 bình luận", for: .normal)
+        button.tintColor = .label
+        button.addTarget(self, action: #selector(handelAllCommentButtonTapped), for: .touchUpInside)
+        button.setTitleColor(.gray, for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.titleLabel?.textAlignment = .left
+        button.titleLabel?.font = .systemFont(ofSize: 14, weight: .regular)
+        return button
     }()
     
     private let timePostTusLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = "27 minutes ago"
-        label.font = .systemFont(ofSize: 14, weight: .regular)
+        label.font = .systemFont(ofSize: 12, weight: .regular)
         label.textColor = .gray
         return label
     }()
@@ -120,7 +127,7 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         addSubview(actionBar)
         addSubview(numberLikedLabel)
         addSubview(statusLabel)
-        addSubview(getCommentLabel)
+        addSubview(allCommentsButton)
         addSubview(timePostTusLabel)
         addSubview(fakeView)
         
@@ -148,15 +155,14 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
             numberLikedLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -15),
             numberLikedLabel.leftAnchor.constraint(equalTo: leftAnchor, constant: 15),
             
-            statusLabel.topAnchor.constraint(equalTo: numberLikedLabel.bottomAnchor, constant: 7),
+            statusLabel.topAnchor.constraint(equalTo: numberLikedLabel.bottomAnchor, constant: 5),
             statusLabel.leftAnchor.constraint(equalTo: leftAnchor, constant: 15),
             statusLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -15),
             
-            getCommentLabel.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 7),
-            getCommentLabel.leftAnchor.constraint(equalTo: leftAnchor, constant: 15),
-            getCommentLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -15),
+            allCommentsButton.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 0),
+            allCommentsButton.leftAnchor.constraint(equalTo: leftAnchor, constant: 15),
 
-            timePostTusLabel.topAnchor.constraint(equalTo: getCommentLabel.bottomAnchor, constant: 5),
+            timePostTusLabel.topAnchor.constraint(equalTo: allCommentsButton.bottomAnchor, constant: 0),
             timePostTusLabel.leftAnchor.constraint(equalTo: leftAnchor, constant: 15),
             timePostTusLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -15),
             bottomAnchor,
@@ -166,20 +172,20 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
     
     func setupNavigationBar() {
         let attributeFirstLeftButton = AttibutesButton(image: UIImage(named: "like1"),
-                                                       sizeImage: CGSize(width: 23, height: 23)) {
-            self.delegate?.didSelectLikeButton(button: self.actionBar.leftButtons[0])
+                                                       sizeImage: CGSize(width: 25, height: 25)) { [weak self] in
+            self!.didTapLikeButton(button: self!.actionBar.leftButtons[0])
         }
                                                    
         let attributeSecondLeftButton = AttibutesButton(image: UIImage(named: "comment-1"),
-                                                        sizeImage: CGSize(width: 23, height: 23)) {
-            self.delegate?.didSelectCommentButton(status: self.viewModel?.status)
+                                                        sizeImage: CGSize(width: 25, height: 25)) { [weak self] in
+            self?.delegate?.didSelectCommentButton(status: self!.viewModel!.status)
         }
                                                         
         let attributeThreeLeftButton = AttibutesButton(image: UIImage(named: "share"),
-                                                  sizeImage: CGSize(width: 28, height: 28))
+                                                  sizeImage: CGSize(width: 29, height: 29))
         
         let attributeFirstRightButton = AttibutesButton(image: UIImage(named: "Bookmark"),
-                                                  sizeImage: CGSize(width: 36, height: 32))
+                                                  sizeImage: CGSize(width: 34, height: 31))
                                                    
         self.actionBar = NavigationCustomView(attributeLeftButtons: [attributeFirstLeftButton,
                                                                     attributeSecondLeftButton,
@@ -187,12 +193,17 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
                                               attributeRightBarButtons: [attributeFirstRightButton],
                                               isHiddenDivider: true,
                                               beginSpaceLeftButton: 15,
-                                              beginSpaceRightButton: 24,
-                                              continueSpaceleft: 12)
+                                              beginSpaceRightButton: 15,
+                                              continueSpaceleft: 15)
+    }
+    
+    func configureProperties() {
+        self.viewModel?.completion = {
+            self.updateLikeButton()
+        }
     }
     
     func updateUI() {
-
         NSLayoutConstraint.deactivate([heightImageConstraint])
         
         let ratio: CGFloat = viewModel?.ratioImage ?? 1
@@ -210,10 +221,53 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
     }
     
     
+    func updateLikeButton() {
+        guard let hasLiked = viewModel?.likedStatus else {return}
+        
+        if hasLiked {
+            self.actionBar.leftButtons[0].setImage(UIImage(named: "heart-red"), for: .normal)
+            self.actionBar.leftButtons[0].tintColor = .red
+        } else {
+            self.actionBar.leftButtons[0].setImage(UIImage(named: "like1"), for: .normal)
+            self.actionBar.leftButtons[0].tintColor = .label
+        }
+    }
+    
+    func didTapLikeButton(button: UIButton) {
+        guard let hasLiked = viewModel?.likedStatus else {return}
+
+        let transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+        UIView.animate(withDuration: 0.15) {
+            button.transform = transform
+            if  hasLiked {
+                button.setImage(UIImage(named: "like1"), for: .normal)
+                button.tintColor = .label
+
+            } else {
+                button.setImage(UIImage(named: "heart-red"), for: .normal)
+                button.tintColor = .red
+            }
+        } completion: { _ in
+            button.transform = .identity
+        }
+        
+        
+        if hasLiked {
+            viewModel?.unlikeStatus()
+        } else {
+            viewModel?.likeStatus()
+        }
+        
+    }
+    
     //MARK: - Selectors
     @objc func handleAvatarImageTapped() {
         guard let status = viewModel?.status else {return}
         self.delegate?.didSelectAvatar(status: status)
+    }
+    
+    @objc func handelAllCommentButtonTapped() {
+        self.delegate?.didSelectCommentButton(status: self.viewModel!.status)
     }
     
 }

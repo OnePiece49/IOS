@@ -98,11 +98,65 @@ class StatusService {
             self.fetchStatusUser(uid: user.uid) { userStatuses in
                 statues.append(contentsOf: userStatuses)
                 numberUsers += 1
+                
                 if numberUsers == users.count {
                     statues = statues.shuffled()  //Random statues
                     completion(statues)
                 }
              }
+        }
+    }
+    
+    func likeStatus(status: InstaStatus,
+                    completion: @escaping() -> Void) {
+        let statusId = status.statusId
+        guard let currentUid = Auth.auth().currentUser?.uid else {return}
+        
+        FirebaseRef.ref_userLikeStatuses.document(currentUid).setData([statusId: "1"], merge: true) { _ in
+            FirebaseRef.ref_tusLiked.document(statusId).setData([currentUid: "1"], merge: true) { _ in
+                completion()
+            }
+
+        }
+    }
+    
+    func unlikeStatus(status: InstaStatus,
+                    completion: @escaping() -> Void) {
+        let statusId = status.statusId
+        guard let currentUid = Auth.auth().currentUser?.uid else {return}
+        
+        FirebaseRef.ref_userLikeStatuses.document(currentUid).updateData([statusId: FieldValue.delete()]) { _ in
+            FirebaseRef.ref_tusLiked.document(statusId).updateData([currentUid: FieldValue.delete()]) { _ in
+                completion()
+            }
+        }
+    }
+    
+    func hasUserLikedTus(status: InstaStatus,
+                         uid: String,
+                         completion: @escaping(Bool) -> Void) {
+        let statusId = status.statusId
+        FirebaseRef.ref_userLikeStatuses.document(uid).getDocument { documentSnap, _ in
+            guard let documentData = documentSnap?.data() else {
+                completion(false)
+                return
+            }
+            
+            if documentData[statusId] == nil {
+                completion(false)
+            } else {
+                completion(true)
+            }
+        }
+    }
+    
+    func fetchNumberUsersLikedStatus(status: InstaStatus,
+                                     completion: @escaping(Int) -> Void) {
+        let statusId = status.statusId
+        FirebaseRef.ref_tusLiked.document(statusId).getDocument { documentSnap, _ in
+            guard let data = documentSnap?.data() else {return}
+            
+            completion(data.count)
         }
     }
 

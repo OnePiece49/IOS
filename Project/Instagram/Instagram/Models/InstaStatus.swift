@@ -18,14 +18,14 @@ struct InstaStatus {
     let postImage: PostImage
     var timeStamp: Date!
     let statusId: String
-    var numberLikes: Int
+    var numberLikes: Int = 0
     var numberComments: Int
+    var likedTus: Bool = false
     
     init(user: User, statusId: String, dictionary: [String: Any]) {
         self.user = user
         self.statusId = statusId
         self.caption = dictionary[UsersConstant.caption] as? String ?? ""
-        self.numberLikes = dictionary[UsersConstant.numberComments] as? Int ?? 0
         self.numberComments = dictionary[UsersConstant.numberComments] as? Int ?? 0
         
         if let timestamp = dictionary[UsersConstant.timestamp] as? Double {

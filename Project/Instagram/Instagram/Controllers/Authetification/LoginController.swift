@@ -79,6 +79,10 @@ class LoginController: UIViewController {
         configureUI()
     }
     
+    deinit {
+        print("DEBUG: login deint")
+    }
+    
     override func viewDidLayoutSubviews() {
         let layer0 = CAGradientLayer()
         layer0.colors = [
@@ -97,6 +101,10 @@ class LoginController: UIViewController {
         navigationController?.navigationBar.isHidden = true
         tabBarController?.tabBar.isHidden = true
         self.errorLabel.isHidden = true
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
     }
     
     //MARK: - Helpers
@@ -176,9 +184,9 @@ class LoginController: UIViewController {
             
             self.errorLabel.isHidden = true
             let mainTBVC = MainTabBarController()
-            mainTBVC.modalPresentationStyle = .fullScreen
 
-            self.present(mainTBVC, animated: true, completion: .none)
+            self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+            self.navigationController?.pushViewController(mainTBVC, animated: true)
             self.loginLabel.isUserInteractionEnabled = true
         }
     }

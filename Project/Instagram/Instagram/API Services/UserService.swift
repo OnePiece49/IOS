@@ -54,8 +54,8 @@ class UserService {
     func followUser(uid: String, completion: @escaping () -> Void) {
         guard let currentUid = Auth.auth().currentUser?.uid else {
             return
-            
         }
+        
         FirebaseRef.ref_followUser.document(uid).setData([currentUid: "1"], merge: true) { error in
             if let error = error {
                 print("DEBUG: \(error.localizedDescription)")

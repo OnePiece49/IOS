@@ -15,17 +15,19 @@ class ProfileViewModel {
         guard let uid = Auth.auth().currentUser?.uid else {return}
         UserService.shared.fetchUser(uid: uid) { user in
             self.user = user
+            self.completionFetchMainInfo?()
             UserService.shared.fetchUserRelationStats(uid: uid) { relationStats in
                 self.user?.stats = relationStats
                 StatusService.shared.fetchStatusUser(uid: uid) { statuses in
                     self.user?.numberStatus = statuses.count
-                    self.completion?()
+                    self.completionFetchSubInfo?()
                 }
             }
         }
     }
     
-    var completion: (() -> Void)?
+    var completionFetchMainInfo: (() -> Void)?
+    var completionFetchSubInfo: (() -> Void)?
     
     var isFollowed: Bool {
         return user?.isFollowed == true
@@ -36,11 +38,12 @@ class ProfileViewModel {
 
         UserService.shared.ifUserHasFollowed(uid: user.uid) { isFollowed in
             self.user?.isFollowed = isFollowed
+            self.completionFetchMainInfo?()
             UserService.shared.fetchUserRelationStats(uid: user.uid) { relationStats in
                 self.user?.stats = relationStats
                 StatusService.shared.fetchStatusUser(uid: user.uid) { statuses in
                     self.user?.numberStatus = statuses.count
-                    self.completion?()
+                    self.completionFetchSubInfo?()
                 }
             }
         }
@@ -67,6 +70,14 @@ class ProfileViewModel {
     }
     
     func referchData() {
-        self.hasFollowedUser()
+        guard let user = user else {
+            return
+        }
+
+        UserService.shared.fetchUser(uid: user.uid) { user in
+            self.user = user
+            self.hasFollowedUser()
+
+        }
     }
 }
