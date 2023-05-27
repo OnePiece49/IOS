@@ -62,19 +62,30 @@ class HeaderProfileViewModel {
         return user.uid == Auth.auth().currentUser?.uid
     }
     
-    func followUser(completion: @escaping: ()-> Void) {
+    func followUser() {
         UserService.shared.followUser(uid: user.uid) {
             self.user.isFollowed = true
-            completion()
+            self.fetchRelationStats()
         }
     }
     
-    func unfollowUser(completion: @escaping: ()-> Void) {
+    func unfollowUser() {
         UserService.shared.unfollowUser(uid: user.uid) {
             self.user.isFollowed = false
-            completion()
+            self.fetchRelationStats()
         }
     }
+    
+    func fetchRelationStats() {
+        let uid = self.user.uid
+        
+        UserService.shared.fetchUserRelationStats(uid: uid) { relationStats in
+            self.user.stats = relationStats
+            self.completionFetchRelations?()
+        }
+    }
+    
+    var completionFetchRelations: (() -> Void)?
     
     init(user: User) {
         self.user = user

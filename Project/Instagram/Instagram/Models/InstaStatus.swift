@@ -9,7 +9,7 @@ import UIKit
 
 struct PostImage {
     let imageURL: String
-    let aspectRatio: Float  ///width / height
+    let aspectRatio: Float  /// width / height
 }
 
 struct InstaStatus {
@@ -20,7 +20,7 @@ struct InstaStatus {
     let statusId: String
     var numberLikes: Int = 0
     var numberComments: Int
-    var likedTus: Bool = false
+    var likedStatus: Bool = false
     
     init(user: User, statusId: String, dictionary: [String: Any]) {
         self.user = user

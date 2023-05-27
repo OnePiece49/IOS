@@ -1,20 +1,20 @@
 //
-//  CommentCollectionViewCell.swift
+//  CommentHeaderCollectionView.swift
 //  Instagram
 //
-//  Created by Long Bảo on 26/05/2023.
+//  Created by Long Bảo on 27/05/2023.
 //
-
 
 import UIKit
 import SDWebImage
 
-class CommentCollectionViewCell: UICollectionViewCell {
+class CommentHeaderCollectionView: UICollectionReusableView {
     //MARK: - Properties
-    var viewModel: CommentCollectionViewCellViewModel? {
+    var status: InstaStatus? {
         didSet {updateUI()}
     }
-    static let identifier = "CommentCollectionViewCell"
+    static let identifier = "CommentHeaderCollectionView"
+    var bottomConstraint: NSLayoutConstraint!
     
     private lazy var avatarImageView: UIImageView = {
         let iv = UIImageView(image: UIImage(named: "jisoo"))
@@ -44,6 +44,13 @@ class CommentCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
+    private let divider: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .systemGray
+        view.alpha = 0.4
+        return view
+    }()
     
     private lazy var captionLabel: UILabel = {
         let label = UILabel()
@@ -77,7 +84,10 @@ class CommentCollectionViewCell: UICollectionViewCell {
         addSubview(usernameLabel)
         addSubview(dateLabel)
         addSubview(captionLabel)
+        addSubview(divider)
         
+        self.bottomConstraint = captionLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -22)
+        self.bottomConstraint.priority = UILayoutPriority(999)
         NSLayoutConstraint.activate([
             avatarImageView.topAnchor.constraint(equalTo: topAnchor, constant: 13),
             avatarImageView.leftAnchor.constraint(equalTo: leftAnchor, constant: 12),
@@ -91,21 +101,31 @@ class CommentCollectionViewCell: UICollectionViewCell {
             captionLabel.topAnchor.constraint(equalTo: usernameLabel.bottomAnchor, constant: 2),
             captionLabel.leftAnchor.constraint(equalTo: usernameLabel.leftAnchor),
             captionLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -22),
-            captionLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -12),
+            bottomConstraint,
+            
+            divider.bottomAnchor.constraint(equalTo: bottomAnchor),
+            divider.leftAnchor.constraint(equalTo: leftAnchor),
+            divider.rightAnchor.constraint(equalTo: rightAnchor),
+            divider.heightAnchor.constraint(equalToConstant: 0.5),
         ])
         avatarImageView.setDimensions(width: 36, height: 36)
     }
     
     func updateUI() {
-        guard let viewModel = viewModel else {
+        guard let status = status else {
             return
         }
 
-        self.avatarImageView.sd_setImage(with: viewModel.avatarImageUrl,
+        let avatarUrl = URL(string: status.user.profileImage ?? "")
+        self.avatarImageView.sd_setImage(with: avatarUrl,
                                         placeholderImage: UIImage(systemName: "person.circle"))
-        self.usernameLabel.text = viewModel.username
-        self.dateLabel.text = viewModel.dateCommentString
-        self.captionLabel.text = viewModel.contentComment
+        self.captionLabel.text = status.caption
+        self.usernameLabel.text = status.user.username
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h:mm a • MM/dd/yyyy"
+        self.dateLabel.text = formatter.string(from: status.timeStamp)
+        
     }
     
     //MARK: - Selectors

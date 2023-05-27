@@ -112,12 +112,17 @@ class StatusService {
         let statusId = status.statusId
         guard let currentUid = Auth.auth().currentUser?.uid else {return}
         
-        FirebaseRef.ref_userLikeStatuses.document(currentUid).setData([statusId: "1"], merge: true) { _ in
-            FirebaseRef.ref_tusLiked.document(statusId).setData([currentUid: "1"], merge: true) { _ in
-                completion()
+        let queue = DispatchQueue(label: "Queue")
+        queue.async {
+            FirebaseRef.ref_userLikeStatuses.document(currentUid).setData([statusId: "1"], merge: true) { _ in
+                FirebaseRef.ref_tusLiked.document(statusId).setData([currentUid: "1"], merge: true) { _ in
+                    DispatchQueue.main.async {
+                        completion()
+                    }
+                }
             }
-
         }
+
     }
     
     func unlikeStatus(status: InstaStatus,
@@ -125,38 +130,55 @@ class StatusService {
         let statusId = status.statusId
         guard let currentUid = Auth.auth().currentUser?.uid else {return}
         
-        FirebaseRef.ref_userLikeStatuses.document(currentUid).updateData([statusId: FieldValue.delete()]) { _ in
-            FirebaseRef.ref_tusLiked.document(statusId).updateData([currentUid: FieldValue.delete()]) { _ in
-                completion()
+        let queue = DispatchQueue(label: "Queue")
+        queue.async {
+            FirebaseRef.ref_userLikeStatuses.document(currentUid).updateData([statusId: FieldValue.delete()]) { _ in
+                FirebaseRef.ref_tusLiked.document(statusId).updateData([currentUid: FieldValue.delete()]) { _ in
+                    DispatchQueue.main.async {
+                        completion()
+                    }
+                }
             }
         }
+ 
     }
     
     func hasUserLikedTus(status: InstaStatus,
                          uid: String,
                          completion: @escaping(Bool) -> Void) {
+        let queue = DispatchQueue(label: "Queue")
         let statusId = status.statusId
-        FirebaseRef.ref_userLikeStatuses.document(uid).getDocument { documentSnap, _ in
-            guard let documentData = documentSnap?.data() else {
-                completion(false)
-                return
+        queue.async {
+            FirebaseRef.ref_userLikeStatuses.document(uid).getDocument { documentSnap, _ in
+                guard let documentData = documentSnap?.data() else {
+                    completion(false)
+                    return
+                }
+                
+                DispatchQueue.main.async {
+                    if documentData[statusId] == nil {
+                        completion(false)
+                    } else {
+                        completion(true)
+                    }
+                }
             }
-            
-            if documentData[statusId] == nil {
-                completion(false)
-            } else {
-                completion(true)
-            }
+
         }
     }
     
     func fetchNumberUsersLikedStatus(status: InstaStatus,
                                      completion: @escaping(Int) -> Void) {
         let statusId = status.statusId
-        FirebaseRef.ref_tusLiked.document(statusId).getDocument { documentSnap, _ in
-            guard let data = documentSnap?.data() else {return}
-            
-            completion(data.count)
+        let queue = DispatchQueue(label: "Queue")
+        queue.async {
+            FirebaseRef.ref_tusLiked.document(statusId).getDocument { documentSnap, _ in
+                guard let data = documentSnap?.data() else {return}
+                
+                DispatchQueue.main.async {
+                    completion(data.count)
+                }
+            }
         }
     }
 

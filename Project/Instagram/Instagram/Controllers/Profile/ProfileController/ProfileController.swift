@@ -309,17 +309,6 @@ extension ProfileController: HeaderProfileDelegate {
         editProfileVC.delegate = self
         self.navigationController?.pushViewController(editProfileVC, animated: true)
     }
-    
-    func didSeclectFollowButton() {
-        guard let user = viewModel.user else {
-            return}
-        if user.isFollowed {
-            viewModel.unfollowUser()
-        } else {
-            viewModel.followUser()
-        }
-        self.headerViewController.updateDataFollowing(isFollowed: user.isFollowed)
-    }
 }
 
 extension ProfileController: SwitchAccountDelegate {

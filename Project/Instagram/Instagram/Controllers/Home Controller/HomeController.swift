@@ -26,16 +26,6 @@ class HomeController: UIViewController {
         return header
     }()
     
-    private lazy var cancelButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Cancel", for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 15)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(hanldeCancelButtonTapped), for: .touchUpInside)
-        button.setTitleColor(.label, for: .normal)
-        return button
-    }()
-    
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     
     //MARK: - View Lifecycle
@@ -188,11 +178,6 @@ class HomeController: UIViewController {
         self.refreshControl.endRefreshing()
     }
     
-    @objc func hanldeCancelButtonTapped() {
-        self.navigationController?.pushViewController(CommentController(), animated: true)
-
-    }
-    
 }
 //MARK: - delegate
 extension HomeController: UICollectionViewDataSource {
@@ -237,19 +222,16 @@ extension HomeController: UICollectionViewDataSource {
 
 
 extension HomeController: HomeFeedCollectionViewCellDelegate {
-    func didSelectCommentButton(status: InstaStatus) {
-        let commentVC = CommentController()
+    func didSelectCommentButton(cell: HomeFeedCollectionViewCell, status: InstaStatus) {
+        let commentVC = CommentController(status: status, currentUser: viewModel.currentUser)
         commentVC.modalPresentationStyle = .overFullScreen
+        commentVC.delegate = cell.self
         self.tabBarController?.navigationController?.pushViewController(commentVC, animated: true)
     }
     
-    
     func didSelectAvatar(status: InstaStatus) {
         let profileVC = ProfileController(user: status.user)
-        let com = CommentController()
-        
-        com.navigationController?.navigationBar.isHidden = true
-        self.navigationController?.navigationBar.isHidden = true
+
         self.navigationController?.pushViewController(profileVC, animated: true)
     }
     
@@ -263,6 +245,6 @@ extension HomeController: UICollectionViewDelegate {
 
 extension HomeController: InstagramHeaderViewDelegate {
     func didSelectInstagramLabel() {
-        self.navigationController?.pushViewController(CommentController(), animated: true)
+//        self.navigationController?.pushViewController(CommentController(), animated: true)
     }
 }

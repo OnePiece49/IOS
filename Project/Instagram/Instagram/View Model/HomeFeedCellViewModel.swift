@@ -40,47 +40,86 @@ class HomeFeedCellViewModel {
     }
     
     var likedStatus: Bool {
-        return status.likedTus
+        return status.likedStatus
     }
     
     var username: String {
         return status.user.username
     }
     
-    var numberLikes: String {
-        return "\(status.numberLikes)"
+    var numberLikesString: String {
+        return "\(status.numberLikes) likes"
+    }
+    
+    var numberLikesInt: Int {
+        return status.numberLikes
+    }
+    
+    var numberCommmentsString: String {
+        if self.status.numberComments == 0 {
+            return "Add comments..."
+        } else {
+            if self.status.numberComments == 1 {
+                return "See all \(status.numberComments) comment"
+            } else {
+                return "See all \(status.numberComments) comments"
+            }
+        }
     }
     
     func hasLikedStatus() {
         guard let uid = Auth.auth().currentUser?.uid else {return}
         StatusService.shared.hasUserLikedTus(status: self.status,
                                              uid: uid) { hasLiked in
-            self.status.likedTus = hasLiked
-            self.completion?()
+            self.status.likedStatus = hasLiked
+            self.completionLike?()
         }
     }
     
     func likeStatus() {
+        self.status.likedStatus = true
+        self.status.numberLikes += 1
+
         StatusService.shared.likeStatus(status: status) {
-            self.status.likedTus = true
+            self.fetchNumberUsersLikedStatusAfterTapLikeButton()
         }
     }
     
     func unlikeStatus() {
+        self.status.likedStatus = false
+        self.status.numberLikes -= 1
+        
         StatusService.shared.unlikeStatus(status: status) {
-            self.status.likedTus = false
+            self.fetchNumberUsersLikedStatusAfterTapLikeButton()
+        }
+    }
+    
+    private func fetchNumberUsersLikedStatusAfterTapLikeButton() {
+        StatusService.shared.fetchNumberUsersLikedStatus(status: status) { number in
+            self.completionFetchNumberLikes?()
         }
     }
     
     func fetchNumberUsersLikedStatus() {
         StatusService.shared.fetchNumberUsersLikedStatus(status: status) { number in
             self.status.numberLikes = number
+            self.completionFetchNumberLikes?()
+        }
+    }
+    
+    func fetchNumberUsersCommented() {
+        CommentStatusService.shared.fetchNumberUsersCommented(status: status) { number in
+            self.status.numberComments = number
+            self.completionFetchNumberUserCommented?()
         }
     }
         
-    var completion: (() -> Void)?
+    var completionLike: (() -> Void)?
+    var completionFetchNumberLikes: (() -> Void)?
+    var completionFetchNumberUserCommented: (() -> Void)?
     
     init(status: InstaStatus) {
         self.status = status
     }
 }
+

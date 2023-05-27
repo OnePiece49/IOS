@@ -8,7 +8,7 @@
 import UIKit
 
 protocol ContainerInputDelegate: AnyObject {
-    func didTapPostButton(text: String)
+    func didTapPostButton(textView: UITextView)
     func didChangeEditTextView(textView: UITextView)
 }
 
@@ -89,7 +89,7 @@ class ContainerInputCustomView: UIView {
     
     //MARK: - Selectors
     @objc func handlePostButtonTapped() {
-        self.delegate?.didTapPostButton(text: inputTextView.text)
+        self.delegate?.didTapPostButton(textView: self.inputTextView)
     }
     
 }

@@ -6,14 +6,17 @@
 //
 
 import UIKit
+import SDWebImage
 
-enum CommentType {
-    case caption
-    case comment
+protocol CommentDelegate: AnyObject {
+    func didPostComment(numberComments: Int)
 }
 
 class CommentController: UIViewController {
     //MARK: - Properties
+    var viewModel = CommentViewModel()
+    
+    weak var delegate: CommentDelegate?
     var navigationbar: NavigationCustomView!
     var collectionView: UICollectionView!
     var bottomContainerViewConstraint: NSLayoutConstraint!
@@ -24,7 +27,7 @@ class CommentController: UIViewController {
     private let plusHeightTextView: CGFloat = 28
     
     private let avatarImageView: UIImageView = {
-        let iv = UIImageView(image: UIImage(named: "emoji-smileHeart"))
+        let iv = UIImageView()
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.backgroundColor = .blue
         iv.clipsToBounds = true
@@ -71,6 +74,23 @@ class CommentController: UIViewController {
     }()
     
     //MARK: - View Lifecycle
+    init(status: InstaStatus, currentUser: User) {
+        super.init(nibName: nil, bundle: nil)
+        self.viewModel.status = status
+        self.viewModel.currentUser = currentUser
+        self.avatarImageView.sd_setImage(with: viewModel.avatarCurrentUserUrl,
+                                        placeholderImage: UIImage(systemName: "person.circle"))
+        self.fetchData()
+        self.viewModel.completionFetchComment = { [weak self] in
+            self?.delegate?.didPostComment(numberComments: self!.viewModel.numberComments)
+            self?.collectionView.reloadData()
+        }
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     deinit {
         print("DEBUG: CommentVC deinit")
     }
@@ -96,6 +116,10 @@ class CommentController: UIViewController {
     }
     
     //MARK: - Helpers
+    func fetchData() {
+        self.viewModel.fetchComment()
+    }
+    
     func configureUI() {
         setupNavigationBar()
         view.backgroundColor = .systemBackground
@@ -136,6 +160,9 @@ class CommentController: UIViewController {
         collectionView.dataSource = self
         collectionView.register(CommentCollectionViewCell.self,
                                 forCellWithReuseIdentifier: CommentCollectionViewCell.identifier)
+        collectionView.register(CommentHeaderCollectionView.self,
+                                forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
+                                withReuseIdentifier: CommentHeaderCollectionView.identifier)
     }
     
     func postNotification() {
@@ -183,7 +210,12 @@ class CommentController: UIViewController {
                                                   item: item,
                                                   count: 1)
         
-        let section = ComposionalLayout.createSectionWithouHeader(group: group)
+        let section: NSCollectionLayoutSection
+        if viewModel.status.caption == "" {
+            section = ComposionalLayout.createSectionWithouHeader(group: group)
+        } else {
+            section = ComposionalLayout.createSection(group: group)
+        }
         section.interGroupSpacing = 2
         let layout = UICollectionViewCompositionalLayout(section: section)
         return layout
@@ -217,23 +249,36 @@ extension CommentController: UICollectionViewDelegate, UICollectionViewDataSourc
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CommentCollectionViewCell.identifier
                                                       , for: indexPath) as! CommentCollectionViewCell
-        if indexPath.row == 0 {
-            cell.type = .caption
-        } else {
-            cell.type = .comment
-        }
+        
+        let comment = viewModel.commentAtIndexPath(indexpath: indexPath)
+        cell.viewModel = CommentCollectionViewCellViewModel(comment: comment)
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 12
+        return viewModel.numberComments
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        let header = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader,
+                                                                     withReuseIdentifier: CommentHeaderCollectionView.identifier,
+                                                                     for: indexPath) as! CommentHeaderCollectionView
+        header.status = self.viewModel.status
+        return header
     }
 }
 
 extension CommentController: ContainerInputDelegate {
-    func didTapPostButton(text: String) {
-        print("DEBUG: \(text)")
+    func didTapPostButton(textView: UITextView) {
+        let isOnlyWhitespace = textView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        if !isOnlyWhitespace {
+            viewModel.uploadComment(caption: textView.text)
+            textView.text = " "
+            textView.endEditing(true)
+        }
     }
+    
+
     
     func didChangeEditTextView(textView: UITextView) {
         if textView.isTruncated(with: self.containerInputView.heightInputTextView)

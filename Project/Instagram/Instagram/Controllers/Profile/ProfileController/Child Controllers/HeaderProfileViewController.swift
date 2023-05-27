@@ -29,6 +29,10 @@ class HeaderProfileViewController: UIViewController {
         didSet {
             configureUI()
             updateUI()
+
+            viewModel?.completionFetchRelations = {
+                self.followersLabel.attributedText = self.viewModel?.attributedFollowers
+            }
         }
     }
     
@@ -209,7 +213,7 @@ class HeaderProfileViewController: UIViewController {
         view.backgroundColor = .systemBackground
         view.addSubview(navigationBar)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        
+
         NSLayoutConstraint.activate([
             navigationBar.topAnchor.constraint(equalTo: view.topAnchor),
             navigationBar.leftAnchor.constraint(equalTo: view.leftAnchor),
@@ -258,6 +262,7 @@ class HeaderProfileViewController: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.isScrollEnabled = false
+
     }
     
     func updateUI() {
@@ -282,9 +287,11 @@ class HeaderProfileViewController: UIViewController {
             if viewModel.isFollowed {
                 editButton.setTitle("Following", for: .normal)
                 editButton.backgroundColor = .systemGray3
+                editButton.setTitleColor(.label, for: .normal)
             } else {
                 editButton.setTitle("Follow", for: .normal)
                 editButton.backgroundColor = . systemBlue
+                editButton.setTitleColor(.white, for: .normal)
             }
         }
 
@@ -331,21 +338,18 @@ class HeaderProfileViewController: UIViewController {
         return layout
     }
     
-    func updateDataFollowing(isFollowed: Bool) {
-        guard let viewModel = viewModel else {
-            return
-        }
-
-        viewModel.user.stats?.followers += isFollowed ? -1 : +1
-        followersLabel.attributedText  = viewModel.attributedFollowers
-
+    func updateDataFollowing() {
+        guard let isFollowed = viewModel?.isFollowed else {return}
+        
         if isFollowed {
             self.editButton.setTitle("Follow", for: .normal)
-            
+            self.editButton.backgroundColor = .systemBlue
+            self.editButton.setTitleColor(.white, for: .normal)
         } else {
             self.editButton.setTitle("Following", for: .normal)
+            self.editButton.backgroundColor = .systemGray3
+            self.editButton.setTitleColor(.label, for: .normal)
         }
-        
     }
     
     func getAvatarImage() -> UIImage? {
@@ -376,7 +380,14 @@ class HeaderProfileViewController: UIViewController {
     }
     
     @objc func handleFollowButtonTapped() {
+        guard let isFollowed = viewModel?.isFollowed else {return}
         
+        self.updateDataFollowing()
+        if isFollowed {
+            viewModel?.unfollowUser()
+        } else {
+            viewModel?.followUser()
+        }
     }
     
     

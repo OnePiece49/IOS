@@ -11,7 +11,7 @@ import SDWebImage
 
 protocol HomeFeedCollectionViewCellDelegate: AnyObject {
     func didSelectAvatar(status: InstaStatus)
-    func didSelectCommentButton(status: InstaStatus)
+    func didSelectCommentButton(cell: HomeFeedCollectionViewCell, status: InstaStatus)
 }
 
 class HomeFeedCollectionViewCell: UICollectionViewCell {
@@ -24,6 +24,8 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         didSet {
             updateUI()
             viewModel?.hasLikedStatus()
+            viewModel?.fetchNumberUsersLikedStatus()
+            viewModel?.fetchNumberUsersCommented()
             configureProperties()
         }
     }
@@ -63,7 +65,7 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
     private let numberLikedLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "102 lượt thích"
+        label.text = "0 likes"
         label.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
         label.textColor = .label
         return label
@@ -178,7 +180,7 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
                                                    
         let attributeSecondLeftButton = AttibutesButton(image: UIImage(named: "comment-1"),
                                                         sizeImage: CGSize(width: 25, height: 25)) { [weak self] in
-            self?.delegate?.didSelectCommentButton(status: self!.viewModel!.status)
+            self?.delegate?.didSelectCommentButton(cell: self!, status: self!.viewModel!.status)
         }
                                                         
         let attributeThreeLeftButton = AttibutesButton(image: UIImage(named: "share"),
@@ -198,8 +200,16 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
     }
     
     func configureProperties() {
-        self.viewModel?.completion = {
+        self.viewModel?.completionLike = {
             self.updateLikeButton()
+        }
+        
+        self.viewModel?.completionFetchNumberLikes = {
+            self.numberLikedLabel.text = self.viewModel?.numberLikesString
+        }
+        
+        self.viewModel?.completionFetchNumberUserCommented = {
+            self.allCommentsButton.setTitle(self.viewModel?.numberCommmentsString, for: .normal)
         }
     }
     
@@ -235,6 +245,18 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
     
     func didTapLikeButton(button: UIButton) {
         guard let hasLiked = viewModel?.likedStatus else {return}
+        guard let viewModel = viewModel else {
+            return
+        }
+
+        if hasLiked {
+            viewModel.unlikeStatus()
+        } else {
+            viewModel.likeStatus()
+        }
+        
+        let fakeNumberLikes = viewModel.numberLikesInt
+        self.numberLikedLabel.text = "\(fakeNumberLikes) likes "
 
         let transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
         UIView.animate(withDuration: 0.15) {
@@ -252,11 +274,7 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         }
         
         
-        if hasLiked {
-            viewModel?.unlikeStatus()
-        } else {
-            viewModel?.likeStatus()
-        }
+
         
     }
     
@@ -267,9 +285,21 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
     }
     
     @objc func handelAllCommentButtonTapped() {
-        self.delegate?.didSelectCommentButton(status: self.viewModel!.status)
+        guard let viewModel = viewModel else {
+            return
+        }
+
+        self.delegate?.didSelectCommentButton(cell: self, status: viewModel.status)
     }
     
 }
 //MARK: - delegate
-
+extension HomeFeedCollectionViewCell: CommentDelegate {
+    func didPostComment(numberComments: Int) {
+        if numberComments == 1 {
+            self.allCommentsButton.setTitle("See all \(numberComments) comment", for: .normal)
+        } else {
+            self.allCommentsButton.setTitle("See all \(numberComments) comments", for: .normal)
+        }
+    }
+}

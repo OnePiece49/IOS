@@ -61,7 +61,7 @@ class ShortVideoController: UIViewController {
     
     //MARK: - Selectors
     @objc func hanldeCancelButtonTapped() {
-        self.navigationController?.pushViewController(CommentController(), animated: true)
+        
 
     }
 }
