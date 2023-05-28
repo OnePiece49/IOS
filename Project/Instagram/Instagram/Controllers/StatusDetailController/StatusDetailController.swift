@@ -111,6 +111,11 @@ extension StatusDetailController: UICollectionViewDelegate, UICollectionViewData
 }
 
 extension StatusDetailController: HomeFeedCollectionViewCellDelegate {
+    func didSelectNumberLikesButton(status: InstaStatus) {
+        let userLikedVc = UsersLikedController(status: status)
+        self.navigationController?.pushViewController(userLikedVc, animated: true)
+    }
+    
     func didSelectCommentButton(cell: HomeFeedCollectionViewCell, status: InstaStatus) {
         let commentVC = CommentController(status: status, currentUser: currentUser)
         commentVC.modalPresentationStyle = .overFullScreen

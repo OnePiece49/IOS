@@ -41,7 +41,7 @@ class ProfileViewModel {
             self.currentUser = user
         }
 
-        UserService.shared.ifUserHasFollowed(uid: user.uid) { isFollowed in
+        UserService.shared.hasFollowedUser(uid: user.uid) { isFollowed in
             self.user?.isFollowed = isFollowed
             self.completionFetchMainInfo?()
             UserService.shared.fetchUserRelationStats(uid: user.uid) { relationStats in

@@ -8,10 +8,11 @@
 import Foundation
 import UIKit
 
+
 class ExploreController: UIViewController {
     //MARK: - Properties
     let viewModel = ExploreViewModel()
-    let searchBar = CustomSearchBarView(frame: .zero)
+    let searchBar = CustomSearchBarView()
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     let searchTableView = UITableView(frame: .zero, style: .plain)
     

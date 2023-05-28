@@ -12,6 +12,7 @@ import SDWebImage
 protocol HomeFeedCollectionViewCellDelegate: AnyObject {
     func didSelectAvatar(status: InstaStatus)
     func didSelectCommentButton(cell: HomeFeedCollectionViewCell, status: InstaStatus)
+    func didSelectNumberLikesButton(status: InstaStatus)
 }
 
 class HomeFeedCollectionViewCell: UICollectionViewCell {
@@ -84,14 +85,17 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         iv.tintColor = .white
         return iv
     }()
+
     
-    private let numberLikedLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "0 likes"
-        label.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
-        label.textColor = .label
-        return label
+    private let numberLikesButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.setTitle("0 like", for: .normal)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+        button.setTitleColor(.label, for: .normal)
+        button.addTarget(self, action: #selector(handleNumberLikeButtonTapped), for: .touchUpInside)
+        
+        return button
     }()
     
     private lazy var statusLabel: UILabel = Utilites.createStatusFeedLabel(username: "black_pink",
@@ -150,7 +154,7 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         addSubview(usernameLabel)
         addSubview(photoImageView)
         addSubview(actionBar)
-        addSubview(numberLikedLabel)
+        addSubview(numberLikesButton)
         addSubview(statusLabel)
         addSubview(allCommentsButton)
         addSubview(timePostTusLabel)
@@ -176,11 +180,10 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
             actionBar.rightAnchor.constraint(equalTo: rightAnchor),
             actionBar.heightAnchor.constraint(equalToConstant: 35),
             
-            numberLikedLabel.topAnchor.constraint(equalTo: actionBar.bottomAnchor, constant: 7),
-            numberLikedLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -15),
-            numberLikedLabel.leftAnchor.constraint(equalTo: leftAnchor, constant: 15),
+            numberLikesButton.topAnchor.constraint(equalTo: actionBar.bottomAnchor, constant: 7),
+            numberLikesButton.leftAnchor.constraint(equalTo: leftAnchor, constant: 15),
             
-            statusLabel.topAnchor.constraint(equalTo: numberLikedLabel.bottomAnchor, constant: 5),
+            statusLabel.topAnchor.constraint(equalTo: numberLikesButton.bottomAnchor, constant: 5),
             statusLabel.leftAnchor.constraint(equalTo: leftAnchor, constant: 15),
             statusLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -15),
             
@@ -228,7 +231,8 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         }
         
         self.viewModel?.completionFetchNumberLikes = {
-            self.numberLikedLabel.text = self.viewModel?.numberLikesString
+            self.numberLikesButton.setTitle(self.viewModel?.numberLikesString, for: .normal)
+
         }
         
         self.viewModel?.completionFetchNumberUserCommented = {
@@ -280,7 +284,7 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         }
         
         let fakeNumberLikes = viewModel.numberLikesInt
-        self.numberLikedLabel.text = "\(fakeNumberLikes) likes "
+        self.numberLikesButton.setTitle("\(fakeNumberLikes) likes ", for: .normal)
 
         let transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
         UIView.animate(withDuration: 0.15) {
@@ -328,6 +332,14 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         }
 
         self.delegate?.didSelectCommentButton(cell: self, status: viewModel.status)
+    }
+    
+    @objc func handleNumberLikeButtonTapped() {
+        guard let viewModel = viewModel else {
+            return
+        }
+
+        self.delegate?.didSelectNumberLikesButton(status: viewModel.status)
     }
     
 }

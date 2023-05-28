@@ -99,7 +99,7 @@ class UserService {
         }
     }
     
-    func ifUserHasFollowed(uid: String, completion: @escaping (Bool) -> ()) {
+    func hasFollowedUser(uid: String, completion: @escaping (Bool) -> ()) {
         guard let currentUid = Auth.auth().currentUser?.uid else {
             completion(false)
             return

@@ -182,5 +182,32 @@ class StatusService {
             }
         }
     }
+    
+    func fetchUsersLikeStatus(status: InstaStatus,
+                              completion: @escaping([User]) -> Void) {
+        var users: [User] = []
+        let statusId = status.statusId
+        let queue = DispatchQueue(label: "Queue")
+        var numberUser = 0
+        queue.async {
+            FirebaseRef.ref_tusLiked.document(statusId).getDocument { documentSnap, _ in
+                guard let documents = documentSnap?.data() else {return}
+                
+                for document in documents {
+                    let uid = document.key
+                    UserService.shared.fetchUser(uid: uid) { user in
+                        users.append(user)
+                        numberUser += 1
+                        
+                        if numberUser == documents.count {
+                            DispatchQueue.main.async {
+                                completion(users)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 }

@@ -54,6 +54,7 @@ class NavigationCustomView: UIView {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
         view.backgroundColor = .systemGray
+        view.alpha = 0.4
         return view
     }()
     

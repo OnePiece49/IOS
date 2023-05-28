@@ -20,6 +20,7 @@ class CustomSearchBarView: UIView {
     
     var rightContainerViewConstraint: NSLayoutConstraint!
     var widthCancelButtonConstraint: NSLayoutConstraint!
+    let isHiddenCancelButton: Bool
     
     private lazy var searchLogoImageView: UIImageView = {
         let iv = UIImageView(image: UIImage(named: "search"))
@@ -43,6 +44,7 @@ class CustomSearchBarView: UIView {
         view.addSubview(searchTextFiled)
         view.backgroundColor = UIColor(red: 0.463, green: 0.463, blue: 0.502, alpha: 0.12)
         view.layer.cornerRadius = 11
+        searchLogoImageView.tintColor = .label
         
         NSLayoutConstraint.activate([
             searchLogoImageView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
@@ -70,8 +72,9 @@ class CustomSearchBarView: UIView {
 
     
     //MARK: - View Lifecycle
-    override init(frame: CGRect) {
-        super.init(frame: frame)
+    init(ishiddenCancelButton: Bool = false) {
+        self.isHiddenCancelButton = ishiddenCancelButton
+        super.init(frame: .infinite)
         configureUI()
     }
     
@@ -120,16 +123,18 @@ class CustomSearchBarView: UIView {
 //MARK: - delegate
 extension CustomSearchBarView: UITextFieldDelegate {
     func textFieldDidBeginEditing(_ textField: UITextField) {
-        self.widthCancelButtonConstraint.constant = -60
-        NSLayoutConstraint.deactivate([self.rightContainerViewConstraint])
-        self.rightContainerViewConstraint = containerView.rightAnchor.constraint(equalTo: cancelButton.leftAnchor, constant: -10)
-        NSLayoutConstraint.activate([
-            rightContainerViewConstraint,
-        ])
-        
-        UIView.animate(withDuration: 0.32) {
-            self.cancelButton.alpha = 1
-            self.layoutIfNeeded()
+        if !self.isHiddenCancelButton {
+            self.widthCancelButtonConstraint.constant = -60
+            NSLayoutConstraint.deactivate([self.rightContainerViewConstraint])
+            self.rightContainerViewConstraint = containerView.rightAnchor.constraint(equalTo: cancelButton.leftAnchor, constant: -10)
+            NSLayoutConstraint.activate([
+                rightContainerViewConstraint,
+            ])
+            
+            UIView.animate(withDuration: 0.32) {
+                self.cancelButton.alpha = 1
+                self.layoutIfNeeded()
+            }
         }
         self.delegate?.didBeginEdittingSearchField(textField: textField)
     }

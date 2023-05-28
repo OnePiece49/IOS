@@ -19,6 +19,10 @@
 		6E1B6D8F2A1DC0230032AE8B /* ExploreCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E1B6D8E2A1DC0230032AE8B /* ExploreCollectionViewCell.swift */; };
 		6E1B6D912A1DC2E10032AE8B /* ExploreSearchBarTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E1B6D902A1DC2E10032AE8B /* ExploreSearchBarTableViewCell.swift */; };
 		6E1B6D942A1E60240032AE8B /* ExploreViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E1B6D932A1E60220032AE8B /* ExploreViewModel.swift */; };
+		6E2104302A239BDD008BDB7A /* UsersLikedController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E21042F2A239BDD008BDB7A /* UsersLikedController.swift */; };
+		6E2104322A239F94008BDB7A /* UserLikedViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E2104312A239F94008BDB7A /* UserLikedViewModel.swift */; };
+		6E2104352A23A3DA008BDB7A /* UserLikedTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E2104342A23A3DA008BDB7A /* UserLikedTableViewCell.swift */; };
+		6E2104372A23A4BD008BDB7A /* UserLikedCellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E2104362A23A4BD008BDB7A /* UserLikedCellViewModel.swift */; };
 		6E2EDF092A0F760A000C62EB /* InstagramStoryLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E2EDF082A0F760A000C62EB /* InstagramStoryLayer.swift */; };
 		6E3201892A0D417D00D707E8 /* BottomController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3201882A0D417D00D707E8 /* BottomController.swift */; };
 		6E32018B2A0D418F00D707E8 /* BottomTabTripController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E32018A2A0D418F00D707E8 /* BottomTabTripController.swift */; };
@@ -96,6 +100,10 @@
 		6E1B6D8E2A1DC0230032AE8B /* ExploreCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreCollectionViewCell.swift; sourceTree = "<group>"; };
 		6E1B6D902A1DC2E10032AE8B /* ExploreSearchBarTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreSearchBarTableViewCell.swift; sourceTree = "<group>"; };
 		6E1B6D932A1E60220032AE8B /* ExploreViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreViewModel.swift; sourceTree = "<group>"; };
+		6E21042F2A239BDD008BDB7A /* UsersLikedController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersLikedController.swift; sourceTree = "<group>"; };
+		6E2104312A239F94008BDB7A /* UserLikedViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLikedViewModel.swift; sourceTree = "<group>"; };
+		6E2104342A23A3DA008BDB7A /* UserLikedTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLikedTableViewCell.swift; sourceTree = "<group>"; };
+		6E2104362A23A4BD008BDB7A /* UserLikedCellViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserLikedCellViewModel.swift; sourceTree = "<group>"; };
 		6E2EDF082A0F760A000C62EB /* InstagramStoryLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramStoryLayer.swift; sourceTree = "<group>"; };
 		6E3201882A0D417D00D707E8 /* BottomController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomController.swift; sourceTree = "<group>"; };
 		6E32018A2A0D418F00D707E8 /* BottomTabTripController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomTabTripController.swift; sourceTree = "<group>"; };
@@ -244,8 +252,27 @@
 				6E341A6F2A1F77E100D91BAB /* HeaderProfileViewModel.swift */,
 				6E50FE642A21DB1300B212B4 /* CommentViewModel.swift */,
 				6E50FE682A21E4A400B212B4 /* CommentCollectionViewCellViewModel.swift */,
+				6E2104312A239F94008BDB7A /* UserLikedViewModel.swift */,
+				6E2104362A23A4BD008BDB7A /* UserLikedCellViewModel.swift */,
 			);
 			path = "View Model";
+			sourceTree = "<group>";
+		};
+		6E21042E2A239AA0008BDB7A /* ReactionUsersController */ = {
+			isa = PBXGroup;
+			children = (
+				6E21042F2A239BDD008BDB7A /* UsersLikedController.swift */,
+				6E2104332A23A3C8008BDB7A /* Views */,
+			);
+			path = ReactionUsersController;
+			sourceTree = "<group>";
+		};
+		6E2104332A23A3C8008BDB7A /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				6E2104342A23A3DA008BDB7A /* UserLikedTableViewCell.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 		6E2EDF0A2A0FD7ED000C62EB /* Home Controller */ = {
@@ -315,6 +342,7 @@
 		6E3471FE29EE8640003CB6AA /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				6E21042E2A239AA0008BDB7A /* ReactionUsersController */,
 				6EF4283B2A22555200E722AB /* StatusDetailController */,
 				6E341A712A1F857300D91BAB /* CommentController */,
 				6E1B6D872A1DA3E60032AE8B /* ExploreController */,
@@ -648,6 +676,7 @@
 				6E32018B2A0D418F00D707E8 /* BottomTabTripController.swift in Sources */,
 				6E8E842A2A17167B0023529A /* EditBioProfileController.swift in Sources */,
 				6E3440102A15149D0079AB58 /* CapturePhotoController.swift in Sources */,
+				6E2104372A23A4BD008BDB7A /* UserLikedCellViewModel.swift in Sources */,
 				6E8E842E2A172C940023529A /* NavigationCustomView.swift in Sources */,
 				6E3201892A0D417D00D707E8 /* BottomController.swift in Sources */,
 				6E50FE672A21E1BC00B212B4 /* CommentHeaderCollectionView.swift in Sources */,
@@ -659,6 +688,8 @@
 				6E1AC0922A1B071C004E81D9 /* AuthService.swift in Sources */,
 				6E4B5F312A0622190049E3AD /* StoryCollectionViewCell.swift in Sources */,
 				6E341A6E2A1F630400D91BAB /* HomeFeedCellViewModel.swift in Sources */,
+				6E2104302A239BDD008BDB7A /* UsersLikedController.swift in Sources */,
+				6E2104352A23A3DA008BDB7A /* UserLikedTableViewCell.swift in Sources */,
 				6E341A6C2A1F4CFB00D91BAB /* HomeViewModel.swift in Sources */,
 				6E34721129EEF0F3003CB6AA /* CompostionalLayout.swift in Sources */,
 				6E3201912A0D426F00D707E8 /* BottomCollectionViewCell.swift in Sources */,
@@ -701,6 +732,7 @@
 				6E8E84262A16438D0023529A /* SettingProfileController.swift in Sources */,
 				6E50FE692A21E4A400B212B4 /* CommentCollectionViewCellViewModel.swift in Sources */,
 				6E3A59982A20BE0200A2C8BA /* CommentCollectionViewCell.swift in Sources */,
+				6E2104322A239F94008BDB7A /* UserLikedViewModel.swift in Sources */,
 				6EB383E32A13743300892740 /* UploadFeedHeaderView.swift in Sources */,
 				6EAC17CD2A1871E6007E7640 /* BottomSheetViewCustomController.swift in Sources */,
 				6EF4283D2A22558200E722AB /* StatusDetailController.swift in Sources */,

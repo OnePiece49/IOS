@@ -220,6 +220,11 @@ extension HomeController: UICollectionViewDataSource {
 
 
 extension HomeController: HomeFeedCollectionViewCellDelegate {
+    func didSelectNumberLikesButton(status: InstaStatus) {
+        let userLikedVc = UsersLikedController(status: status)
+        self.navigationController?.pushViewController(userLikedVc, animated: true)
+    }
+    
     func didSelectCommentButton(cell: HomeFeedCollectionViewCell, status: InstaStatus) {
         let commentVC = CommentController(status: status, currentUser: viewModel.currentUser)
         commentVC.modalPresentationStyle = .overFullScreen
