@@ -10,6 +10,11 @@ import UIKit
 class StoryHomeCollectionViewCell: UICollectionViewCell {
     //MARK: - Properties
     static let identifier = "StoryHomeCollectionViewCell"
+    var imageStory: UIImage? {
+        didSet {
+            self.storyImageView.image = imageStory
+        }
+    }
     
     var storyLayer: InstagramStoryLayer!
     var isRunningAnimationStory = false
@@ -22,6 +27,7 @@ class StoryHomeCollectionViewCell: UICollectionViewCell {
         iv.layer.cornerRadius = 58 / 2
         iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleImageStoryTapped)))
         iv.isUserInteractionEnabled = true
+        iv.contentMode = .scaleAspectFill
         return iv
     }()
     
@@ -82,9 +88,12 @@ class StoryHomeCollectionViewCell: UICollectionViewCell {
         plusStoryImageView.setDimensions(width: 32, height: 32)
         
         layoutIfNeeded()
-        self.storyLayer = InstagramStoryLayer(centerPoint: CGPoint(x: storyImageView.bounds.midX, y: storyImageView.bounds.midY), width: self.storyImageView.bounds.width + 10, lineWidth: 2.35)
-        storyImageView.layer.addSublayer(storyLayer)
-        storyImageView.layer.masksToBounds = false
+        self.storyLayer = InstagramStoryLayer(centerPoint: CGPoint(x: storyImageView.frame.midX,
+                                                                   y: storyImageView.frame.midY),
+                                              width: self.storyImageView.bounds.width + 10,
+                                              lineWidth: 2.35)
+        layer.addSublayer(storyLayer)
+
     }
     
     //MARK: - Selectors

@@ -252,6 +252,7 @@ extension CommentController: UICollectionViewDelegate, UICollectionViewDataSourc
         
         let comment = viewModel.commentAtIndexPath(indexpath: indexPath)
         cell.viewModel = CommentCollectionViewCellViewModel(comment: comment)
+        cell.delegate = self
         return cell
     }
     
@@ -273,7 +274,7 @@ extension CommentController: ContainerInputDelegate {
         let isOnlyWhitespace = textView.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         if !isOnlyWhitespace {
             viewModel.uploadComment(caption: textView.text)
-            textView.text = " "
+            textView.text = ""
             textView.endEditing(true)
         }
     }
@@ -308,6 +309,17 @@ extension CommentController: ContainerInputDelegate {
             }
         }
 
+    }
+    
+    
+}
+
+extension CommentController: CommentCollectionViewDelegate {
+    func didSelectAvatarOrUsername(user: User) {
+        let profileVC = ProfileController(user: user, type: .other)
+        profileVC.modalPresentationStyle = .overFullScreen
+        self.present(profileVC, animated: true, completion: .none)
+//        self.navigationController?.viewControllers[0].navigationController?.pushViewController(profileVC, animated: true)
     }
     
     

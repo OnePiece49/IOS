@@ -50,7 +50,7 @@ class MainTabBarController: UITabBarController {
         let uploadFeedNavc = templateNavigationController(rootViewController: PickPhotoController(type: .uploadTus),
                                                           namedImage: "Add")
         let shortVideoNaVc = templateNavigationController(rootViewController: ShortVideoController(), namedImage: "video")
-        let profileNaVc = templateNavigationController(rootViewController: ProfileController(), namedImage: "profile")
+        let profileNaVc = templateNavigationController(rootViewController: ProfileController(type: .mainTabBar), namedImage: "profile")
         self.viewControllers = [homeNaVc,
                                searchNaVc,
                                uploadFeedNavc,

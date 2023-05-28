@@ -10,8 +10,9 @@ import FirebaseAuth
 
 class ProfileViewModel {
     var user: User?
+    var currentUser: User?
     
-    func fetchUser() {
+    func fetchDataForCurrentUser() {
         guard let uid = Auth.auth().currentUser?.uid else {return}
         UserService.shared.fetchUser(uid: uid) { user in
             self.user = user
@@ -33,8 +34,12 @@ class ProfileViewModel {
         return user?.isFollowed == true
     }
     
-    func hasFollowedUser() {
+    func fetchDataForAnotherUser() {
         guard let user = user else {return}
+        guard let uid = Auth.auth().currentUser?.uid else {return}
+        UserService.shared.fetchUser(uid: uid) { user in
+            self.currentUser = user
+        }
 
         UserService.shared.ifUserHasFollowed(uid: user.uid) { isFollowed in
             self.user?.isFollowed = isFollowed
@@ -76,7 +81,7 @@ class ProfileViewModel {
 
         UserService.shared.fetchUser(uid: user.uid) { user in
             self.user = user
-            self.hasFollowedUser()
+            self.fetchDataForAnotherUser()
 
         }
     }

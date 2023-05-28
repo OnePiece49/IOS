@@ -32,7 +32,7 @@ class ExploreController: UIViewController {
     
     //MARK: - Helpers
     func configureUI() {
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
         view.addSubview(searchBar)
         view.addSubview(collectionView)
         view.addSubview(searchTableView)
@@ -124,6 +124,13 @@ extension ExploreController: UICollectionViewDelegate, UICollectionViewDataSourc
         cell.imageURL = viewModel.imageUrlAtIndexpath(indexPath: indexPath)
         return cell
     }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let user = viewModel.currentUser else {return}
+        let status = viewModel.statusAtIndexPath(indexPath: indexPath)
+        let statusDetailVC = StatusDetailController(status: status, user: user)
+        self.navigationController?.pushViewController(statusDetailVC, animated: true)
+    }
 }
 
 extension ExploreController: UITableViewDelegate, UITableViewDataSource {
@@ -143,7 +150,7 @@ extension ExploreController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let profileVC = ProfileController(user: viewModel.userAtIndexPath(indexPath: indexPath))
+        let profileVC = ProfileController(user: viewModel.userAtIndexPath(indexPath: indexPath), type: .other)
 
         navigationController?.pushViewController(profileVC, animated: true)
     }

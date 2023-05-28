@@ -9,18 +9,26 @@
 import UIKit
 import SDWebImage
 
+protocol CommentCollectionViewDelegate: AnyObject {
+    func didSelectAvatarOrUsername(user: User)
+}
+
+
 class CommentCollectionViewCell: UICollectionViewCell {
     //MARK: - Properties
     var viewModel: CommentCollectionViewCellViewModel? {
         didSet {updateUI()}
     }
     static let identifier = "CommentCollectionViewCell"
+    weak var delegate: CommentCollectionViewDelegate?
     
     private lazy var avatarImageView: UIImageView = {
         let iv = UIImageView(image: UIImage(named: "jisoo"))
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.clipsToBounds = true
         iv.layer.cornerRadius = 36 / 2
+        iv.isUserInteractionEnabled = true
+        iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleInfoUserTapped)))
         return iv
     }()
     
@@ -31,6 +39,8 @@ class CommentCollectionViewCell: UICollectionViewCell {
         label.textColor = .label
         label.textAlignment = .left
         label.text = "b_lackBink"
+        label.isUserInteractionEnabled = true
+        label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleInfoUserTapped)))
         return label
     }()
     
@@ -109,6 +119,13 @@ class CommentCollectionViewCell: UICollectionViewCell {
     }
     
     //MARK: - Selectors
+    @objc func handleInfoUserTapped() {
+        guard let viewModel = viewModel else {
+            return
+        }
+
+        self.delegate?.didSelectAvatarOrUsername(user: viewModel.user)
+    }
     
 }
 //MARK: - delegate

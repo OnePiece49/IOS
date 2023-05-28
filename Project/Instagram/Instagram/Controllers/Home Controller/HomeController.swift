@@ -185,10 +185,8 @@ extension HomeController: UICollectionViewDataSource {
         if indexPath.section == 0 {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: StoryHomeCollectionViewCell.identifier,
                                                           for: indexPath) as! StoryHomeCollectionViewCell
-            if  indexPath.row == 0 {
-                cell.storyLabel.text = "Tin của bạn"
-                cell.plusStoryImageView.isHidden = false
-            }
+            cell.plusStoryImageView.isHidden = true
+            cell.imageStory = UIImage(named: "aqua\(indexPath.row)")
             return cell
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeFeedCollectionViewCell.identifier,
@@ -205,7 +203,7 @@ extension HomeController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if section == 0 {
-            return 20
+            return 10
         } else {
             return viewModel.numberStatuses
         }
@@ -230,7 +228,7 @@ extension HomeController: HomeFeedCollectionViewCellDelegate {
     }
     
     func didSelectAvatar(status: InstaStatus) {
-        let profileVC = ProfileController(user: status.user)
+        let profileVC = ProfileController(user: status.user, type: .other)
 
         self.navigationController?.pushViewController(profileVC, animated: true)
     }

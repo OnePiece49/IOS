@@ -51,14 +51,37 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         label.addGestureRecognizer(UITapGestureRecognizer(target: self,
                                                        action: #selector(handleAvatarImageTapped)))
         label.isUserInteractionEnabled = true
+        
         return label
     }()
     
     private lazy var photoImageView: UIImageView = {
         let iv = UIImageView()
         iv.translatesAutoresizingMaskIntoConstraints = false
-        iv.backgroundColor = .systemCyan
         iv.contentMode = .scaleToFill
+        iv.addSubview(heardLikemageView)
+        NSLayoutConstraint.activate([
+            heardLikemageView.centerXAnchor.constraint(equalTo: iv.centerXAnchor),
+            heardLikemageView.centerYAnchor.constraint(equalTo: iv.centerYAnchor),
+        ])
+        heardLikemageView.setDimensions(width: 33, height: 25)
+        let tapGeture = UITapGestureRecognizer(target: self,
+                                               action: #selector(handelDoubleTapPhotoImageView))
+        tapGeture.numberOfTapsRequired = 2
+        iv.addGestureRecognizer(tapGeture)
+        iv.isUserInteractionEnabled = true
+        return iv
+    }()
+    
+    private lazy var heardLikemageView: UIImageView = {
+        let iv = UIImageView(image: UIImage(systemName: "heart.fill"))
+        iv.translatesAutoresizingMaskIntoConstraints = false
+        iv.contentMode = .scaleAspectFit
+        iv.isUserInteractionEnabled = true
+        iv.isHidden = true
+        iv.clipsToBounds = true
+        iv.layer.masksToBounds = true
+        iv.tintColor = .white
         return iv
     }()
     
@@ -175,7 +198,7 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
     func setupNavigationBar() {
         let attributeFirstLeftButton = AttibutesButton(image: UIImage(named: "like1"),
                                                        sizeImage: CGSize(width: 25, height: 25)) { [weak self] in
-            self!.didTapLikeButton(button: self!.actionBar.leftButtons[0])
+            self?.didTapLikeButton()
         }
                                                    
         let attributeSecondLeftButton = AttibutesButton(image: UIImage(named: "comment-1"),
@@ -243,7 +266,8 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         }
     }
     
-    func didTapLikeButton(button: UIButton) {
+    func didTapLikeButton() {
+        guard let button = self.actionBar.leftButtons.first else {return}
         guard let hasLiked = viewModel?.likedStatus else {return}
         guard let viewModel = viewModel else {
             return
@@ -266,19 +290,33 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
                 button.tintColor = .label
 
             } else {
+
                 button.setImage(UIImage(named: "heart-red"), for: .normal)
                 button.tintColor = .red
             }
         } completion: { _ in
             button.transform = .identity
         }
-        
-        
-
-        
     }
     
     //MARK: - Selectors
+    @objc func handelDoubleTapPhotoImageView() {
+        didTapLikeButton()
+        
+        let transform = CGAffineTransform(scaleX: 120 / 25, y: 102 / 25)
+        UIView.animate(withDuration: 0.3) {
+            self.heardLikemageView.transform = transform
+            self.heardLikemageView.isHidden = false
+        } completion: { _ in
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.13) {
+                self.heardLikemageView.transform = .identity
+                self.heardLikemageView.isHidden = true
+            }
+
+        }
+    }
+    
+    
     @objc func handleAvatarImageTapped() {
         guard let status = viewModel?.status else {return}
         self.delegate?.didSelectAvatar(status: status)
@@ -296,7 +334,9 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
 //MARK: - delegate
 extension HomeFeedCollectionViewCell: CommentDelegate {
     func didPostComment(numberComments: Int) {
-        if numberComments == 1 {
+        if numberComments == 0 {
+            self.allCommentsButton.setTitle("Add comments...", for: .normal)
+        } else if numberComments == 1  {
             self.allCommentsButton.setTitle("See all \(numberComments) comment", for: .normal)
         } else {
             self.allCommentsButton.setTitle("See all \(numberComments) comments", for: .normal)

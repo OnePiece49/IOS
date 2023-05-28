@@ -10,6 +10,7 @@ import FirebaseAuth
 
 class UploadFeedController: UIViewController {
     //MARK: - Properties
+    let loadingIndicator = UIActivityIndicatorView()
     var imageUpload: UIImage? {
         didSet {
             self.headerView.imageUploadImageView.image = imageUpload
@@ -51,23 +52,31 @@ class UploadFeedController: UIViewController {
     
     func activeConstraint() {
         view.addSubview(headerView)
+        view.addSubview(loadingIndicator)
+
         headerView.translatesAutoresizingMaskIntoConstraints = false
-        
+        loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
+
         NSLayoutConstraint.activate([
             headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             headerView.leftAnchor.constraint(equalTo: view.leftAnchor),
             headerView.rightAnchor.constraint(equalTo: view.rightAnchor),
             headerView.heightAnchor.constraint(equalToConstant: 300),
+            
+            loadingIndicator.rightAnchor.constraint(equalTo: headerView.rightAnchor, constant: -12),
+            loadingIndicator.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 12),
         ])
     }
     
     func uploadStatus() {
         guard let uid = Auth.auth().currentUser?.uid else {return}
         let status = headerView.getSatusUpload()
-        
+        self.headerView.navigationBar.rightButtons[0].isHidden = true
+        self.loadingIndicator.startAnimating()
         StatusService.shared.uploadStatus(image: imageUpload,
                                           uid: uid,
                                           status: status) { [weak self] _ in
+            self?.loadingIndicator.stopAnimating()
             self?.tabBarController?.selectedViewController = self?.tabBarController?.viewControllers?.first
             self?.navigationController?.popToRootViewController(animated: false)
         }

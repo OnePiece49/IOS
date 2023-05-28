@@ -10,6 +10,11 @@ import UIKit
 class StoryCollectionViewCell: UICollectionViewCell {
     //MARK: - Properties
     static let identifier = "StoryCollectionViewCell"
+    var imageStory: UIImage? {
+        didSet {
+            self.storyImageView.image = imageStory
+        }
+    }
     
     var storyLayer: InstagramStoryLayer!
     var isRunningAnimationStory = false
@@ -19,9 +24,10 @@ class StoryCollectionViewCell: UICollectionViewCell {
         iv.translatesAutoresizingMaskIntoConstraints = false
         iv.backgroundColor = .blue
         iv.clipsToBounds = true
-        iv.layer.cornerRadius = 54 / 2
+        iv.layer.cornerRadius = 58 / 2
         iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleImageStoryTapped)))
         iv.isUserInteractionEnabled = true
+        iv.contentMode = .scaleAspectFill
         return iv
     }()
     
@@ -56,13 +62,12 @@ class StoryCollectionViewCell: UICollectionViewCell {
             storyLabel.centerXAnchor.constraint(equalTo: storyImageView.centerXAnchor),
             storyLabel.topAnchor.constraint(equalTo: storyImageView.bottomAnchor, constant: 8.3),
         ])
-        storyImageView.setDimensions(width: 54, height: 54)
+        storyImageView.setDimensions(width: 58, height: 58)
         storyLabel.setDimensions(width: 80, height: 15)
         
         layoutIfNeeded()
-        self.storyLayer = InstagramStoryLayer(centerPoint: CGPoint(x: storyImageView.bounds.midX, y: storyImageView.bounds.midY), width: self.storyImageView.bounds.width + 10, lineWidth: 2.35)
-        storyImageView.layer.addSublayer(storyLayer)
-        storyImageView.layer.masksToBounds = false
+        self.storyLayer = InstagramStoryLayer(centerPoint: CGPoint(x: storyImageView.frame.midX, y: storyImageView.frame.midY), width: self.storyImageView.bounds.width + 10, lineWidth: 2.35)
+        layer.addSublayer(storyLayer)
 
     }
     

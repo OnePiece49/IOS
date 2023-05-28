@@ -13,12 +13,17 @@ enum BottomControllerType {
     case tag
 }
 
+protocol BottomControllerDelegate: AnyObject {
+    func didSelectStatus(status: InstaStatus)
+}
+
 class BottomController: UIViewController {
     //MARK: - Properties
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     let titleImage: UIImage?
     let type: BottomControllerType
-    var status: [InstaStatus] = []
+    var statuses: [InstaStatus] = []
+    weak var delegate: BottomControllerDelegate?
     var user: User? {
         didSet {
             guard let user = user else {
@@ -26,7 +31,7 @@ class BottomController: UIViewController {
             }
 
             StatusService.shared.fetchStatusUser(uid: user.uid) { status in
-                self.status.append(contentsOf: status)
+                self.statuses.append(contentsOf: status)
                 self.collectionView.reloadData()
             }
         }
@@ -102,14 +107,18 @@ extension BottomController: UICollectionViewDelegate, UICollectionViewDataSource
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return status.count
+        return statuses.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BottomCollectionViewCell.identifier, for: indexPath) as! BottomCollectionViewCell
-        let url = URL(string: self.status[indexPath.row].postImage.imageURL)
+        let url = URL(string: self.statuses[indexPath.row].postImage.imageURL)
         cell.photoImage.sd_setImage(with: url)
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        self.delegate?.didSelectStatus(status: statuses[indexPath.row])
     }
 }
 

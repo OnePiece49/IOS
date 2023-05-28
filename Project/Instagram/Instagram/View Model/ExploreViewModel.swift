@@ -6,12 +6,14 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 class ExploreViewModel {
     private var users: [User] = []
     var foundedUsers: [User] = []
     var statuses: [InstaStatus] = []
     var completion: (() -> Void)?
+    var currentUser: User?
     
     var numberUserFounded: Int {
         return foundedUsers.count
@@ -22,6 +24,8 @@ class ExploreViewModel {
             self.users = users
             self.fetchStatuses()
         }
+        
+        self.fetchCurrentUser()
     }
     
     var numberStatuses: Int {
@@ -47,6 +51,14 @@ class ExploreViewModel {
                 self.statuses.append(contentsOf: userStatues)
                 self.completion?()
             }
+        }
+    }
+    
+    private func fetchCurrentUser() {
+        guard let uid = Auth.auth().currentUser?.uid else {return}
+        
+        UserService.shared.fetchUser(uid: uid) { user in
+            self.currentUser = user
         }
     }
     

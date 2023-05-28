@@ -25,6 +25,7 @@ class HeaderProfileViewController: UIViewController {
     weak var delegate: HeaderProfileDelegate?
     var storyAvatarLayer: InstagramStoryLayer!
     var isRunningAnimationStory = false
+    let type: ProfileControllerType
     var viewModel: HeaderProfileViewModel? {
         didSet {
             configureUI()
@@ -32,23 +33,20 @@ class HeaderProfileViewController: UIViewController {
 
             viewModel?.completionFetchRelations = {
                 self.followersLabel.attributedText = self.viewModel?.attributedFollowers
+                self.followingLabel.attributedText = self.viewModel?.attributedFollowings
             }
         }
     }
     
-    private lazy var postLabel = Utilites.createHeaderProfileInfoLabel(type: .posts, with: "80")
-    private lazy var followersLabel = Utilites.createHeaderProfileInfoLabel(type: .followers, with: "428.5k")
-    private lazy var followingLabel = Utilites.createHeaderProfileInfoLabel(type: .following, with: "60k")
+    private lazy var postLabel = Utilites.createHeaderProfileInfoLabel(type: .posts, with: "0")
+    private lazy var followersLabel = Utilites.createHeaderProfileInfoLabel(type: .followers, with: "0")
+    private lazy var followingLabel = Utilites.createHeaderProfileInfoLabel(type: .following, with: "")
     lazy var editButton = Utilites.createHeaderProfileButton(with: "Loading")
     private lazy var shareButton = Utilites.createHeaderProfileButton(with: "Share")
     
     private lazy var navigationBar: NavigationCustomView = {
-        guard let viewModel = viewModel else {
-            return NavigationCustomView(attributeLeftButtons: [],
-                                        attributeRightBarButtons: [])
-        }
-
-        if viewModel.isCurrentUser {
+        switch type {
+        case .mainTabBar:
             let attributeFirstLeftButton = AttibutesButton(image: UIImage(systemName: "lock"),
                                                            sizeImage: CGSize(width: 15, height: 15),
                                                            tincolor: .label) {  [weak self] in
@@ -87,18 +85,22 @@ class HeaderProfileViewController: UIViewController {
                                                       continueSpaceleft: 5,
                                                       continueSpaceRight: 15)
             return navigationBar
-        } else {
+        case .other:
             let attributeFirstLeftButton = AttibutesButton(image: UIImage(systemName: "chevron.backward"),
                                                            sizeImage: CGSize(width: 20, height: 25),
                                                            tincolor: .label) { [weak self] in
-                self?.navigationController?.popViewController(animated: true)
+                if let navi = self?.navigationController {
+                    self?.navigationController?.popViewController(animated: true)
+                } else {
+                    self?.dismiss(animated: true)
+                }
             }
             
             let attributeFirstRightButton = AttibutesButton(image: UIImage(named: "3cham"),
                                                            sizeImage: CGSize(width: 26, height: 25),
                                                            tincolor: .label)
 
-            let navigationBar = NavigationCustomView(centerTitle: viewModel.username,
+            let navigationBar = NavigationCustomView(centerTitle: viewModel!.username,
                                                      attributeLeftButtons: [attributeFirstLeftButton],
                                                      attributeRightBarButtons: [attributeFirstRightButton],
                                                      isHiddenDivider: true,
@@ -120,7 +122,6 @@ class HeaderProfileViewController: UIViewController {
     private let fullnameLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "Trịnh Tiến Việt 123"
         label.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
         label.textAlignment = .left
         return label
@@ -130,7 +131,6 @@ class HeaderProfileViewController: UIViewController {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.systemFont(ofSize: 14)
-        label.text = ""
         label.numberOfLines = 2
         label.textAlignment = .left
         return label
@@ -140,7 +140,7 @@ class HeaderProfileViewController: UIViewController {
         let button = UIButton()
         button.setTitle("Read more", for: .normal)
         button.setTitleColor(.systemGray, for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 15)
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(handleDidTapReadMoreButton), for: .touchUpInside)
         button.isHidden = true
@@ -160,14 +160,11 @@ class HeaderProfileViewController: UIViewController {
     private lazy var avartImageView: UIImageView = {
         let iv = UIImageView(image: UIImage(systemName: "person.circle"))
         iv.translatesAutoresizingMaskIntoConstraints = false
-        iv.layer.borderWidth = 8
-        iv.layer.borderColor = UIColor.clear.cgColor
         iv.clipsToBounds = true
         iv.layer.cornerRadius = 90 / 2
         iv.addGestureRecognizer(UITapGestureRecognizer(target: self,
                                                        action: #selector(handleAvatarImageStoryTapped)))
         iv.isUserInteractionEnabled = true
-        iv.layer.masksToBounds = true
         return iv
     }()
     
@@ -193,6 +190,15 @@ class HeaderProfileViewController: UIViewController {
     }()
         
     //MARK: - View Lifecycle
+    init(type: ProfileControllerType) {
+        self.type = type
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         configureProperties()
@@ -266,12 +272,12 @@ class HeaderProfileViewController: UIViewController {
     }
     
     func updateUI() {
+        if type == .mainTabBar {
+            self.navigationBar.leftButtons[1].setTitle(viewModel?.username, for: .normal)
+        }
+        
         guard let viewModel = viewModel else {
             return
-        }
-
-        if viewModel.isCurrentUser {
-            self.navigationBar.leftButtons[1].setTitle(viewModel.username, for: .normal)
         }
         
         self.fullnameLabel.text = viewModel.fullname
@@ -396,6 +402,7 @@ class HeaderProfileViewController: UIViewController {
 extension HeaderProfileViewController: UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: StoryCollectionViewCell.identifier, for: indexPath) as! StoryCollectionViewCell
+        cell.imageStory = UIImage(named: "aqua\(indexPath.row)")
         return cell
     }
     
@@ -404,6 +411,6 @@ extension HeaderProfileViewController: UICollectionViewDataSource, UICollectionV
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 20
+        return 10
     }
 }

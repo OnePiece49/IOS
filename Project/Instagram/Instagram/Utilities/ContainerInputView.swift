@@ -35,7 +35,7 @@ class ContainerInputCustomView: UIView {
         iv.font = UIFont.systemFont(ofSize: 15)
         iv.delegate = self
         iv.textAlignment = .left
-        iv.text = " "
+        iv.text = ""
         return iv
     }()
     

@@ -102,7 +102,7 @@ class BottomTapTripController: UIViewController {
     func configureDivider() {
         self.view.addSubview(divider)
         xAnchorDivider = divider.leftAnchor.constraint(equalTo: self.view.leftAnchor)
-        widthAnchorDivider = divider.widthAnchor.constraint(equalToConstant: 0)
+        widthAnchorDivider = divider.widthAnchor.constraint(equalToConstant: view.frame.width / CGFloat(controllers.count))
         divider.backgroundColor = self.configureTabBar.dividerColor
 
         NSLayoutConstraint.activate([
@@ -205,6 +205,7 @@ class BottomTapTripController: UIViewController {
         collectionView.isPrefetchingEnabled = true
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.isScrollEnabled = false
+        collectionView.layoutIfNeeded()
         
         let indexPath = IndexPath(row: 0, section: 0)
         
@@ -396,7 +397,6 @@ extension BottomTapTripController: UIScrollViewDelegate {
 extension BottomTapTripController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BottomTabBarCollectionViewCell.identifier, for: indexPath) as! BottomTabBarCollectionViewCell
-
         cell.optionImage.image = self.controllers[indexPath.row].titleImage
         cell.backgroundColor = self.configureTabBar.backgroundColor
         if indexPath.row == 0 {

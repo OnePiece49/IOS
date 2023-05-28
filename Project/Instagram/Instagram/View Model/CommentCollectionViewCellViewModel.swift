@@ -19,6 +19,10 @@ class CommentCollectionViewCellViewModel {
         return formatter.string(from: comment.timestamp, to: now) ?? "1m"
     }
     
+    var user: User {
+        return comment.user
+    }
+    
     var contentComment: String {
         return comment.content
     }

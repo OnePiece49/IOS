@@ -84,7 +84,8 @@ class StatusService {
             }
             
             dispathGroup.notify(queue: .main) {
-                completion(statuses)
+                let sortedStatus = statuses.sorted { $0.timeStamp > $1.timeStamp}
+                completion(sortedStatus)
             }
         }
     }

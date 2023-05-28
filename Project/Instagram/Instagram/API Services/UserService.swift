@@ -157,7 +157,15 @@ class UserService {
         var relationStats = UserRelationStats(followers: 0, followings: 0)
         FirebaseRef.ref_followingUser.document(uid).getDocument { documentSnap, _ in
             guard let documentData = documentSnap?.data() else {
-                completion(relationStats)
+                FirebaseRef.ref_followUser.document(uid).getDocument { documentSnap, _ in
+                    guard let documentData = documentSnap?.data() else {
+                        completion(relationStats)
+                        return
+                    }
+                    
+                    relationStats.followers = documentData.count
+                    completion(relationStats)
+                }
                 return
             }
             

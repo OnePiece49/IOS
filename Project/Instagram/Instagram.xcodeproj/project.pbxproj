@@ -76,6 +76,7 @@
 		6EB383E32A13743300892740 /* UploadFeedHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EB383E22A13743300892740 /* UploadFeedHeaderView.swift */; };
 		6EDEF4942A1A0F3200E47EF7 /* TextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDEF4932A1A0F3200E47EF7 /* TextField.swift */; };
 		6EDEF4962A1A261F00E47EF7 /* SwitchAccountController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDEF4952A1A261F00E47EF7 /* SwitchAccountController.swift */; };
+		6EF4283D2A22558200E722AB /* StatusDetailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EF4283C2A22558200E722AB /* StatusDetailController.swift */; };
 		8F06ABBD9B1F956E09E7B2A2 /* Pods_Instagram.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A70E69F4791E07FA687D84A /* Pods_Instagram.framework */; };
 /* End PBXBuildFile section */
 
@@ -154,6 +155,7 @@
 		6EB383E22A13743300892740 /* UploadFeedHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadFeedHeaderView.swift; sourceTree = "<group>"; };
 		6EDEF4932A1A0F3200E47EF7 /* TextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextField.swift; sourceTree = "<group>"; };
 		6EDEF4952A1A261F00E47EF7 /* SwitchAccountController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchAccountController.swift; sourceTree = "<group>"; };
+		6EF4283C2A22558200E722AB /* StatusDetailController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusDetailController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -313,6 +315,7 @@
 		6E3471FE29EE8640003CB6AA /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				6EF4283B2A22555200E722AB /* StatusDetailController */,
 				6E341A712A1F857300D91BAB /* CommentController */,
 				6E1B6D872A1DA3E60032AE8B /* ExploreController */,
 				6EDEF48B2A1A089900E47EF7 /* UploadFeedController */,
@@ -512,6 +515,14 @@
 			path = "Child Controllers";
 			sourceTree = "<group>";
 		};
+		6EF4283B2A22555200E722AB /* StatusDetailController */ = {
+			isa = PBXGroup;
+			children = (
+				6EF4283C2A22558200E722AB /* StatusDetailController.swift */,
+			);
+			path = StatusDetailController;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -692,6 +703,7 @@
 				6E3A59982A20BE0200A2C8BA /* CommentCollectionViewCell.swift in Sources */,
 				6EB383E32A13743300892740 /* UploadFeedHeaderView.swift in Sources */,
 				6EAC17CD2A1871E6007E7640 /* BottomSheetViewCustomController.swift in Sources */,
+				6EF4283D2A22558200E722AB /* StatusDetailController.swift in Sources */,
 				6EB383E12A1373E300892740 /* UploadFeedController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

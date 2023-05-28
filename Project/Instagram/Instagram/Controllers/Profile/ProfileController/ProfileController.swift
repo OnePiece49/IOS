@@ -9,16 +9,22 @@ import FirebaseAuth
 import UIKit
 import SDWebImage
 
+enum ProfileControllerType {
+    case mainTabBar
+    case other
+}
+
 class ProfileController: UIViewController {
     //MARK: - Properties
     let viewModel = ProfileViewModel()
-    var headerViewController = HeaderProfileViewController()
+    var headerViewController: HeaderProfileViewController!
     let selectedSettingVC = SettingProfileController()
     let overlayScrollView = UIScrollView()
     let containerScrollView = UIScrollView()
     var bottomTabTripController: BottomTapTripController!
     let refreshControl = UIRefreshControl()
     var selectSettingViewTopConstraint: NSLayoutConstraint!
+    let type: ProfileControllerType
     
     var beganPresentSettingVC = false
     let heightSelectedSettingVC: CGFloat = 475
@@ -56,13 +62,17 @@ class ProfileController: UIViewController {
     }()
     
     //MARK: - View Lifecycle
-    init(user: User) {
+    init(user: User, type: ProfileControllerType) {
+        self.type = type
+        self.headerViewController = HeaderProfileViewController(type: type)
         super.init(nibName: nil, bundle: nil)
         self.viewModel.user = user
         self.fetchDataForAnotherUser()
     }
     
-    init() {
+    init(type: ProfileControllerType) {
+        self.type = type
+        self.headerViewController = HeaderProfileViewController(type: type)
         super.init(nibName: nil, bundle: nil)
         fetchDataForCurrentUser()
     }
@@ -151,6 +161,9 @@ class ProfileController: UIViewController {
         bottomVC1.user = viewModel.user
         bottomVC2.user = viewModel.user
         bottomVC3.user = viewModel.user
+        bottomVC1.delegate = self
+        bottomVC2.delegate = self
+        bottomVC3.delegate = self
         
         let configureTabBar = ConfigureTabBar(backgroundColor: .white,
                                               dividerColor: .black,
@@ -187,7 +200,7 @@ class ProfileController: UIViewController {
     }
 
     func fetchDataForAnotherUser() {
-        self.viewModel.hasFollowedUser()
+        self.viewModel.fetchDataForAnotherUser()
         self.viewModel.completionFetchMainInfo = { [weak self] in
             self?.updateUI()
             self?.configureProperties()
@@ -200,7 +213,7 @@ class ProfileController: UIViewController {
     }
     
     func fetchDataForCurrentUser() {
-        viewModel.fetchUser()
+        viewModel.fetchDataForCurrentUser()
         viewModel.completionFetchMainInfo = { [weak self] in
             self?.updateUI()
             self?.configureProperties()
@@ -333,4 +346,12 @@ extension ProfileController: EditProfileDelegate {
         
     }
 
+}
+
+extension ProfileController: BottomControllerDelegate {
+    func didSelectStatus(status: InstaStatus) {
+        guard let user = viewModel.currentUser else {return}
+        let statusDetailVC = StatusDetailController(status: status, user: user)
+        self.navigationController?.pushViewController(statusDetailVC, animated: true)
+    }
 }
