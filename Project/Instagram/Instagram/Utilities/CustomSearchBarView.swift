@@ -13,6 +13,10 @@ protocol CustomSearchBarDelegate: AnyObject {
     func didBeginEdittingSearchField(textField: UITextField)
 }
 
+extension CustomSearchBarDelegate {
+    func didSelectCancelButton() {}
+}
+
 class CustomSearchBarView: UIView {
     //MARK: - Properties
     var isSearching: Bool = false
@@ -99,6 +103,10 @@ class CustomSearchBarView: UIView {
             cancelButton.centerYAnchor.constraint(equalTo: centerYAnchor),
             widthCancelButtonConstraint,
         ])
+    }
+    
+    func forceEndSearching() {
+        self.searchTextFiled.endEditing(true)
     }
     
     //MARK: - Selectors

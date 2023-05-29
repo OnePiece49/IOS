@@ -180,10 +180,10 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
             actionBar.rightAnchor.constraint(equalTo: rightAnchor),
             actionBar.heightAnchor.constraint(equalToConstant: 35),
             
-            numberLikesButton.topAnchor.constraint(equalTo: actionBar.bottomAnchor, constant: 7),
+            numberLikesButton.topAnchor.constraint(equalTo: actionBar.bottomAnchor, constant: 2),
             numberLikesButton.leftAnchor.constraint(equalTo: leftAnchor, constant: 15),
             
-            statusLabel.topAnchor.constraint(equalTo: numberLikesButton.bottomAnchor, constant: 5),
+            statusLabel.topAnchor.constraint(equalTo: numberLikesButton.bottomAnchor, constant: 3),
             statusLabel.leftAnchor.constraint(equalTo: leftAnchor, constant: 15),
             statusLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -15),
             

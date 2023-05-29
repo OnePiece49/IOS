@@ -7,12 +7,13 @@
 
 import UIKit
 
-class UsersLikedController: UIViewController {
+class LikesController: UIViewController {
     //MARK: - Properties
     let viewModel: UserLikedViewModel
     let tableView = UITableView(frame: .zero, style: .plain)
     var navigationbar: NavigationCustomView!
     let searchBar = CustomSearchBarView(ishiddenCancelButton: true)
+    var indexPathSelected: IndexPath?
 
     //MARK: - View Lifecycle
     init(status: InstaStatus) {
@@ -77,6 +78,9 @@ class UsersLikedController: UIViewController {
         tableView.register(UserLikedTableViewCell.self,
                                  forCellReuseIdentifier: UserLikedTableViewCell.identifier)
         tableView.separatorStyle = .none
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self,
+                                                                    action: #selector(didEndSearchUser)))
+        view.isUserInteractionEnabled = true
     }
     
     func setupNavigationBar() {
@@ -88,7 +92,7 @@ class UsersLikedController: UIViewController {
         let attributeFirstRightButton = AttibutesButton(image: UIImage(named: "share"),
                                                         sizeImage: CGSize(width: 28, height: 28))
                                                    
-        self.navigationbar = NavigationCustomView(centerTitle: "Number Likes",
+        self.navigationbar = NavigationCustomView(centerTitle: "Likes",
                                               attributeLeftButtons: [attributeFirstLeftButton],
                                               attributeRightBarButtons: [attributeFirstRightButton],
                                               beginSpaceLeftButton: 15,
@@ -96,10 +100,13 @@ class UsersLikedController: UIViewController {
     }
     
     //MARK: - Selectors
+    @objc func didEndSearchUser() {
+        self.searchBar.forceEndSearching()
+    }
     
 }
 //MARK: - delegate
-extension UsersLikedController: UITableViewDelegate, UITableViewDataSource {
+extension LikesController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewModel.numberUsers
     }
@@ -116,8 +123,31 @@ extension UsersLikedController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        self.indexPathSelected = indexPath
         tableView.deselectRow(at: indexPath, animated: false)
         let profileVc = ProfileController(user: viewModel.userAtIndexPath(indexPath: indexPath), type: .other)
+        profileVc.headerViewController.delegate = self
         navigationController?.pushViewController(profileVc, animated: true)
     }
+}
+
+extension LikesController: HeaderProfileDelegate {
+    func didSelectFollowButtonTap(hasFollowed: Bool) {
+        guard let indexPath = self.indexPathSelected else {
+            return}
+        let cell = tableView.cellForRow(at: indexPath) as! UserLikedTableViewCell
+        cell.updateFollowButton(hasFollowed: hasFollowed)
+    }
+}
+
+extension LikesController: CustomSearchBarDelegate {
+    func didChangedSearchTextFiled(textField: UITextField) {
+        
+    }
+    
+    func didBeginEdittingSearchField(textField: UITextField) {
+        
+    }
+    
+    
 }

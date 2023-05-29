@@ -14,6 +14,7 @@ enum ProfileControllerType {
     case other
 }
 
+
 class ProfileController: UIViewController {
     //MARK: - Properties
     let viewModel = ProfileViewModel()
@@ -90,8 +91,6 @@ class ProfileController: UIViewController {
         self.view.backgroundColor = .systemBackground
         self.navigationController?.navigationBar.isHidden = true
         self.configureUI()
-        print("DEBUG: \(self) profile")
-
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -141,7 +140,6 @@ class ProfileController: UIViewController {
     }
     
     func configureProperties() {
-        headerViewController.delegate = self
         overlayScrollView.delegate = self
         containerScrollView.addGestureRecognizer(overlayScrollView.panGestureRecognizer)
         overlayScrollView.showsVerticalScrollIndicator = false
@@ -151,6 +149,11 @@ class ProfileController: UIViewController {
         self.overlayScrollView.contentSize = CGSize(width: 0,
                                                     height: self.heightHeaderView + self.view.frame.height + 60)
         refreshControl.addTarget(self, action: #selector(handleRefreshControl), for: .valueChanged)
+        
+        guard let _ = headerViewController.delegate, viewModel.user?.uid != Auth.auth().currentUser?.uid else {
+            self.headerViewController.delegate = self
+            return
+        }
     }
 
     
@@ -277,7 +280,7 @@ extension ProfileController: BottomTapTripControllerDelegate {
 }
 
 
-extension ProfileController: HeaderProfileDelegate {
+extension ProfileController: HeaderProfileDelegate {    
     func didSelectUsernameButton() {
         let viewTransform = CGAffineTransform(scaleX: 0.88, y: 0.88)
         self.tabBarController?.view.clipsToBounds = true
@@ -322,6 +325,7 @@ extension ProfileController: HeaderProfileDelegate {
         editProfileVC.delegate = self
         self.navigationController?.pushViewController(editProfileVC, animated: true)
     }
+
 }
 
 extension ProfileController: SwitchAccountDelegate {
@@ -355,3 +359,4 @@ extension ProfileController: BottomControllerDelegate {
         self.navigationController?.pushViewController(statusDetailVC, animated: true)
     }
 }
+

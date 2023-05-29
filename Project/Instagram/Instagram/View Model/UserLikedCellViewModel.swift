@@ -22,11 +22,12 @@ class UserLikedCellViewModel {
         return user.fullname
     }
     
-    var isFollowed: Bool {
+    var hasFollowed: Bool {
         return user.isFollowed
     }
     
     func followUser() {
+        user.isFollowed = true
         UserService.shared.followUser(uid: user.uid) {
             self.user.isFollowed = true
             self.completion?()
@@ -34,6 +35,7 @@ class UserLikedCellViewModel {
     }
     
     func unfollowUser() {
+        user.isFollowed = false
         UserService.shared.unfollowUser(uid: user.uid) {
             self.user.isFollowed = false
             self.completion?()

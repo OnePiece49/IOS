@@ -9,19 +9,18 @@ import UIKit
 import SDWebImage
 import FirebaseAuth
 
-protocol UserLikedTableViewDelegate: AnyObject {
-    func didTapUserInfor(user: User)
-}
+//protocol UserLikedTableViewDelegate: AnyObject {
+//    func didSelect
+//}
 
 class UserLikedTableViewCell: UITableViewCell {
     static let identifier = "UserLikedTableViewCell"
-    weak var delegate: UserLikedTableViewDelegate?
     
     var viewModel: UserLikedCellViewModel? {
         didSet {updateUI()}
     }
     
-    lazy var editButton = Utilites.createHeaderProfileButton(with: "Follow")
+    lazy var followButton = Utilites.createHeaderProfileButton(with: "Follow")
     
     private lazy var avatarImageView: UIImageView = {
         let iv = UIImageView(image: UIImage(named: "jisoo"))
@@ -64,7 +63,7 @@ class UserLikedTableViewCell: UITableViewCell {
         contentView.addSubview(avatarImageView)
         contentView.addSubview(usernameLabel)
         contentView.addSubview(fullnameLabel)
-        contentView.addSubview(editButton)
+        contentView.addSubview(followButton)
         
         NSLayoutConstraint.activate([
             avatarImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
@@ -75,17 +74,17 @@ class UserLikedTableViewCell: UITableViewCell {
             
             fullnameLabel.topAnchor.constraint(equalTo: usernameLabel.bottomAnchor, constant: 1),
             fullnameLabel.leftAnchor.constraint(equalTo: avatarImageView.rightAnchor, constant: 10),
-            fullnameLabel.rightAnchor.constraint(equalTo: editButton.leftAnchor, constant: -20),
+            fullnameLabel.rightAnchor.constraint(equalTo: followButton.leftAnchor, constant: -20),
             
-            editButton.rightAnchor.constraint(equalTo: rightAnchor, constant: -14),
-            editButton.topAnchor.constraint(equalTo: usernameLabel.topAnchor),
+            followButton.rightAnchor.constraint(equalTo: rightAnchor, constant: -14),
+            followButton.topAnchor.constraint(equalTo: usernameLabel.topAnchor),
             
         ])
         avatarImageView.setDimensions(width: 54, height: 54)
-        editButton.setDimensions(width: 135, height: 32)
-        editButton.layer.cornerRadius = 14
-        editButton.backgroundColor = .systemBlue
-        editButton.addTarget(self, action: #selector(handleFollowButtonTapped), for: .touchUpInside)
+        followButton.setDimensions(width: 130, height: 33)
+        followButton.layer.cornerRadius = 14
+        followButton.backgroundColor = .systemBlue
+        followButton.addTarget(self, action: #selector(handleFollowButtonTapped), for: .touchUpInside)
     }
     
     func updateUI() {
@@ -102,27 +101,35 @@ class UserLikedTableViewCell: UITableViewCell {
         self.fullnameLabel.text = viewModel.fullname
         self.usernameLabel.text = viewModel.username
         if viewModel.user.uid == currentUid {
-            editButton.isHidden = true
+            followButton.isHidden = true
             return
         } else {
-            editButton.isHidden = false
+            followButton.isHidden = false
         }
         
-        if viewModel.isFollowed {
-            editButton.setTitle("Following", for: .normal)
-            editButton.backgroundColor = .systemGray3
-            editButton.setTitleColor(.label, for: .normal)
+        if viewModel.hasFollowed {
+            followButton.setTitle("Following", for: .normal)
+            followButton.backgroundColor = .systemGray3
+            followButton.setTitleColor(.label, for: .normal)
         } else {
-            editButton.setTitle("Follow", for: .normal)
-            editButton.backgroundColor = . systemBlue
-            editButton.setTitleColor(.white, for: .normal)
+            followButton.setTitle("Follow", for: .normal)
+            followButton.backgroundColor = . systemBlue
+            followButton.setTitleColor(.white, for: .normal)
         }
     }
     
     //MARK: - Selectors
     @objc func handleFollowButtonTapped() {
-        guard let isFollowed = viewModel?.isFollowed else {return}
-        
+        guard let isFollowed = viewModel?.hasFollowed else {return}
+        if isFollowed {
+            self.followButton.setTitle("Follow", for: .normal)
+            self.followButton.backgroundColor = .systemBlue
+            self.followButton.setTitleColor(.white, for: .normal)
+        } else {
+            self.followButton.setTitle("Following", for: .normal)
+            self.followButton.backgroundColor = .systemGray3
+            self.followButton.setTitleColor(.label, for: .normal)
+        }
         
         if isFollowed {
             viewModel?.unfollowUser()
@@ -131,17 +138,29 @@ class UserLikedTableViewCell: UITableViewCell {
         }
     }
     
+    func updateFollowButton(hasFollowed: Bool) {
+        if hasFollowed {
+            self.followButton.setTitle("Following", for: .normal)
+            self.followButton.backgroundColor = .systemGray3
+            self.followButton.setTitleColor(.label, for: .normal)
+        } else {
+            self.followButton.setTitle("Follow", for: .normal)
+            self.followButton.backgroundColor = .systemBlue
+            self.followButton.setTitleColor(.white, for: .normal)
+        }
+    }
+    
     func updateFollowButton() {
-        guard let isFollowed = self.viewModel?.isFollowed else {return}
+        guard let isFollowed = self.viewModel?.hasFollowed else {return}
         
         if isFollowed {
-            self.editButton.setTitle("Following", for: .normal)
-            self.editButton.backgroundColor = .systemGray3
-            self.editButton.setTitleColor(.label, for: .normal)
+            self.followButton.setTitle("Following", for: .normal)
+            self.followButton.backgroundColor = .systemGray3
+            self.followButton.setTitleColor(.label, for: .normal)
         } else {
-            self.editButton.setTitle("Follow", for: .normal)
-            self.editButton.backgroundColor = .systemBlue
-            self.editButton.setTitleColor(.white, for: .normal)
+            self.followButton.setTitle("Follow", for: .normal)
+            self.followButton.backgroundColor = .systemBlue
+            self.followButton.setTitleColor(.white, for: .normal)
         }
     }
 }

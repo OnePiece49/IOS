@@ -39,7 +39,7 @@ class Utilites {
     }
     
     static func createHeaderProfileButton(with text: String) -> UIButton {
-        let button = UIButton(type: .system)
+        let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle(text, for: .normal)
         button.backgroundColor = .systemGray3

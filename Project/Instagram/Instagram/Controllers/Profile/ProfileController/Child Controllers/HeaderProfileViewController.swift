@@ -17,6 +17,16 @@ protocol HeaderProfileDelegate: AnyObject {
     func didSelectEditButton()
     func didTapthreeLineImageView()
     func didSelectUsernameButton()
+    func didSelectFollowButtonTap(hasFollowed: Bool)
+}
+
+extension HeaderProfileDelegate {
+    func didSelectEditButton() {}
+    func didTapthreeLineImageView() {}
+    func didSelectUsernameButton() {}
+    func didSelectFollowButtonTap(hasFollowed: Bool) {
+        print("DEBUG: aduuu")
+    }
 }
 
 class HeaderProfileViewController: UIViewController {
@@ -387,6 +397,7 @@ class HeaderProfileViewController: UIViewController {
     
     @objc func handleFollowButtonTapped() {
         guard let isFollowed = viewModel?.isFollowed else {return}
+        self.delegate?.didSelectFollowButtonTap(hasFollowed: !isFollowed)
         
         self.updateDataFollowing()
         if isFollowed {

@@ -221,7 +221,7 @@ extension HomeController: UICollectionViewDataSource {
 
 extension HomeController: HomeFeedCollectionViewCellDelegate {
     func didSelectNumberLikesButton(status: InstaStatus) {
-        let userLikedVc = UsersLikedController(status: status)
+        let userLikedVc = LikesController(status: status)
         self.navigationController?.pushViewController(userLikedVc, animated: true)
     }
     
