@@ -7,9 +7,9 @@
 
 import UIKit
 
-class BottomCollectionViewCell: UICollectionViewCell {
+class BottomProfileCollectionViewCell: UICollectionViewCell {
     //MARK: - Properties
-    static let identifier = "BottomCollectionViewCell"
+    static let identifier = "BottomProfileCollectionViewCell"
     
     lazy var photoImage: UIImageView = {
         let iv = UIImageView()

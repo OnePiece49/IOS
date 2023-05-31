@@ -1,8 +1,8 @@
 //
-//  BottomTabTripController.swift
+//  BottomTabTripControllerVer2.swift
 //  Instagram
 //
-//  Created by Long Bảo on 11/05/2023.
+//  Created by Long Bảo on 30/05/2023.
 //
 
 import UIKit
@@ -10,9 +10,10 @@ import UIKit
 struct ConfigureTabBar {
     var backgroundColor: UIColor = .systemBlue
     var dividerColor: UIColor = .red
-    var selectedBarColor: UIColor = .blue
-    var notSelectedBarColor: UIColor = .gray
-    var selectedBackgroundColor: UIColor = .systemYellow
+    var selectedBarColor: UIColor = .label
+    var notSelectedBarColor: UIColor = .systemGray3
+    var selectedBackgroundColor: UIColor = .systemBackground
+    var isHiddenDivider = false
 }
 
 protocol BottomTapTripControllerDelegate: AnyObject {
@@ -23,18 +24,17 @@ class BottomTapTripController: UIViewController {
     //MARK: - Properties
     let scrollView = UIScrollView()
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-    let heightBarView: CGFloat = 44
     var configureTabBar = ConfigureTabBar()
     weak var delegate: BottomTapTripControllerDelegate?
     var xAnchorDivider: NSLayoutConstraint!
     var widthAnchorDivider: NSLayoutConstraint!
-    var spacingControllers: CGFloat = 1
     var newestControllerContrainted = 0
     var rightConstraintScrollView: NSLayoutConstraint!
     
     private var currentXContentOffset: CGFloat = 0
     private var previousContentOffset: CGFloat = 0
     var currentWidth: CGFloat = 0
+    var beginPaging = 0
     
     private let fakeView: UIView = {
         let view = UIView()
@@ -42,27 +42,46 @@ class BottomTapTripController: UIViewController {
         return view
     }()
     
+    var heightBarView: CGFloat {
+        return 44
+    }
+    
+    var spacingControllers: CGFloat {
+        return 1
+    }
+    
     var currentIndex: Int {
         return Int(scrollView.contentOffset.x / view.frame.width)
     }
     
     var currentCollectionView: UICollectionView {
-        return controllers[currentIndex].collectionView
+        return controllers[currentIndex].bottomTabTripCollectionView
     }
     
     var controllers: [BottomController]
     
-    
     private lazy var divider: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .green
+        view.backgroundColor = .systemGray
+        view.alpha = 0.5
+        return view
+    }()
+    
+    private lazy var indicatorDivider: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .label
         return view
     }()
     
     //MARK: - View Lifecycle
-    init(controllers: [BottomController], configureTapBar: ConfigureTabBar? = nil) {
+    init(controllers: [BottomController],
+         configureTapBar: ConfigureTabBar? = nil,
+         beginPage: Int = 0) {
+        
         self.controllers = controllers
+        self.beginPaging = beginPage
         if let configureTapBar = configureTapBar {
             self.configureTabBar = configureTapBar
         }
@@ -81,9 +100,28 @@ class BottomTapTripController: UIViewController {
         super.viewDidLoad()
         
         configureUI()
+        gotoPage()
     }
     
     //MARK: - Helpers
+    func gotoPage() {
+        if self.beginPaging > controllers.count - 1 {return}
+        let xOffset = CGFloat(beginPaging) * view.frame.width - CGFloat(beginPaging) * spacingControllers
+        scrollView.contentOffset = CGPoint(x: xOffset, y: 0)
+        
+        let indexPath = IndexPath(row: beginPaging, section: 0)
+        DispatchQueue.main.async {
+            if let cell = self.collectionView.cellForItem(at: indexPath) {
+                self.widthAnchorDivider.constant = cell.frame.width
+                self.currentWidth = cell.frame.width
+                self.xAnchorDivider.constant = cell.frame.minX
+        
+            } else {
+                self.widthAnchorDivider.constant = 0
+            }
+        }
+    }
+    
     func configureUI() {
         view.backgroundColor = .white
         self.configureCollectionView()
@@ -100,17 +138,25 @@ class BottomTapTripController: UIViewController {
     
     //MARK: - Selectors
     func configureDivider() {
+        self.view.addSubview(indicatorDivider)
         self.view.addSubview(divider)
-        xAnchorDivider = divider.leftAnchor.constraint(equalTo: self.view.leftAnchor)
-        widthAnchorDivider = divider.widthAnchor.constraint(equalToConstant: view.frame.width / CGFloat(controllers.count))
-        divider.backgroundColor = self.configureTabBar.dividerColor
+        xAnchorDivider = indicatorDivider.leftAnchor.constraint(equalTo: self.view.leftAnchor)
+        widthAnchorDivider = indicatorDivider.widthAnchor.constraint(equalToConstant: view.frame.width / CGFloat(controllers.count))
+        indicatorDivider.backgroundColor = self.configureTabBar.dividerColor
 
         NSLayoutConstraint.activate([
-            divider.heightAnchor.constraint(equalToConstant: 2),
-            divider.topAnchor.constraint(equalTo: collectionView.bottomAnchor, constant: 1),
+            indicatorDivider.heightAnchor.constraint(equalToConstant: 1),
+            indicatorDivider.topAnchor.constraint(equalTo: collectionView.bottomAnchor),
             widthAnchorDivider,
             xAnchorDivider,
+            
+            divider.leftAnchor.constraint(equalTo: view.leftAnchor),
+            divider.rightAnchor.constraint(equalTo: view.rightAnchor),
+            divider.topAnchor.constraint(equalTo: collectionView.bottomAnchor),
+            divider.heightAnchor.constraint(equalToConstant: 0.5),
         ])
+   
+        self.divider.isHidden = self.configureTabBar.isHiddenDivider
     }
     
     func addConstraintChildController(index: Int) {
@@ -192,7 +238,7 @@ class BottomTapTripController: UIViewController {
         self.configureDivider()
         
         NSLayoutConstraint.activate([
-            scrollView.topAnchor.constraint(equalTo: divider.bottomAnchor, constant: 1),
+            scrollView.topAnchor.constraint(equalTo: indicatorDivider.bottomAnchor, constant: 0.5),
             scrollView.leftAnchor.constraint(equalTo: view.leftAnchor),
             scrollView.rightAnchor.constraint(equalTo: view.rightAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 10),
@@ -201,21 +247,7 @@ class BottomTapTripController: UIViewController {
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.isScrollEnabled = false
         collectionView.layoutIfNeeded()
-        
-        let indexPath = IndexPath(row: 0, section: 0)
-        
-        DispatchQueue.main.async {
-            NSLayoutConstraint.deactivate([self.widthAnchorDivider])
-            if let cell = self.collectionView.cellForItem(at: indexPath) {
-                self.widthAnchorDivider.constant = cell.frame.width
-                self.currentWidth = cell.frame.width
-                NSLayoutConstraint.activate([
-                    self.widthAnchorDivider,
-                ])
-            } else {
-                self.widthAnchorDivider.constant = 0
-            }
-        }
+
     }
     
     func createLayout() -> UICollectionViewLayout {
@@ -241,6 +273,7 @@ class BottomTapTripController: UIViewController {
 //MARK: - delegate
 extension BottomTapTripController: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    
         let temp = Float(scrollView.contentOffset.x.truncatingRemainder(dividingBy: view.frame.width).truncatingRemainder(dividingBy: self.spacingControllers))
         if scrollView.contentOffset.x > self.currentXContentOffset {
             self.addConstraintChildController(index: self.currentIndex + 1)
@@ -257,7 +290,7 @@ extension BottomTapTripController: UIScrollViewDelegate {
                 
             UIView.animate(withDuration: 0.13) {
                     self.widthAnchorDivider.constant = CGFloat(nexPosition.nextWidth)
-                    self.xAnchorDivider = self.divider.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: CGFloat(nexPosition.nextX) + CGFloat(currentCell?.frame.origin.x ?? 0.0) )
+                    self.xAnchorDivider = self.indicatorDivider.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: CGFloat(nexPosition.nextX) + CGFloat(currentCell?.frame.origin.x ?? 0.0) )
                     NSLayoutConstraint.activate([
                         self.widthAnchorDivider,
                         self.xAnchorDivider,
@@ -328,7 +361,7 @@ extension BottomTapTripController: UIScrollViewDelegate {
         
         UIView.animate(withDuration: 0.13) {
             self.widthAnchorDivider.constant = self.currentWidth
-            self.xAnchorDivider = self.divider.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: cell.frame.origin.x)
+            self.xAnchorDivider = self.indicatorDivider.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: cell.frame.origin.x)
             NSLayoutConstraint.activate([
                 self.widthAnchorDivider,
                 self.xAnchorDivider,
@@ -377,13 +410,16 @@ extension BottomTapTripController: UIScrollViewDelegate {
         for i in 0..<controllers.count {
             let tempIndexPath = IndexPath(row: i, section: 0)
             let cell = collectionView.cellForItem(at: tempIndexPath) as! BottomTabBarCollectionViewCell
-//            if i != rowSelected {
-//                cell.optionImage.tintColor = self.configureTabBar.notSelectedBarColor
-//                cell.backgroundColor = self.configureTabBar.backgroundColor
-//            } else {
-//                cell.optionImage.image?.withTintColor(self.configureTabBar.selectedBarColor, renderingMode: .alwaysTemplate)
-//                cell.backgroundColor = self.configureTabBar.selectedBackgroundColor
-//            }
+            if i != rowSelected {
+                cell.titleButton.tintColor = self.configureTabBar.notSelectedBarColor
+                cell.backgroundColor = self.configureTabBar.backgroundColor
+                cell.titleButton.setTitleColor(self.configureTabBar.notSelectedBarColor, for: .normal)
+
+            } else {
+                cell.titleButton.tintColor = self.configureTabBar.selectedBarColor
+                cell.backgroundColor = self.configureTabBar.selectedBackgroundColor
+                cell.titleButton.setTitleColor(self.configureTabBar.selectedBarColor, for: .normal)
+            }
         }
     }
 }
@@ -392,11 +428,16 @@ extension BottomTapTripController: UIScrollViewDelegate {
 extension BottomTapTripController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BottomTabBarCollectionViewCell.identifier, for: indexPath) as! BottomTabBarCollectionViewCell
-//        cell.optionImage.image = self.controllers[indexPath.row].titleImage
         cell.backgroundColor = self.configureTabBar.backgroundColor
-        if indexPath.row == 0 {
-            cell.backgroundColor = self.configureTabBar.selectedBackgroundColor
+        cell.titleBottom = controllers[indexPath.row].titleBottom
+        if indexPath.row == beginPaging {
+            cell.titleButton.tintColor = self.configureTabBar.selectedBarColor
+            cell.titleButton.setTitleColor(self.configureTabBar.selectedBarColor, for: .normal)
+        } else {
+            cell.titleButton.tintColor = self.configureTabBar.notSelectedBarColor
+            cell.titleButton.setTitleColor(self.configureTabBar.notSelectedBarColor, for: .normal)
         }
+        
         return cell
     }
     
@@ -419,7 +460,7 @@ extension BottomTapTripController: UICollectionViewDelegate, UICollectionViewDat
         NSLayoutConstraint.deactivate([self.widthAnchorDivider, self.xAnchorDivider])
         UIView.animate(withDuration: 0.25) {
             self.widthAnchorDivider.constant = CGFloat(width)
-            self.xAnchorDivider = self.divider.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: x)
+            self.xAnchorDivider = self.indicatorDivider.leftAnchor.constraint(equalTo: self.view.leftAnchor, constant: x)
             NSLayoutConstraint.activate([
                 self.widthAnchorDivider,
                 self.xAnchorDivider,

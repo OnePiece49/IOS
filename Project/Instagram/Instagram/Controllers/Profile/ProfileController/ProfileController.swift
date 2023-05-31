@@ -166,9 +166,9 @@ class ProfileController: UIViewController {
 
     
     func configureTabTripController() {
-        let bottomVC1 = BottomController(image: UIImage(named: "grid"), type: .image)
-        let bottomVC2 = BottomController(image: UIImage(named: "video-1"),  type: .image)
-        let bottomVC3 = BottomController(image: UIImage(named: "tag-black"), type: .image)
+        let bottomVC1 = BottomProfileController(titleBottom: TitleTabStripBottom(titleImage: TitleImage(image: UIImage(named: "grid"))))
+        let bottomVC2 = BottomProfileController(titleBottom: TitleTabStripBottom(titleImage: TitleImage(image: UIImage(named: "video-1"))))
+        let bottomVC3 = BottomProfileController(titleBottom: TitleTabStripBottom(titleImage: TitleImage(image: UIImage(named: "tag-black"))))
         bottomVC1.user = viewModel.user
         bottomVC2.user = viewModel.user
         bottomVC3.user = viewModel.user
@@ -178,8 +178,8 @@ class ProfileController: UIViewController {
         
         let configureTabBar = ConfigureTabBar(backgroundColor: .white,
                                               dividerColor: .black,
-                                              selectedBarColor: .green,
-                                              notSelectedBarColor: .green,
+                                              selectedBarColor: .label,
+                                              notSelectedBarColor: .systemGray,
                                               selectedBackgroundColor: .white)
         bottomTabTripController = BottomTapTripController(controllers: [bottomVC1,
                                                                         bottomVC2,
@@ -200,7 +200,7 @@ class ProfileController: UIViewController {
         bottomTabTripView.setDimensions(width: view.frame.width, height: view.frame.height)
         
         bottomTabTripController.controllers.forEach { controller in
-            controller.collectionView.panGestureRecognizer.require(toFail: self.overlayScrollView.panGestureRecognizer)
+            controller.bottomTabTripCollectionView.panGestureRecognizer.require(toFail: self.overlayScrollView.panGestureRecognizer)
         }
         bottomTabTripController.delegate = self
         
@@ -251,7 +251,7 @@ extension ProfileController: UIScrollViewDelegate {
         if yContentOffset < self.heightHeaderView  {
             containerScrollView.contentOffset = CGPoint(x: 0, y: yContentOffset)
             self.bottomTabTripController.controllers.forEach { controller in
-                controller.collectionView.contentOffset = CGPoint(x: 0, y: 0)
+                controller.bottomTabTripCollectionView.contentOffset = CGPoint(x: 0, y: 0)
             }
             
             for i in 0..<bottomTabTripController.controllers.count {
@@ -288,7 +288,21 @@ extension ProfileController: BottomTapTripControllerDelegate {
 }
 
 
-extension ProfileController: HeaderProfileDelegate {    
+extension ProfileController: HeaderProfileDelegate {
+    func didSelectPostsLabel() {
+        
+    }
+    
+    func didSelectFollowersLabel() {
+        let followVc = FollowController(begin: .follower)
+        self.navigationController?.pushViewController(followVc, animated: true)
+    }
+    
+    func didSelectFollowingsLabel() {
+        let followVc = FollowController(begin: .Following)
+        self.navigationController?.pushViewController(followVc, animated: true)
+    }
+    
     func didSelectUsernameButton() {
         let viewTransform = CGAffineTransform(scaleX: 0.88, y: 0.88)
         self.tabBarController?.view.clipsToBounds = true

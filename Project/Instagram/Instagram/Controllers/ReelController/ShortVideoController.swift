@@ -41,9 +41,9 @@ class ShortVideoController: UIViewController {
         tabBarController?.tabBar.standardAppearance = appearTabBar
         tabBarController?.tabBar.scrollEdgeAppearance = appearTabBar
 
-        let followersController = BottomFollowersController()
-        let followingController = BottomFollowingController()
-        let bottomTapTrip = BottomTapTripControllerVer2(controllers: [followersController, followingController
+        let followersController = BottomFollowersController(titleBottom: TitleTabStripBottom(titleString: TitleLabel(title: "48 people followers")))
+        let followingController = BottomFollowingController(titleBottom: TitleTabStripBottom(titleString: TitleLabel(title: "56 people following")))
+        let bottomTapTrip = BottomTapTripController(controllers: [followersController, followingController
                                                                       ])
         addChild(bottomTapTrip)
         view.addSubview(bottomTapTrip.view)

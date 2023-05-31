@@ -7,21 +7,16 @@
 
 import UIKit
 
-enum BottomControllerType {
-    case image
-    case video
-    case tag
-}
-
 protocol BottomControllerDelegate: AnyObject {
     func didSelectStatus(status: InstaStatus)
 }
 
-class BottomController: UIViewController {
+class BottomProfileController: BottomController {
     //MARK: - Properties
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-    let titleImage: UIImage?
-    let type: BottomControllerType
+    override var bottomTabTripCollectionView: UICollectionView {
+        return collectionView
+    }
     var statuses: [InstaStatus] = []
     weak var delegate: BottomControllerDelegate?
     var user: User? {
@@ -39,16 +34,6 @@ class BottomController: UIViewController {
     
     
     //MARK: - View Lifecycle
-    init(image: UIImage?, type: BottomControllerType) {
-        self.type = type
-        self.titleImage = image
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     deinit {
         print("DEBUG: BottomController deinit")
     }
@@ -66,7 +51,7 @@ class BottomController: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.register(BottomCollectionViewCell.self, forCellWithReuseIdentifier: BottomCollectionViewCell.identifier)
+        collectionView.register(BottomProfileCollectionViewCell.self, forCellWithReuseIdentifier: BottomProfileCollectionViewCell.identifier)
         
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -101,7 +86,7 @@ class BottomController: UIViewController {
     
 }
 //MARK: - delegate
-extension BottomController: UICollectionViewDelegate, UICollectionViewDataSource {
+extension BottomProfileController: UICollectionViewDelegate, UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
     }
@@ -111,7 +96,7 @@ extension BottomController: UICollectionViewDelegate, UICollectionViewDataSource
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BottomCollectionViewCell.identifier, for: indexPath) as! BottomCollectionViewCell
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BottomProfileCollectionViewCell.identifier, for: indexPath) as! BottomProfileCollectionViewCell
         let url = URL(string: self.statuses[indexPath.row].postImage.imageURL)
         cell.photoImage.sd_setImage(with: url)
         return cell

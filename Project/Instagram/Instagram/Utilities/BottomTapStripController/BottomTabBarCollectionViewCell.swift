@@ -17,12 +17,12 @@ class BottomTabBarCollectionViewCell: UICollectionViewCell {
         }
     }
     
-   private lazy var titleButton: UIButton = {
+    lazy var titleButton: UIButton = {
         let button = UIButton(type: .system)
         button.contentMode = .scaleToFill
         button.tintColor = .label
         button.translatesAutoresizingMaskIntoConstraints = false
-       button.titleLabel?.textAlignment = .center
+        button.isUserInteractionEnabled = false
         return button
     }()
     
@@ -61,7 +61,9 @@ class BottomTabBarCollectionViewCell: UICollectionViewCell {
             titleButton.tintColor = titleImage.tinColor
             titleButton.contentVerticalAlignment = .fill
             titleButton.contentHorizontalAlignment = .center
- 
+            NSLayoutConstraint.activate([
+                titleButton.heightAnchor.constraint(equalToConstant: titleImage.size.height)
+            ])
         } else {
             let titleLabel = titleBottom.titleString
             titleButton.setTitle(titleLabel.title, for: .normal)

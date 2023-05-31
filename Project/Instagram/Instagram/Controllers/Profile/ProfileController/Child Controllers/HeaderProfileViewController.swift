@@ -18,15 +18,19 @@ protocol HeaderProfileDelegate: AnyObject {
     func didTapthreeLineImageView()
     func didSelectUsernameButton()
     func didSelectFollowButtonTap(hasFollowed: Bool)
+    func didSelectPostsLabel()
+    func didSelectFollowersLabel()
+    func didSelectFollowingsLabel()
 }
 
 extension HeaderProfileDelegate {
     func didSelectEditButton() {}
     func didTapthreeLineImageView() {}
     func didSelectUsernameButton() {}
-    func didSelectFollowButtonTap(hasFollowed: Bool) {
-        print("DEBUG: aduuu")
-    }
+    func didSelectFollowButtonTap(hasFollowed: Bool) {}
+    func didSelectPostsLabel() {}
+    func didSelectFollowersLabel() {}
+    func didSelectFollowingsLabel() {}
 }
 
 class HeaderProfileViewController: UIViewController {
@@ -126,6 +130,12 @@ class HeaderProfileViewController: UIViewController {
         stackView.axis = .horizontal
         stackView.distribution = .equalSpacing
         stackView.spacing = -3
+        postLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handlePostLabelTapped)))
+        postLabel.isUserInteractionEnabled = true
+        followersLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleFollowersLabelTapped)))
+        followersLabel.isUserInteractionEnabled = true
+        followingLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleFollowingLabelTapped)))
+        followingLabel.isUserInteractionEnabled = true
         return stackView
     }()
     
@@ -410,7 +420,17 @@ class HeaderProfileViewController: UIViewController {
         }
     }
     
+    @objc func handlePostLabelTapped() {
+        self.delegate?.didSelectPostsLabel()
+    }
     
+    @objc func handleFollowersLabelTapped() {
+        self.delegate?.didSelectFollowersLabel()
+    }
+    
+    @objc func handleFollowingLabelTapped() {
+        self.delegate?.didSelectFollowingsLabel()
+    }
 }
 //MARK: - delegate
 extension HeaderProfileViewController: UICollectionViewDataSource, UICollectionViewDelegate {

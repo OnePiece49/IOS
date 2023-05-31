@@ -24,13 +24,12 @@
 		6E2104392A24534D008BDB7A /* LikesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E2104382A24534D008BDB7A /* LikesTableViewCell.swift */; };
 		6E21043C2A24538B008BDB7A /* LikesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E21043B2A24538B008BDB7A /* LikesController.swift */; };
 		6E2EDF092A0F760A000C62EB /* InstagramStoryLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E2EDF082A0F760A000C62EB /* InstagramStoryLayer.swift */; };
-		6E3128C82A264B240039559B /* BottomTabTripControllerVer2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3128C72A264B240039559B /* BottomTabTripControllerVer2.swift */; };
-		6E3128CB2A264B780039559B /* BottomControllerVer2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3128CA2A264B780039559B /* BottomControllerVer2.swift */; };
-		6E3201892A0D417D00D707E8 /* BottomController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3201882A0D417D00D707E8 /* BottomController.swift */; };
-		6E32018B2A0D418F00D707E8 /* BottomTabTripController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E32018A2A0D418F00D707E8 /* BottomTabTripController.swift */; };
+		6E3128C82A264B240039559B /* BottomTabTripController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3128C72A264B240039559B /* BottomTabTripController.swift */; };
+		6E3128CB2A264B780039559B /* BottomController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3128CA2A264B780039559B /* BottomController.swift */; };
+		6E3201892A0D417D00D707E8 /* BottomProfileController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3201882A0D417D00D707E8 /* BottomProfileController.swift */; };
 		6E32018D2A0D41D300D707E8 /* ExtensionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E32018C2A0D41D300D707E8 /* ExtensionViewController.swift */; };
 		6E32018F2A0D423700D707E8 /* BottomTabBarCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E32018E2A0D423700D707E8 /* BottomTabBarCollectionViewCell.swift */; };
-		6E3201912A0D426F00D707E8 /* BottomCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3201902A0D426F00D707E8 /* BottomCollectionViewCell.swift */; };
+		6E3201912A0D426F00D707E8 /* BottomProfile'CollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3201902A0D426F00D707E8 /* BottomProfile'CollectionViewCell.swift */; };
 		6E341A6A2A1F148900D91BAB /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E341A692A1F148900D91BAB /* ProfileViewModel.swift */; };
 		6E341A6C2A1F4CFB00D91BAB /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E341A6B2A1F4CFA00D91BAB /* HomeViewModel.swift */; };
 		6E341A6E2A1F630400D91BAB /* HomeFeedCellViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E341A6D2A1F630400D91BAB /* HomeFeedCellViewModel.swift */; };
@@ -48,6 +47,9 @@
 		6E34720D29EEA056003CB6AA /* ExtensionUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E34720C29EEA056003CB6AA /* ExtensionUIView.swift */; };
 		6E34721129EEF0F3003CB6AA /* CompostionalLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E34721029EEF0F3003CB6AA /* CompostionalLayout.swift */; };
 		6E3A59982A20BE0200A2C8BA /* CommentCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3A59972A20BE0200A2C8BA /* CommentCollectionViewCell.swift */; };
+		6E3D0BC12A275A02006C6336 /* BottomFollowersController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3D0BC02A275A02006C6336 /* BottomFollowersController.swift */; };
+		6E3D0BC32A275A2B006C6336 /* BottomFollowingController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3D0BC22A275A2B006C6336 /* BottomFollowingController.swift */; };
+		6E3D0BC62A275B2E006C6336 /* FollowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E3D0BC52A275B2E006C6336 /* FollowController.swift */; };
 		6E46250E2A19C05400B87CC0 /* BottomSheetViewControllerCustomController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E46250D2A19C05400B87CC0 /* BottomSheetViewControllerCustomController.swift */; };
 		6E4B5F312A0622190049E3AD /* StoryCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E4B5F302A0622180049E3AD /* StoryCollectionViewCell.swift */; };
 		6E4E81612A15E31B00CD4584 /* EditProfileController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E4E81602A15E31B00CD4584 /* EditProfileController.swift */; };
@@ -109,13 +111,12 @@
 		6E2104382A24534D008BDB7A /* LikesTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikesTableViewCell.swift; sourceTree = "<group>"; };
 		6E21043B2A24538B008BDB7A /* LikesController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikesController.swift; sourceTree = "<group>"; };
 		6E2EDF082A0F760A000C62EB /* InstagramStoryLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstagramStoryLayer.swift; sourceTree = "<group>"; };
-		6E3128C72A264B240039559B /* BottomTabTripControllerVer2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomTabTripControllerVer2.swift; sourceTree = "<group>"; };
-		6E3128CA2A264B780039559B /* BottomControllerVer2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomControllerVer2.swift; sourceTree = "<group>"; };
-		6E3201882A0D417D00D707E8 /* BottomController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomController.swift; sourceTree = "<group>"; };
-		6E32018A2A0D418F00D707E8 /* BottomTabTripController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomTabTripController.swift; sourceTree = "<group>"; };
+		6E3128C72A264B240039559B /* BottomTabTripController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomTabTripController.swift; sourceTree = "<group>"; };
+		6E3128CA2A264B780039559B /* BottomController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomController.swift; sourceTree = "<group>"; };
+		6E3201882A0D417D00D707E8 /* BottomProfileController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomProfileController.swift; sourceTree = "<group>"; };
 		6E32018C2A0D41D300D707E8 /* ExtensionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionViewController.swift; sourceTree = "<group>"; };
 		6E32018E2A0D423700D707E8 /* BottomTabBarCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomTabBarCollectionViewCell.swift; sourceTree = "<group>"; };
-		6E3201902A0D426F00D707E8 /* BottomCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomCollectionViewCell.swift; sourceTree = "<group>"; };
+		6E3201902A0D426F00D707E8 /* BottomProfile'CollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BottomProfile'CollectionViewCell.swift"; sourceTree = "<group>"; };
 		6E341A692A1F148900D91BAB /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
 		6E341A6B2A1F4CFA00D91BAB /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		6E341A6D2A1F630400D91BAB /* HomeFeedCellViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeFeedCellViewModel.swift; sourceTree = "<group>"; };
@@ -135,6 +136,9 @@
 		6E34720C29EEA056003CB6AA /* ExtensionUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionUIView.swift; sourceTree = "<group>"; };
 		6E34721029EEF0F3003CB6AA /* CompostionalLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompostionalLayout.swift; sourceTree = "<group>"; };
 		6E3A59972A20BE0200A2C8BA /* CommentCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentCollectionViewCell.swift; sourceTree = "<group>"; };
+		6E3D0BC02A275A02006C6336 /* BottomFollowersController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomFollowersController.swift; sourceTree = "<group>"; };
+		6E3D0BC22A275A2B006C6336 /* BottomFollowingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomFollowingController.swift; sourceTree = "<group>"; };
+		6E3D0BC52A275B2E006C6336 /* FollowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowController.swift; sourceTree = "<group>"; };
 		6E46250D2A19C05400B87CC0 /* BottomSheetViewControllerCustomController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomSheetViewControllerCustomController.swift; sourceTree = "<group>"; };
 		6E4B5F302A0622180049E3AD /* StoryCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryCollectionViewCell.swift; sourceTree = "<group>"; };
 		6E4E81602A15E31B00CD4584 /* EditProfileController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileController.swift; sourceTree = "<group>"; };
@@ -295,7 +299,6 @@
 		6E3128C52A264AE60039559B /* ReelController */ = {
 			isa = PBXGroup;
 			children = (
-				6E3128C62A264B0B0039559B /* Child Controller */,
 				6E34720329EE869B003CB6AA /* ShortVideoController.swift */,
 			);
 			path = ReelController;
@@ -304,10 +307,9 @@
 		6E3128C62A264B0B0039559B /* Child Controller */ = {
 			isa = PBXGroup;
 			children = (
-				6E3128C72A264B240039559B /* BottomTabTripControllerVer2.swift */,
-				6E3128CA2A264B780039559B /* BottomControllerVer2.swift */,
-				6EEFA0602A26F02E0022A54E /* BottomFollowerCollectionViewCell.swift */,
-				6EEFA0622A2708030022A54E /* BottomFollowingCollectionViewCell.swift */,
+				6E3D0BC82A275B8D006C6336 /* Views */,
+				6E3D0BC02A275A02006C6336 /* BottomFollowersController.swift */,
+				6E3D0BC22A275A2B006C6336 /* BottomFollowingController.swift */,
 			);
 			path = "Child Controller";
 			sourceTree = "<group>";
@@ -315,10 +317,8 @@
 		6E3201872A0D415700D707E8 /* Custom Bottom ProfileController */ = {
 			isa = PBXGroup;
 			children = (
-				6E32018A2A0D418F00D707E8 /* BottomTabTripController.swift */,
-				6E3201882A0D417D00D707E8 /* BottomController.swift */,
-				6E32018E2A0D423700D707E8 /* BottomTabBarCollectionViewCell.swift */,
-				6E3201902A0D426F00D707E8 /* BottomCollectionViewCell.swift */,
+				6E3201882A0D417D00D707E8 /* BottomProfileController.swift */,
+				6E3201902A0D426F00D707E8 /* BottomProfile'CollectionViewCell.swift */,
 			);
 			path = "Custom Bottom ProfileController";
 			sourceTree = "<group>";
@@ -370,6 +370,7 @@
 		6E3471FE29EE8640003CB6AA /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				6E3D0BC42A275B1D006C6336 /* FollowController */,
 				6E3128C52A264AE60039559B /* ReelController */,
 				6E21042E2A239AA0008BDB7A /* LikesController */,
 				6EF4283B2A22555200E722AB /* StatusDetailController */,
@@ -416,6 +417,34 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		6E3D0BBF2A2759D7006C6336 /* BottomTapStripController */ = {
+			isa = PBXGroup;
+			children = (
+				6E3128CA2A264B780039559B /* BottomController.swift */,
+				6E3128C72A264B240039559B /* BottomTabTripController.swift */,
+				6E32018E2A0D423700D707E8 /* BottomTabBarCollectionViewCell.swift */,
+			);
+			path = BottomTapStripController;
+			sourceTree = "<group>";
+		};
+		6E3D0BC42A275B1D006C6336 /* FollowController */ = {
+			isa = PBXGroup;
+			children = (
+				6E3128C62A264B0B0039559B /* Child Controller */,
+				6E3D0BC52A275B2E006C6336 /* FollowController.swift */,
+			);
+			path = FollowController;
+			sourceTree = "<group>";
+		};
+		6E3D0BC82A275B8D006C6336 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				6EEFA0602A26F02E0022A54E /* BottomFollowerCollectionViewCell.swift */,
+				6EEFA0622A2708030022A54E /* BottomFollowingCollectionViewCell.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		6E4B5F2D2A05F1310049E3AD /* Profile */ = {
 			isa = PBXGroup;
 			children = (
@@ -438,6 +467,7 @@
 		6E7F1C982A026A61008BD8B0 /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				6E3D0BBF2A2759D7006C6336 /* BottomTapStripController */,
 				6E7F1C992A026A73008BD8B0 /* Utilities.swift */,
 				6EDEF4932A1A0F3200E47EF7 /* LoginTextFiled.swift */,
 				6E2EDF082A0F760A000C62EB /* InstagramStoryLayer.swift */,
@@ -701,15 +731,15 @@
 				6E1B6D8F2A1DC0230032AE8B /* ExploreCollectionViewCell.swift in Sources */,
 				6E1B6D8D2A1DB2EA0032AE8B /* CustomSearchBarView.swift in Sources */,
 				6E341A6A2A1F148900D91BAB /* ProfileViewModel.swift in Sources */,
-				6E32018B2A0D418F00D707E8 /* BottomTabTripController.swift in Sources */,
 				6E21043C2A24538B008BDB7A /* LikesController.swift in Sources */,
 				6E8E842A2A17167B0023529A /* EditBioProfileController.swift in Sources */,
 				6E3440102A15149D0079AB58 /* CapturePhotoController.swift in Sources */,
 				6E2104372A23A4BD008BDB7A /* LikesTableViweCellViewModel.swift in Sources */,
 				6E8E842E2A172C940023529A /* NavigationCustomView.swift in Sources */,
-				6E3201892A0D417D00D707E8 /* BottomController.swift in Sources */,
-				6E3128CB2A264B780039559B /* BottomControllerVer2.swift in Sources */,
+				6E3201892A0D417D00D707E8 /* BottomProfileController.swift in Sources */,
+				6E3128CB2A264B780039559B /* BottomController.swift in Sources */,
 				6E50FE672A21E1BC00B212B4 /* CommentHeaderCollectionView.swift in Sources */,
+				6E3D0BC62A275B2E006C6336 /* FollowController.swift in Sources */,
 				6E8E84222A161C0A0023529A /* SelectTypePhotoController.swift in Sources */,
 				6E7F1C972A026879008BD8B0 /* LoginController.swift in Sources */,
 				6E1B6D832A1C753D0032AE8B /* InstaStatus.swift in Sources */,
@@ -722,7 +752,7 @@
 				6E341A6E2A1F630400D91BAB /* HomeFeedCellViewModel.swift in Sources */,
 				6E341A6C2A1F4CFB00D91BAB /* HomeViewModel.swift in Sources */,
 				6E34721129EEF0F3003CB6AA /* CompostionalLayout.swift in Sources */,
-				6E3201912A0D426F00D707E8 /* BottomCollectionViewCell.swift in Sources */,
+				6E3201912A0D426F00D707E8 /* BottomProfile'CollectionViewCell.swift in Sources */,
 				6EDEF4962A1A261F00E47EF7 /* SwitchAccountController.swift in Sources */,
 				6E34720429EE869B003CB6AA /* ShortVideoController.swift in Sources */,
 				6E7F1C9A2A026A73008BD8B0 /* Utilities.swift in Sources */,
@@ -735,13 +765,15 @@
 				6E1AC0972A1B157D004E81D9 /* UserService.swift in Sources */,
 				6EB383DD2A12522D00892740 /* PickPhotoHeaderView.swift in Sources */,
 				6EB383DE2A12522D00892740 /* PickPhotoCollectionViewCell.swift in Sources */,
+				6E3D0BC32A275A2B006C6336 /* BottomFollowingController.swift in Sources */,
 				6E32018D2A0D41D300D707E8 /* ExtensionViewController.swift in Sources */,
 				6EB383DC2A12522D00892740 /* PickPhotoController.swift in Sources */,
 				6E1AC09B2A1BB4D5004E81D9 /* ExtensionLabel+TextView.swift in Sources */,
 				6E34720229EE865F003CB6AA /* ExploreController.swift in Sources */,
 				6E3471EF29EE8562003CB6AA /* MainTabBarController.swift in Sources */,
-				6E3128C82A264B240039559B /* BottomTabTripControllerVer2.swift in Sources */,
+				6E3128C82A264B240039559B /* BottomTabTripController.swift in Sources */,
 				6E1AC0992A1B2DA5004E81D9 /* HeaderProfileViewController.swift in Sources */,
+				6E3D0BC12A275A02006C6336 /* BottomFollowersController.swift in Sources */,
 				6EB383D22A1251F200892740 /* HomeFeedCollectionViewCell.swift in Sources */,
 				6E8E842C2A1720AF0023529A /* EditDetailProfileViewController.swift in Sources */,
 				6E341A732A1F858600D91BAB /* CommentController.swift in Sources */,

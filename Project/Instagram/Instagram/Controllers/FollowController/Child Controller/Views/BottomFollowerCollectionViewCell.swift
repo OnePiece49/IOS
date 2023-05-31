@@ -60,6 +60,7 @@ class BottomFollowerCollectionViewCell: UICollectionViewCell {
         button.setTitle("Remove", for: .normal)
         button.setTitleColor(.label, for: .normal)
         button.backgroundColor = .systemGray5
+        button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
         button.translatesAutoresizingMaskIntoConstraints = false
 
         return button
@@ -85,27 +86,27 @@ class BottomFollowerCollectionViewCell: UICollectionViewCell {
         addSubview(followButton)
         addSubview(removeButton)
         
-        self.centerYUsernameConstraint = self.usernameLabel.centerYAnchor.constraint(equalTo: centerYAnchor, constant: -12)
+        self.centerYUsernameConstraint = self.usernameLabel.centerYAnchor.constraint(equalTo: centerYAnchor, constant: -9)
         NSLayoutConstraint.activate([
             avatarImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
-            avatarImageView.leftAnchor.constraint(equalTo: leftAnchor, constant: 18),
+            avatarImageView.leftAnchor.constraint(equalTo: leftAnchor, constant: 14),
             
             usernameLabel.leftAnchor.constraint(equalTo: avatarImageView.rightAnchor, constant: 15),
-            usernameLabel.widthAnchor.constraint(lessThanOrEqualToConstant: 120),
+            usernameLabel.widthAnchor.constraint(lessThanOrEqualToConstant: 110),
             centerYUsernameConstraint,
             
             fullnameLabel.leftAnchor.constraint(equalTo: avatarImageView.rightAnchor, constant: 15),
-            fullnameLabel.topAnchor.constraint(equalTo: usernameLabel.bottomAnchor, constant: 6),
+            fullnameLabel.topAnchor.constraint(equalTo: usernameLabel.bottomAnchor, constant: 3),
             fullnameLabel.rightAnchor.constraint(equalTo: removeButton.leftAnchor, constant: -15),
             
             followButton.centerYAnchor.constraint(equalTo: usernameLabel.centerYAnchor),
-            followButton.leftAnchor.constraint(equalTo: usernameLabel.rightAnchor, constant: 18),
+            followButton.leftAnchor.constraint(equalTo: usernameLabel.rightAnchor, constant: 13),
             
             removeButton.centerYAnchor.constraint(equalTo: centerYAnchor),
-            removeButton.rightAnchor.constraint(equalTo: rightAnchor, constant: -19),
+            removeButton.rightAnchor.constraint(equalTo: rightAnchor, constant: -15),
         ])
         avatarImageView.setDimensions(width: 56, height: 56)
-        removeButton.setDimensions(width: 70, height: 35)
+        removeButton.setDimensions(width: 80, height: 35)
         removeButton.layer.cornerRadius = 13
     }
     

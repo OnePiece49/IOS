@@ -77,7 +77,7 @@ class BottomFollowingCollectionViewCell: UICollectionViewCell {
         addSubview(fullnameLabel)
         addSubview(followButton)
         
-        self.centerYUsernameConstraint = self.usernameLabel.centerYAnchor.constraint(equalTo: centerYAnchor, constant: -12)
+        self.centerYUsernameConstraint = self.usernameLabel.centerYAnchor.constraint(equalTo: centerYAnchor, constant: -8)
         NSLayoutConstraint.activate([
             avatarImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
             avatarImageView.leftAnchor.constraint(equalTo: leftAnchor, constant: 18),
@@ -87,9 +87,9 @@ class BottomFollowingCollectionViewCell: UICollectionViewCell {
             centerYUsernameConstraint,
             
             fullnameLabel.leftAnchor.constraint(equalTo: avatarImageView.rightAnchor, constant: 15),
-            fullnameLabel.topAnchor.constraint(equalTo: usernameLabel.bottomAnchor, constant: 6),
+            fullnameLabel.topAnchor.constraint(equalTo: usernameLabel.bottomAnchor, constant: 3),
             
-            followButton.centerYAnchor.constraint(equalTo: usernameLabel.centerYAnchor),
+            followButton.centerYAnchor.constraint(equalTo: centerYAnchor),
             followButton.rightAnchor.constraint(equalTo: rightAnchor, constant: -20),
         ])
         avatarImageView.setDimensions(width: 56, height: 56)
