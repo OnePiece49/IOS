@@ -88,13 +88,20 @@ class ProfileController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = .systemBackground
         self.navigationController?.navigationBar.isHidden = true
         self.configureUI()
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        
         super.viewWillAppear(animated)
+        self.navigationController?.navigationBar.isHidden = true
+        self.tabBarController?.tabBar.isHidden = false
+        self.hidesBottomBarWhenPushed = false
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        self.tabBarController?.tabBar.isHidden = false
         self.navigationController?.navigationBar.isHidden = true
 
     }
@@ -105,6 +112,7 @@ class ProfileController: UIViewController {
     
     //MARK: - Helpers
     func configureUI() {
+        self.view.backgroundColor = .systemBackground
         addChild(headerViewController)
         containerScrollView.addSubview(headerViewController.view)
         didMove(toParent: self)
@@ -121,12 +129,12 @@ class ProfileController: UIViewController {
             containerScrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             containerScrollView.leftAnchor.constraint(equalTo: view.leftAnchor),
             containerScrollView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            containerScrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            containerScrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             
             overlayScrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             overlayScrollView.leftAnchor.constraint(equalTo: view.leftAnchor),
             overlayScrollView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            overlayScrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            overlayScrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             
             headerViewController.view.topAnchor.constraint(equalTo: containerScrollView.topAnchor),
             headerViewController.view.leftAnchor.constraint(equalTo: containerScrollView.leftAnchor),
@@ -291,13 +299,13 @@ extension ProfileController: HeaderProfileDelegate {
         switchAccountVC.durationDismissing = {
             UIView.animate(withDuration: 0.2) {
                 self.tabBarController?.view.layer.cornerRadius = 0
-                self.tabBarController?.navigationController?.view.transform = .identity
+                self.tabBarController?.view.transform = .identity
                 self.shadowView.alpha = 0
             }
         }
         self.present(switchAccountVC, animated: false, completion: .none)
         UIView.animate(withDuration: 0.2) {
-            self.tabBarController?.navigationController?.view.transform = viewTransform
+            self.tabBarController?.view.transform = viewTransform
             self.shadowView.alpha = 0.8
             self.tabBarController?.view.layer.cornerRadius = 20
         }
@@ -323,7 +331,9 @@ extension ProfileController: HeaderProfileDelegate {
         guard let user = viewModel.user else {return}
         let editProfileVC = EditProfileController(user: user, image: headerViewController.getAvatarImage())
         editProfileVC.delegate = self
-        self.navigationController?.pushViewController(editProfileVC, animated: true)
+        let nav = UINavigationController(rootViewController: editProfileVC)
+        nav.modalPresentationStyle = .fullScreen
+        self.present(nav, animated: true, completion: .none)
     }
 
 }
@@ -331,10 +341,15 @@ extension ProfileController: HeaderProfileDelegate {
 extension ProfileController: SwitchAccountDelegate {
     func didSelectLogoutButton(_ viewController: BottomSheetViewCustomController) {
         try? Auth.auth().signOut()
-        let loginVC = LoginController()
-        navigationController?.pushViewController(loginVC, animated: true)
-        
+
+        let navi = UINavigationController(rootViewController: LoginController())
+        navi.modalPresentationStyle = .fullScreen
+        viewController.dismiss(animated: true)
         viewController.animationDismiss()
+        viewController.didEndDissmiss = {
+            (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(LoginController())
+        }
+
     }
     
     func didSelectCreateNewAccountButton(_ viewController: BottomSheetViewCustomController) {
@@ -346,7 +361,7 @@ extension ProfileController: SwitchAccountDelegate {
 extension ProfileController: EditProfileDelegate {
     func didUpdateProfile(user: User, image: UIImage?) {
         self.viewModel.user = user
-        self.headerViewController.updateAvatar(image: image)
+        self.headerViewController.updateDataAfterEdit(image: image, user: user)
         
     }
 
@@ -355,7 +370,12 @@ extension ProfileController: EditProfileDelegate {
 extension ProfileController: BottomControllerDelegate {
     func didSelectStatus(status: InstaStatus) {
         guard let user = viewModel.currentUser else {return}
-        let statusDetailVC = StatusDetailController(status: status, user: user)
+        
+        let attributedString = NSMutableAttributedString(attributedString: NSAttributedString(string: user.username.uppercased(), attributes: [.font : UIFont.systemFont(ofSize: 13, weight: .semibold), .foregroundColor: UIColor.systemGray]))
+        attributedString.append(NSAttributedString(string: "\nPosts", attributes: [.font: UIFont.systemFont(ofSize: 16, weight: .bold), .foregroundColor: UIColor.label]))
+        let statusDetailVC = StatusController(status: status,
+                                                    user: user,
+                                                    attributedTitle: attributedString)
         self.navigationController?.pushViewController(statusDetailVC, animated: true)
     }
 }

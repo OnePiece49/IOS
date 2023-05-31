@@ -63,9 +63,8 @@ class LoginController: UIViewController {
     private let divider: UIView = {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .white
-        view.layer.borderWidth = 0.6
         view.layer.borderColor = UIColor.blue.cgColor
+        view.alpha = 0.5
         return view
     }()
     
@@ -80,7 +79,7 @@ class LoginController: UIViewController {
     }
     
     deinit {
-        print("DEBUG: login deint")
+        print("DEBUG: login deinit")
     }
     
     override func viewDidLayoutSubviews() {
@@ -142,7 +141,7 @@ class LoginController: UIViewController {
             
             divider.bottomAnchor.constraint(equalTo: dontHaveAccountButton.topAnchor, constant: -8),
             divider.leftAnchor.constraint(equalTo: view.leftAnchor),
-            divider.heightAnchor.constraint(equalToConstant: 1),
+            divider.heightAnchor.constraint(equalToConstant: 0.5),
             divider.widthAnchor.constraint(equalTo: view.widthAnchor),
             
             dontHaveAccountButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -15),
@@ -183,11 +182,8 @@ class LoginController: UIViewController {
             }
             
             self.errorLabel.isHidden = true
-            let mainTBVC = MainTabBarController()
-
-            self.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
-            self.navigationController?.pushViewController(mainTBVC, animated: true)
             self.loginLabel.isUserInteractionEnabled = true
+            (UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate)?.changeRootViewController(MainTabBarController())
         }
     }
     

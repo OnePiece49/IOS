@@ -9,7 +9,9 @@ import UIKit
 
 class LikesController: UIViewController {
     //MARK: - Properties
-    let viewModel: UserLikedViewModel
+    let refreshControl = UIRefreshControl()
+    let loadingIndicator = UIActivityIndicatorView()
+    let viewModel: LikesViewModel
     let tableView = UITableView(frame: .zero, style: .plain)
     var navigationbar: NavigationCustomView!
     let searchBar = CustomSearchBarView(ishiddenCancelButton: true)
@@ -17,13 +19,17 @@ class LikesController: UIViewController {
 
     //MARK: - View Lifecycle
     init(status: InstaStatus) {
-        self.viewModel = UserLikedViewModel(status: status)
+        self.viewModel = LikesViewModel(status: status)
         super.init(nibName: nil, bundle: nil)
         self.fetchData()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit {
+        print("DEBUG: LikesController deinit")
     }
     
     override func viewDidLoad() {
@@ -33,13 +39,16 @@ class LikesController: UIViewController {
         configureProperties()
     }
     
-    
-    
     //MARK: - Helpers
     func fetchData() {
         viewModel.fetchData()
-        viewModel.completion = { [weak self] in
+        viewModel.completionFecthData = { [weak self] in
             self?.tableView.reloadData()
+            self?.refreshControl.endRefreshing()
+            self?.loadingIndicator.stopAnimating()
+        }
+        viewModel.duringReloadData = { [weak self] in
+            self?.loadingIndicator.startAnimating()
         }
     }
     
@@ -48,11 +57,13 @@ class LikesController: UIViewController {
         self.view.addSubview(navigationbar)
         self.view.addSubview(tableView)
         self.view.addSubview(searchBar)
+        self.view.addSubview(loadingIndicator)
         navigationbar.translatesAutoresizingMaskIntoConstraints = false
         tableView.translatesAutoresizingMaskIntoConstraints = false
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchBar.backgroundColor = .systemBackground
         view.backgroundColor = .systemBackground
+        loadingIndicator.center = view.center
         
         NSLayoutConstraint.activate([
             navigationbar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -73,14 +84,21 @@ class LikesController: UIViewController {
     }
     
     func configureProperties() {
+        loadingIndicator.startAnimating()
         tableView.delegate = self
         tableView.dataSource = self
+        tableView.refreshControl = refreshControl
         tableView.register(UserLikedTableViewCell.self,
                                  forCellReuseIdentifier: UserLikedTableViewCell.identifier)
         tableView.separatorStyle = .none
-        view.addGestureRecognizer(UITapGestureRecognizer(target: self,
-                                                                    action: #selector(didEndSearchUser)))
+        let geture = UITapGestureRecognizer(target: self,
+                                            action: #selector(didEndSearchUser))
+        geture.cancelsTouchesInView = false
+        view.addGestureRecognizer(geture)
+        refreshControl.addTarget(self, action: #selector(handleRefreshControl), for: .valueChanged)
+
         view.isUserInteractionEnabled = true
+        searchBar.delegate = self
     }
     
     func setupNavigationBar() {
@@ -89,19 +107,19 @@ class LikesController: UIViewController {
             self?.navigationController?.popViewController(animated: true)
         }
                                                    
-        let attributeFirstRightButton = AttibutesButton(image: UIImage(named: "share"),
-                                                        sizeImage: CGSize(width: 28, height: 28))
-                                                   
         self.navigationbar = NavigationCustomView(centerTitle: "Likes",
                                               attributeLeftButtons: [attributeFirstLeftButton],
-                                              attributeRightBarButtons: [attributeFirstRightButton],
-                                              beginSpaceLeftButton: 15,
-                                              beginSpaceRightButton: 15)
+                                              attributeRightBarButtons: [],
+                                              beginSpaceLeftButton: 15)
     }
     
     //MARK: - Selectors
     @objc func didEndSearchUser() {
         self.searchBar.forceEndSearching()
+    }
+    
+    @objc func handleRefreshControl() {
+        self.viewModel.reloadData()
     }
     
 }
@@ -114,7 +132,8 @@ extension LikesController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: UserLikedTableViewCell.identifier,
                                                  for: indexPath) as! UserLikedTableViewCell
-        cell.viewModel = UserLikedCellViewModel(user: viewModel.userAtIndexPath(indexPath: indexPath))
+        cell.viewModel = LikesTableViweCellViewModel(user: viewModel.userAtIndexPath(indexPath: indexPath))
+        cell.delegate = self
         return cell
     }
     
@@ -124,10 +143,11 @@ extension LikesController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         self.indexPathSelected = indexPath
-        tableView.deselectRow(at: indexPath, animated: false)
         let profileVc = ProfileController(user: viewModel.userAtIndexPath(indexPath: indexPath), type: .other)
         profileVc.headerViewController.delegate = self
         navigationController?.pushViewController(profileVc, animated: true)
+        tableView.deselectRow(at: indexPath, animated: false)
+
     }
 }
 
@@ -142,12 +162,25 @@ extension LikesController: HeaderProfileDelegate {
 
 extension LikesController: CustomSearchBarDelegate {
     func didChangedSearchTextFiled(textField: UITextField) {
-        
+        viewModel.searchUser(name: textField.text ?? "")
     }
-    
-    func didBeginEdittingSearchField(textField: UITextField) {
         
+    func didEndSearching() {
+        viewModel.reloadData()
     }
-    
+}
+
+extension LikesController: UserLikedTableViewDelegate {
+    func didTapFollowButton(cell: UserLikedTableViewCell, user: User) {
+        if user.isFollowed {
+            self.viewModel.unfollowUser(user: user)
+            user.isFollowed = false
+            cell.updateFollowButton()
+        } else {
+            self.viewModel.followUser(user: user)
+            user.isFollowed = true
+            cell.updateFollowButton()
+        }
+    }
     
 }

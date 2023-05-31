@@ -28,6 +28,10 @@ class ExploreViewModel {
         self.fetchCurrentUser()
     }
     
+    func reloadData() {
+        self.fetchOtherUsers()
+    }
+    
     var numberStatuses: Int {
         return statuses.count
     }
@@ -46,10 +50,16 @@ class ExploreViewModel {
     }
     
     private func fetchStatuses() {
+        var numberUser = 0
+        self.statuses = []
         for user in users {
             StatusService.shared.fetchStatusUser(uid: user.uid) { userStatues in
+                numberUser += 1
                 self.statuses.append(contentsOf: userStatues)
-                self.completion?()
+                if numberUser == self.users.count {
+                    self.statuses.shuffle()
+                    self.completion?()
+                }
             }
         }
     }
@@ -67,7 +77,6 @@ class ExploreViewModel {
         for user in users {
             if user.fullname.lowercased().contains(name.lowercased()) || user.username.lowercased().contains(name.lowercased()) {
                 expectedUsers.append(user)
-                
             }
         }
         

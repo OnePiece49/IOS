@@ -8,8 +8,8 @@
 import UIKit
 
 class Utilites {
-    static func createTextField(with placeholder: String, with text: String? = nil) -> TextField {
-        let tf = TextField()
+    static func createTextField(with placeholder: String, with text: String? = nil) -> LoginTextFiled {
+        let tf = LoginTextFiled()
         tf.textColor = .black
         tf.layer.borderColor = UIColor(red: 0.769, green: 0.769, blue: 0.769, alpha: 1).cgColor
         tf.backgroundColor = .white

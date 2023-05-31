@@ -7,7 +7,7 @@
 
 import UIKit
 
-class TextField: UITextField {
+class LoginTextFiled: UITextField {
     let padding = UIEdgeInsets(top: 13.5, left: 15, bottom: 13.5, right: 15)
     
     override func textRect(forBounds bounds: CGRect) -> CGRect {

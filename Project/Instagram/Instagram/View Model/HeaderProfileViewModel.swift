@@ -12,7 +12,7 @@ class HeaderProfileViewModel {
     var user: User
     
     var attributedFollowers: NSAttributedString {
-        let attributedText = NSMutableAttributedString(attributedString: NSAttributedString(string: "\(user.stats?.followers ?? 0) \n",
+        let attributedText = NSMutableAttributedString(attributedString: NSAttributedString(string: "\(user.stats?.followers ?? 0)\n",
                                                        attributes: [.font: UIFont.systemFont(ofSize: 16, weight: .semibold),
                                                                     .foregroundColor: UIColor.label]))
         attributedText.append(NSAttributedString(string: "Followers",
@@ -21,7 +21,7 @@ class HeaderProfileViewModel {
     }
     
     var attributedFollowings: NSAttributedString {
-        let attributedText = NSMutableAttributedString(attributedString: NSAttributedString(string: "\(user.stats?.followings ?? 0) \n",
+        let attributedText = NSMutableAttributedString(attributedString: NSAttributedString(string: "\(user.stats?.followings ?? 0)\n",
                                                        attributes: [.font: UIFont.systemFont(ofSize: 16, weight: .semibold),
                                                                     .foregroundColor: UIColor.label]))
         attributedText.append(NSAttributedString(string: "Followings",
@@ -30,7 +30,7 @@ class HeaderProfileViewModel {
     }
     
     var attributedPosts: NSAttributedString {
-        let attributedText = NSMutableAttributedString(attributedString: NSAttributedString(string: "\(user.numberStatus) \n",
+        let attributedText = NSMutableAttributedString(attributedString: NSAttributedString(string: "\(user.numberStatus)\n",
                                                        attributes: [.font: UIFont.systemFont(ofSize: 16, weight: .semibold),
                                                                     .foregroundColor: UIColor.label]))
         attributedText.append(NSAttributedString(string: "Post",

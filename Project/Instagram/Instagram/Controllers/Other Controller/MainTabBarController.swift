@@ -11,53 +11,55 @@ import FirebaseAuth
 class MainTabBarController: UITabBarController {
     //MARK: - Properties
     private var homeNaVc: UINavigationController!
-    private var isFirst: Bool = true
 
     //MARK: - View Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        self.navigationController?.navigationBar.isHidden = true
-        checkUserSignedIn()
 
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.navigationController?.navigationBar.isHidden = true
+
+        checkUserSignedIn()
+    }
+
     deinit {
         print("DEBUG: maintabBar deinit")
     }
     
     //MARK: - Helpers
     private func checkUserSignedIn() {
-        if isFirst {
-            if Auth.auth().currentUser == nil {
-                let loginVC = LoginController()
-                loginVC.modalPresentationStyle = .overFullScreen
-                self.navigationController?.pushViewController(loginVC, animated: true)
-                return
-            }
-            
-            self.isFirst = false
-            self.configureUI()
+        if Auth.auth().currentUser == nil {
+            let naVi = UINavigationController(rootViewController: LoginController())
+            naVi.modalPresentationStyle = .fullScreen
+            self.present(naVi, animated: false, completion: .none)
+            return
         }
+        self.configureUI()
     }
     
-    func configureUI() {
-        let homeNaVc = templateNavigationController(rootViewController: HomeController(), namedImage: "home")
-        let searchNaVc = templateNavigationController(rootViewController: ExploreController(), namedImage: "search")
+     private func configureUI() {
+        view.backgroundColor = .systemBackground
+        
+        let homeNaVc = templateNavigationController(rootViewController: HomeController(),
+                                                    namedImage: "home")
+        let searchNaVc = templateNavigationController(rootViewController: ExploreController(),
+                                                      namedImage: "search")
         let uploadFeedNavc = templateNavigationController(rootViewController: PickPhotoController(type: .uploadTus),
                                                           namedImage: "Add")
-        let shortVideoNaVc = templateNavigationController(rootViewController: ShortVideoController(), namedImage: "video")
-        let profileNaVc = templateNavigationController(rootViewController: ProfileController(type: .mainTabBar), namedImage: "profile")
+         let shortVideoNaVc = templateNavigationController(rootViewController: ShortVideoController(),
+                                                          namedImage: "video")
+        let profileNaVc = templateNavigationController(rootViewController: ProfileController(type: .mainTabBar),
+                                                       namedImage: "profile")
         self.viewControllers = [homeNaVc,
                                searchNaVc,
                                uploadFeedNavc,
                                shortVideoNaVc,
                                profileNaVc]
         self.homeNaVc = homeNaVc
-        self.selectedIndex = 3
+        self.selectedIndex = 0
         delegate = self
     }
     

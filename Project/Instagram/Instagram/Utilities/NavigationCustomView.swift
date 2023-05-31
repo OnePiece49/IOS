@@ -26,7 +26,7 @@ class NavigationCustomView: UIView {
     private var beginSpaceRightButton: CGFloat = 10
     private var continueSpaceleft: CGFloat = 10
     private var continueSpaceRight: CGFloat = 10
-
+    private var attributedTitle: NSAttributedString?
     private var centerTitle: String?
     private var centertitleFont: UIFont = .systemFont(ofSize: 16, weight: .bold)
     private var centerColor: UIColor = .label
@@ -44,8 +44,13 @@ class NavigationCustomView: UIView {
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = self.centerTitle
-        label.textColor = self.centerColor
         label.font = self.centertitleFont
+        label.textColor = self.centerColor
+        if let attributedTitle = attributedTitle {
+            label.attributedText = attributedTitle
+            label.numberOfLines = 2
+            label.textAlignment = .center
+        }
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -60,6 +65,7 @@ class NavigationCustomView: UIView {
     
     //MARK: - View Lifecycle
     init(centerTitle: String? = nil,
+         attributedTitle: NSAttributedString? = nil,
          centertitleFont: UIFont = .systemFont(ofSize: 16, weight: .bold),
          centerColor: UIColor = .label,
          attributeLeftButtons: [AttibutesButton],
@@ -71,6 +77,7 @@ class NavigationCustomView: UIView {
          continueSpaceRight: CGFloat = 10) {
         
         self.attributeLeftBarButtons = attributeLeftButtons
+        self.attributedTitle = attributedTitle
         self.attrubuteRightBarButtons = attributeRightBarButtons
         self.headerDivider.isHidden = isHiddenDivider
         self.centerTitle = centerTitle

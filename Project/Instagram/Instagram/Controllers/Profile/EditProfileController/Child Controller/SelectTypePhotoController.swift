@@ -16,6 +16,11 @@ class SelectTypePhotoController: BottomSheetViewCustomController {
     //MARK: - Properties
     weak var delegate: SelectTypePhotoDelegate?
     let tableView = UITableView(frame: .zero, style: .plain)
+    var avatarImage: UIImage? {
+        didSet {
+            self.avatarUserImageView.image = avatarImage
+        }
+    }
     
     override var bottomSheetView: UIView {
         return tableView
@@ -36,10 +41,9 @@ class SelectTypePhotoController: BottomSheetViewCustomController {
     private let avatarUserImageView: UIImageView = {
         let iv = UIImageView()
         iv.translatesAutoresizingMaskIntoConstraints = false
-        iv.backgroundColor = .blue
         iv.clipsToBounds = true
         iv.layer.cornerRadius = 40 / 2
-        iv.contentMode = .scaleAspectFit
+        iv.contentMode = .scaleToFill
         return iv
     }()
     
@@ -129,5 +133,4 @@ extension SelectTypePhotoController: UITableViewDelegate, UITableViewDataSource 
             delegate?.didSelectChooseTakePicture(self)
         }
     }
-
 }

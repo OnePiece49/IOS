@@ -21,7 +21,6 @@ class CommentController: UIViewController {
     var collectionView: UICollectionView!
     var bottomContainerViewConstraint: NSLayoutConstraint!
     var heightContainerInputViewConstraint: NSLayoutConstraint!
-    var spacingCommentToBottom: CGFloat = 0
     private let containerInputView = ContainerInputCustomView()
     private let beginHeightContainerInputView: CGFloat = 43
     private let plusHeightTextView: CGFloat = 28
@@ -107,12 +106,11 @@ class CommentController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         self.navigationController?.navigationBar.isHidden = true
-        self.navigationController?.interactivePopGestureRecognizer?.isEnabled = true
+        self.tabBarController?.tabBar.isHidden = true
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        postNotification()
     }
     
     //MARK: - Helpers
@@ -131,8 +129,7 @@ class CommentController: UIViewController {
         navigationbar.translatesAutoresizingMaskIntoConstraints = false
         containerView.backgroundColor = .systemBackground
         
-        bottomContainerViewConstraint = containerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor,
-                                                                                   constant: -spacingCommentToBottom)
+        bottomContainerViewConstraint = containerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         NSLayoutConstraint.activate([
             navigationbar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             navigationbar.leftAnchor.constraint(equalTo: view.leftAnchor),
@@ -142,7 +139,7 @@ class CommentController: UIViewController {
             collectionView.topAnchor.constraint(equalTo: navigationbar.bottomAnchor),
             collectionView.leftAnchor.constraint(equalTo: view.leftAnchor),
             collectionView.rightAnchor.constraint(equalTo: view.rightAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: containerView.topAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -60),
             
             bottomContainerViewConstraint,
             containerView.leftAnchor.constraint(equalTo: view.leftAnchor),
@@ -163,11 +160,7 @@ class CommentController: UIViewController {
         collectionView.register(CommentHeaderCollectionView.self,
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                 withReuseIdentifier: CommentHeaderCollectionView.identifier)
-    }
-    
-    func postNotification() {
-        NotificationCenter.default.post(name: NSNotification.Name(NotificationConstant.commentVcDisappear),
-                                        object: .none, userInfo: [:])
+
     }
     
     func addNotification() {
@@ -229,16 +222,18 @@ class CommentController: UIViewController {
     @objc func handleKeyBoardWillAppearce(_ notification: Notification) {
         if let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
               let keyboardHeight = keyboardSize.height
+            self.collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: keyboardHeight, right: 0)
             UIView.animate(withDuration: 0.2) {
-                self.bottomContainerViewConstraint.constant = -keyboardHeight - self.spacingCommentToBottom
+                self.bottomContainerViewConstraint.constant = -keyboardHeight
                 self.view.layoutIfNeeded()
             }
           }
     }
     
     @objc func handleKeyBoardWillHide() {
+        self.collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         UIView.animate(withDuration: 0.2) {
-            self.bottomContainerViewConstraint.constant = -self.spacingCommentToBottom
+            self.bottomContainerViewConstraint.constant = 0
             self.view.layoutIfNeeded()
         }
     }
@@ -279,8 +274,6 @@ extension CommentController: ContainerInputDelegate {
         }
     }
     
-
-    
     func didChangeEditTextView(textView: UITextView) {
         if textView.isTruncated(with: self.containerInputView.heightInputTextView)
             && self.heightContainerInputViewConstraint.constant < self.beginHeightContainerInputView + self.plusHeightTextView * 2 + 2 {
@@ -317,9 +310,9 @@ extension CommentController: ContainerInputDelegate {
 extension CommentController: CommentCollectionViewDelegate {
     func didSelectAvatarOrUsername(user: User) {
         let profileVC = ProfileController(user: user, type: .other)
-        profileVC.modalPresentationStyle = .overFullScreen
-        self.present(profileVC, animated: true, completion: .none)
-//        self.navigationController?.viewControllers[0].navigationController?.pushViewController(profileVC, animated: true)
+        profileVC.hidesBottomBarWhenPushed = false
+        
+        navigationController?.pushViewController(profileVC, animated: true)
     }
     
     

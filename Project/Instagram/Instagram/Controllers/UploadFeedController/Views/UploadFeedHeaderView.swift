@@ -79,9 +79,10 @@ class UploadFeedHeaderView: UIView {
         backgroundColor = .systemBackground
         addSubview(placeHolderLabel)
         addSubview(statusTextView)
+        addSubview(navigationBar)
         addSubview(shadowView)
         addSubview(imageUploadImageView)
-        addSubview(navigationBar)
+
         navigationBar.translatesAutoresizingMaskIntoConstraints = false
         navigationBar.backgroundColor = .systemBackground
         
@@ -95,12 +96,12 @@ class UploadFeedHeaderView: UIView {
             imageUploadImageView.leftAnchor.constraint(equalTo: leftAnchor, constant: 10),
             
             statusTextView.leftAnchor.constraint(equalTo: imageUploadImageView.rightAnchor, constant: 8),
-            statusTextView.topAnchor.constraint(equalTo: navigationBar.bottomAnchor, constant: 4),
+            statusTextView.topAnchor.constraint(equalTo: imageUploadImageView.centerYAnchor, constant: -43),
             statusTextView.rightAnchor.constraint(equalTo: rightAnchor, constant: -10),
             statusTextView.heightAnchor.constraint(equalToConstant: 87),
             
-            placeHolderLabel.leftAnchor.constraint(equalTo: statusTextView.leftAnchor, constant: 3),
-            placeHolderLabel.topAnchor.constraint(equalTo: statusTextView.topAnchor, constant: 12)
+            placeHolderLabel.leftAnchor.constraint(equalTo: statusTextView.leftAnchor),
+            placeHolderLabel.topAnchor.constraint(equalTo: statusTextView.topAnchor, constant: 5),
         ])
 
         imageUploadImageView.setDimensions(width: 70, height: 70 / ratio)

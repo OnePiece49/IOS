@@ -7,8 +7,21 @@
 
 import UIKit
 import FirebaseCore
+import FirebaseAuth
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+    
+    func changeRootViewController(_ vc: UIViewController, animated: Bool = true) {
+            guard let window = self.window else {
+                return
+            }
+            
+            window.rootViewController = vc
+            window.alpha = 0.3
+            UIView.transition(with: window, duration: 0.5, animations: {
+                window.alpha = 1
+            })
+        }
 
     var window: UIWindow?
 
@@ -16,11 +29,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let scene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: scene)
         self.window = window
-        let navi = UINavigationController(rootViewController: MainTabBarController())
-        navi.navigationBar.isHidden = true
-        window.rootViewController = navi
+        window.rootViewController = MainTabBarController()
         window.makeKeyAndVisible()
-
     }
 
 }

@@ -28,7 +28,7 @@ class CommentCollectionViewCell: UICollectionViewCell {
         iv.clipsToBounds = true
         iv.layer.cornerRadius = 36 / 2
         iv.isUserInteractionEnabled = true
-        iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleInfoUserTapped)))
+//        iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleInfoUserTapped)))
         return iv
     }()
     
@@ -40,7 +40,7 @@ class CommentCollectionViewCell: UICollectionViewCell {
         label.textAlignment = .left
         label.text = "b_lackBink"
         label.isUserInteractionEnabled = true
-        label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleInfoUserTapped)))
+//        label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleInfoUserTapped)))
         return label
     }()
     
@@ -55,6 +55,7 @@ class CommentCollectionViewCell: UICollectionViewCell {
     }()
     
     
+    
     private lazy var captionLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -62,10 +63,6 @@ class CommentCollectionViewCell: UICollectionViewCell {
         label.textColor = .label
         label.textAlignment = .left
         label.numberOfLines = 0
-        label.text = """
-        Cupid" của FIFTY FIFTY chính thức là bài hát trụ hạng lâu nhất của một nghệ sĩ nữ K-Pop trên Hot 100, vượt qua "Ice Cream" của BLACKPINK và Selena. Một thành tích quá khủng cho một tân binh.
-        Thứ hạng tuần này của Cupid trên Hot 100: no.18
-        """
         return label
     }()
     

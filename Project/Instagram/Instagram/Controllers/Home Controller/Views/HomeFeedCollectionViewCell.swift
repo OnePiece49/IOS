@@ -11,15 +11,15 @@ import SDWebImage
 
 protocol HomeFeedCollectionViewCellDelegate: AnyObject {
     func didSelectAvatar(status: InstaStatus)
-    func didSelectCommentButton(cell: HomeFeedCollectionViewCell, status: InstaStatus)
     func didSelectNumberLikesButton(status: InstaStatus)
+    func didSelectCommentButton(cell: HomeFeedCollectionViewCell, status: InstaStatus)
 }
 
 class HomeFeedCollectionViewCell: UICollectionViewCell {
     //MARK: - Properties
     private var heightImageConstraint: NSLayoutConstraint!
     static let identifier = "HomeFeedCollectionViewCell"
-    var actionBar: NavigationCustomView!
+    private var actionBar: NavigationCustomView!
     weak var delegate: HomeFeedCollectionViewCellDelegate?
     var viewModel: HomeFeedCellViewModel? {
         didSet {
@@ -98,8 +98,8 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         return button
     }()
     
-    private lazy var statusLabel: UILabel = Utilites.createStatusFeedLabel(username: "black_pink",
-                                                                           status: "Happy birthday Blackpink, have a good day, wish you have all lucky :))")
+    private lazy var statusLabel: UILabel = Utilites.createStatusFeedLabel(username: "",
+                                                                           status: "")
     
     private lazy var allCommentsButton: UIButton = {
         let button = UIButton(type: .system)
@@ -113,6 +113,15 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         return button
     }()
     
+    private lazy var likesButtonAndCaptionStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [statusLabel, allCommentsButton])
+        stackView.spacing = 3
+        stackView.axis = .vertical
+        stackView.alignment = .leading
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
+    }()
+    
     private let timePostTusLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -120,19 +129,6 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         label.font = .systemFont(ofSize: 12, weight: .regular)
         label.textColor = .gray
         return label
-    }()
-    
-    private lazy var fakeView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .red
-        return view
-    }()
-    
-    private let containerView: UIView = {
-        let view = UIView()
-        view.translatesAutoresizingMaskIntoConstraints = false
-        return view
     }()
     
     //MARK: - View Lifecycle
@@ -155,10 +151,8 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         addSubview(photoImageView)
         addSubview(actionBar)
         addSubview(numberLikesButton)
-        addSubview(statusLabel)
-        addSubview(allCommentsButton)
+        addSubview(likesButtonAndCaptionStackView)
         addSubview(timePostTusLabel)
-        addSubview(fakeView)
         
         heightImageConstraint = photoImageView.heightAnchor.constraint(equalToConstant: 500)
         let bottomAnchor =  timePostTusLabel.bottomAnchor.constraint(equalTo: bottomAnchor)
@@ -183,14 +177,10 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
             numberLikesButton.topAnchor.constraint(equalTo: actionBar.bottomAnchor, constant: 2),
             numberLikesButton.leftAnchor.constraint(equalTo: leftAnchor, constant: 15),
             
-            statusLabel.topAnchor.constraint(equalTo: numberLikesButton.bottomAnchor, constant: 3),
-            statusLabel.leftAnchor.constraint(equalTo: leftAnchor, constant: 15),
-            statusLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -15),
-            
-            allCommentsButton.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 0),
-            allCommentsButton.leftAnchor.constraint(equalTo: leftAnchor, constant: 15),
+            likesButtonAndCaptionStackView.topAnchor.constraint(equalTo: numberLikesButton.bottomAnchor, constant: 0),
+            likesButtonAndCaptionStackView.leftAnchor.constraint(equalTo: leftAnchor, constant: 15),
 
-            timePostTusLabel.topAnchor.constraint(equalTo: allCommentsButton.bottomAnchor, constant: 0),
+            timePostTusLabel.topAnchor.constraint(equalTo: likesButtonAndCaptionStackView.bottomAnchor),
             timePostTusLabel.leftAnchor.constraint(equalTo: leftAnchor, constant: 15),
             timePostTusLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -15),
             bottomAnchor,
@@ -242,18 +232,29 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
     
     func updateUI() {
         NSLayoutConstraint.deactivate([heightImageConstraint])
-        
-        let ratio: CGFloat = viewModel?.ratioImage ?? 1
+        guard let viewModel = viewModel else {
+            return
+        }
+
+        let ratio: CGFloat = viewModel.ratioImage
         heightImageConstraint = self.photoImageView.heightAnchor.constraint(equalTo: self.photoImageView.widthAnchor, multiplier: ratio)
         NSLayoutConstraint.activate([
             heightImageConstraint,
         ])
         
-        avatarUserUpTusImageView.sd_setImage(with: viewModel?.avatarURL, placeholderImage: UIImage(systemName: "person.circle"))
-        photoImageView.sd_setImage(with: viewModel?.photoURL)
-        usernameLabel.text = viewModel?.username
-        statusLabel.attributedText = viewModel?.attributedCaptionLabel
-        self.timePostTusLabel.text = viewModel?.dateString
+        avatarUserUpTusImageView.sd_setImage(with: viewModel.avatarURL, placeholderImage: UIImage(systemName: "person.circle"))
+        photoImageView.sd_setImage(with: viewModel.photoURL)
+        usernameLabel.text = viewModel.username
+        
+        if viewModel.haveCaption {
+            statusLabel.attributedText = viewModel.attributedCaptionLabel
+            statusLabel.isHidden = false
+            statusLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handelAllCommentButtonTapped)))
+            statusLabel.isUserInteractionEnabled = true
+        } else {
+            statusLabel.isHidden = true
+        }
+        self.timePostTusLabel.text = viewModel.dateString
         layoutIfNeeded()
     }
     
@@ -311,6 +312,7 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         UIView.animate(withDuration: 0.3) {
             self.heardLikemageView.transform = transform
             self.heardLikemageView.isHidden = false
+            
         } completion: { _ in
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.13) {
                 self.heardLikemageView.transform = .identity

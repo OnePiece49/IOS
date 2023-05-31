@@ -278,7 +278,7 @@ class HeaderProfileViewController: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.isScrollEnabled = false
-
+        editButton.isUserInteractionEnabled = false
     }
     
     func updateUI() {
@@ -310,6 +310,7 @@ class HeaderProfileViewController: UIViewController {
                 editButton.setTitleColor(.white, for: .normal)
             }
         }
+        editButton.isUserInteractionEnabled = true
 
         postLabel.attributedText = viewModel.attributedPosts
         followersLabel.attributedText  = viewModel.attributedFollowers
@@ -323,10 +324,12 @@ class HeaderProfileViewController: UIViewController {
         }
     }
     
-    func updateAvatar(image: UIImage?) {
-        if let image = image {
-            self.avartImageView.image = image
-        }
+    func updateDataAfterEdit(image: UIImage?, user: User) {
+        self.navigationBar.leftButtons[1].setTitle(viewModel?.username, for: .normal)
+        self.viewModel = HeaderProfileViewModel(user: user)
+        self.fullnameLabel.text = viewModel?.fullname   
+        self.bioLabel.text = viewModel?.bio
+        self.avartImageView.image = image
     }
         
     func createStorySection() -> NSCollectionLayoutSection {

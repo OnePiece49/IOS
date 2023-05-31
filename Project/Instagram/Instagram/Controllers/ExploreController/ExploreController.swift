@@ -15,19 +15,24 @@ class ExploreController: UIViewController {
     let searchBar = CustomSearchBarView()
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     let searchTableView = UITableView(frame: .zero, style: .plain)
+    let refreshControl = UIRefreshControl()
+    let loadingIndicator = UIActivityIndicatorView()
     
     //MARK: - View Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        fetchData()
         configureUI()
         configureProperties()
-        fetchData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         self.navigationController?.navigationBar.isHidden = true
         
+    }
+    deinit {
+        print("DEBUG: ExploreController deinit")
     }
     
     
@@ -37,9 +42,11 @@ class ExploreController: UIViewController {
         view.addSubview(searchBar)
         view.addSubview(collectionView)
         view.addSubview(searchTableView)
+        view.addSubview(loadingIndicator)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchTableView.translatesAutoresizingMaskIntoConstraints = false
+        loadingIndicator.center = view.center
         
         NSLayoutConstraint.activate([
             searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
@@ -57,7 +64,6 @@ class ExploreController: UIViewController {
             searchTableView.rightAnchor.constraint(equalTo: view.rightAnchor),
             searchTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
-    
     }
 
     
@@ -68,6 +74,7 @@ class ExploreController: UIViewController {
         collectionView.collectionViewLayout = self.createLayoutCollectionView()
         collectionView.register(ExploreCollectionViewCell.self,
                                 forCellWithReuseIdentifier: ExploreCollectionViewCell.identifier)
+        collectionView.refreshControl = refreshControl
         
         searchTableView.delegate = self
         searchTableView.dataSource = self
@@ -76,9 +83,7 @@ class ExploreController: UIViewController {
         searchTableView.alpha = 0
         searchTableView.backgroundColor = .systemBackground
         searchTableView.separatorColor = .clear
-        viewModel.completion = {
-            self.collectionView.reloadData()
-        }
+        refreshControl.addTarget(self, action: #selector(handleRefreshControl), for: .valueChanged)
     }
     
     func createLayoutCollectionView() -> UICollectionViewLayout {
@@ -101,10 +106,19 @@ class ExploreController: UIViewController {
     }
     
     func fetchData() {
+        loadingIndicator.startAnimating()
         viewModel.fetchOtherUsers()
+        viewModel.completion = {
+            self.collectionView.reloadData()
+            self.loadingIndicator.stopAnimating()
+            self.refreshControl.endRefreshing()
+        }
     }
     
     //MARK: - Selectors
+    @objc func handleRefreshControl() {
+        self.viewModel.reloadData()
+    }
 
     
 }
@@ -129,7 +143,7 @@ extension ExploreController: UICollectionViewDelegate, UICollectionViewDataSourc
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         guard let user = viewModel.currentUser else {return}
         let status = viewModel.statusAtIndexPath(indexPath: indexPath)
-        let statusDetailVC = StatusDetailController(status: status, user: user)
+        let statusDetailVC = StatusController(status: status, user: user)
         self.navigationController?.pushViewController(statusDetailVC, animated: true)
     }
 }
@@ -157,7 +171,7 @@ extension ExploreController: UITableViewDelegate, UITableViewDataSource {
     }
 }
 
-extension ExploreController: CustomSearchBarDelegate {
+extension ExploreController: CustomSearchBarDelegate {    
     func didChangedSearchTextFiled(textField: UITextField) {
         guard let name = textField.text else {return}
         viewModel.searchUsers(name: name)

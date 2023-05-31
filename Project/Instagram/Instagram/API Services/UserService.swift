@@ -120,10 +120,10 @@ class UserService {
         }
     }
     
-    func updateInfoUser(user: User, image: UIImage?, completion: @escaping () -> Void) {
+    func updateInfoUser(user: User, image: UIImage?, completion: @escaping (Bool) -> Void) {
         guard let image = image else {
             self.updateUser(user: user) {
-                completion()
+                completion(true)
             }
             return
         }
@@ -135,19 +135,20 @@ class UserService {
         ref.putData(imageData, metadata: nil) { (meta, error) in
             if let error = error {
                 print("DEBUG: \(error.localizedDescription)")
-                completion()
+                completion(false)
+                return
             }
             
             ref.downloadURL { url, error in
                 guard let profileImageUrl = url?.absoluteString else {
                     self.updateUser(user: user) {
-                        completion()
+                        completion(false)
                     }
                     return
                 }
                 
                 self.updateUser(user: user, imageUrl: profileImageUrl) {
-                    completion()
+                    completion(true)
                 }
             }
         }

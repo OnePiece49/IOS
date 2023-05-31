@@ -7,7 +7,7 @@
 
 import UIKit
  
-class UserLikedCellViewModel {
+class LikesTableViweCellViewModel {
     var user: User
     
     var avatarImageUrl: URL? {
@@ -26,21 +26,7 @@ class UserLikedCellViewModel {
         return user.isFollowed
     }
     
-    func followUser() {
-        user.isFollowed = true
-        UserService.shared.followUser(uid: user.uid) {
-            self.user.isFollowed = true
-            self.completion?()
-        }
-    }
-    
-    func unfollowUser() {
-        user.isFollowed = false
-        UserService.shared.unfollowUser(uid: user.uid) {
-            self.user.isFollowed = false
-            self.completion?()
-        }
-    }
+
     
     var completion: (() -> Void)?
     

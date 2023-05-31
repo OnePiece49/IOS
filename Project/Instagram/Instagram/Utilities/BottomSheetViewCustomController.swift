@@ -22,6 +22,7 @@ class BottomSheetViewCustomController: UIViewController {
     
     var durationDismissing: (() -> Void)?
     var willEndDissmiss: (() -> Void)?
+    var didEndDissmiss: (() -> Void)?
     
     var durationAnimation: CGFloat {
         return 0.2
@@ -146,7 +147,9 @@ class BottomSheetViewCustomController: UIViewController {
                 self.durationDismissing?()
             } completion: { _ in
                 self.willEndDissmiss?()
-                self.dismiss(animated: true, completion: .none)
+                self.dismiss(animated: true) {
+                    self.didEndDissmiss?()
+                }
             }
             
         } else {

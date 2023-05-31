@@ -9,14 +9,15 @@ import UIKit
 import SDWebImage
 import FirebaseAuth
 
-//protocol UserLikedTableViewDelegate: AnyObject {
-//    func didSelect
-//}
+protocol UserLikedTableViewDelegate: AnyObject {
+    func didTapFollowButton(cell: UserLikedTableViewCell, user: User)
+}
 
 class UserLikedTableViewCell: UITableViewCell {
     static let identifier = "UserLikedTableViewCell"
+    weak var delegate: UserLikedTableViewDelegate?
     
-    var viewModel: UserLikedCellViewModel? {
+    var viewModel: LikesTableViweCellViewModel? {
         didSet {updateUI()}
     }
     
@@ -120,22 +121,11 @@ class UserLikedTableViewCell: UITableViewCell {
     
     //MARK: - Selectors
     @objc func handleFollowButtonTapped() {
-        guard let isFollowed = viewModel?.hasFollowed else {return}
-        if isFollowed {
-            self.followButton.setTitle("Follow", for: .normal)
-            self.followButton.backgroundColor = .systemBlue
-            self.followButton.setTitleColor(.white, for: .normal)
-        } else {
-            self.followButton.setTitle("Following", for: .normal)
-            self.followButton.backgroundColor = .systemGray3
-            self.followButton.setTitleColor(.label, for: .normal)
+        guard let viewModel = viewModel else {
+            return
         }
-        
-        if isFollowed {
-            viewModel?.unfollowUser()
-        } else {
-            viewModel?.followUser()
-        }
+
+        self.delegate?.didTapFollowButton(cell: self, user: viewModel.user)
     }
     
     func updateFollowButton(hasFollowed: Bool) {

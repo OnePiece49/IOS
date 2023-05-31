@@ -11,10 +11,13 @@ protocol CustomSearchBarDelegate: AnyObject {
     func didSelectCancelButton()
     func didChangedSearchTextFiled(textField: UITextField)
     func didBeginEdittingSearchField(textField: UITextField)
+    func didEndSearching()
 }
 
 extension CustomSearchBarDelegate {
     func didSelectCancelButton() {}
+    func didBeginEdittingSearchField(textField: UITextField) {}
+    func didEndSearching() {}
 }
 
 class CustomSearchBarView: UIView {
@@ -38,6 +41,7 @@ class CustomSearchBarView: UIView {
         tf.translatesAutoresizingMaskIntoConstraints = false
         tf.placeholder = "Search"
         tf.delegate = self
+        tf.clearButtonMode = .whileEditing
         return tf
     }()
     
@@ -148,6 +152,14 @@ extension CustomSearchBarView: UITextFieldDelegate {
     }
     
     func textFieldDidChangeSelection(_ textField: UITextField) {
+        if textField.text == nil {
+            print("DEBUG: aduuuuu")
+        }
         self.delegate?.didChangedSearchTextFiled(textField: textField)
+    }
+    
+    func textFieldShouldClear(_ textField: UITextField) -> Bool {
+        self.delegate?.didEndSearching()
+        return true
     }
 }

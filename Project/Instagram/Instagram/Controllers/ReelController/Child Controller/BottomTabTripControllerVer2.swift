@@ -1,25 +1,13 @@
 //
-//  BottomTabTripController.swift
+//  BottomTabTripControllerVer2.swift
 //  Instagram
 //
-//  Created by Long Bảo on 11/05/2023.
+//  Created by Long Bảo on 30/05/2023.
 //
 
 import UIKit
 
-struct ConfigureTabBar {
-    var backgroundColor: UIColor = .systemBlue
-    var dividerColor: UIColor = .red
-    var selectedBarColor: UIColor = .blue
-    var notSelectedBarColor: UIColor = .gray
-    var selectedBackgroundColor: UIColor = .systemYellow
-}
-
-protocol BottomTapTripControllerDelegate: AnyObject {
-    func didMoveToNextController(collectionView: UICollectionView, currentIndex: Int)
-}
-
-class BottomTapTripController: UIViewController {
+class BottomTapTripControllerVer2: UIViewController {
     //MARK: - Properties
     let scrollView = UIScrollView()
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
@@ -47,10 +35,10 @@ class BottomTapTripController: UIViewController {
     }
     
     var currentCollectionView: UICollectionView {
-        return controllers[currentIndex].collectionView
+        return controllers[currentIndex].bottomTabTripCollectionView
     }
     
-    var controllers: [BottomController]
+    var controllers: [BottomControllerVer2]
     
     
     private lazy var divider: UIView = {
@@ -61,7 +49,7 @@ class BottomTapTripController: UIViewController {
     }()
     
     //MARK: - View Lifecycle
-    init(controllers: [BottomController], configureTapBar: ConfigureTabBar? = nil) {
+    init(controllers: [BottomControllerVer2], configureTapBar: ConfigureTabBar? = nil) {
         self.controllers = controllers
         if let configureTapBar = configureTapBar {
             self.configureTabBar = configureTapBar
@@ -239,8 +227,10 @@ class BottomTapTripController: UIViewController {
     
 }
 //MARK: - delegate
-extension BottomTapTripController: UIScrollViewDelegate {
+extension BottomTapTripControllerVer2: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        print("DEBUG: lmm \(scrollView.contentSize) and \(scrollView.frame)")
+    
         let temp = Float(scrollView.contentOffset.x.truncatingRemainder(dividingBy: view.frame.width).truncatingRemainder(dividingBy: self.spacingControllers))
         if scrollView.contentOffset.x > self.currentXContentOffset {
             self.addConstraintChildController(index: self.currentIndex + 1)
@@ -389,14 +379,13 @@ extension BottomTapTripController: UIScrollViewDelegate {
 }
 
 
-extension BottomTapTripController: UICollectionViewDelegate, UICollectionViewDataSource {
+extension BottomTapTripControllerVer2: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BottomTabBarCollectionViewCell.identifier, for: indexPath) as! BottomTabBarCollectionViewCell
-//        cell.optionImage.image = self.controllers[indexPath.row].titleImage
         cell.backgroundColor = self.configureTabBar.backgroundColor
-        if indexPath.row == 0 {
-            cell.backgroundColor = self.configureTabBar.selectedBackgroundColor
-        }
+        cell.titleBottom = controllers[indexPath.row].titleBottom
+
+        
         return cell
     }
     

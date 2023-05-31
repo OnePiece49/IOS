@@ -13,7 +13,7 @@ struct UserRelationStats {
     var followings: Int
 }
 
-struct User {
+class User {
     let email: String
     var username: String
     var fullname: String
@@ -25,8 +25,7 @@ struct User {
     var stats: UserRelationStats?
     var numberStatus: Int = 0
     var isCurrentUser: Bool {
-        guard let currentUID = Auth.auth().currentUser?.uid else {return false}
-        return currentUID == uid
+        return Auth.auth().currentUser?.uid == uid
     }
     
     init(uid: String, dictionary: [String: Any]) {

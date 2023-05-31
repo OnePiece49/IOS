@@ -8,18 +8,22 @@
 import UIKit
 
 
-class StatusDetailController: UIViewController {
+class StatusController: UIViewController {
     //MARK: - Properties
     var collectionView: UICollectionView!
     let refreshControl = UIRefreshControl()
     var navigationbar: NavigationCustomView!
     let status: InstaStatus
     let currentUser: User
+    var attributedTitle: NSAttributedString?
     
     //MARK: - View Lifecycle
-    init(status: InstaStatus, user: User) {
+    init(status: InstaStatus,
+         user: User,
+         attributedTitle: NSAttributedString? = nil) {
         self.status = status
         self.currentUser = user
+        self.attributedTitle = attributedTitle
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -74,6 +78,7 @@ class StatusDetailController: UIViewController {
 
 
         let navigationBar = NavigationCustomView(centerTitle: "Explore",
+                                                 attributedTitle: self.attributedTitle,
                                                  attributeLeftButtons: [attributeFirstLeftButton],
                                                  attributeRightBarButtons: [],
                                                  beginSpaceLeftButton: 12,
@@ -96,7 +101,7 @@ class StatusDetailController: UIViewController {
     
 }
 //MARK: - delegate
-extension StatusDetailController: UICollectionViewDelegate, UICollectionViewDataSource {
+extension StatusController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return 1
     }
@@ -110,7 +115,7 @@ extension StatusDetailController: UICollectionViewDelegate, UICollectionViewData
     }
 }
 
-extension StatusDetailController: HomeFeedCollectionViewCellDelegate {
+extension StatusController: HomeFeedCollectionViewCellDelegate {
     func didSelectNumberLikesButton(status: InstaStatus) {
         let userLikedVc = LikesController(status: status)
         self.navigationController?.pushViewController(userLikedVc, animated: true)

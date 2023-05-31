@@ -16,6 +16,7 @@ class ProfileViewModel {
         guard let uid = Auth.auth().currentUser?.uid else {return}
         UserService.shared.fetchUser(uid: uid) { user in
             self.user = user
+            self.currentUser = user
             self.completionFetchMainInfo?()
             UserService.shared.fetchUserRelationStats(uid: uid) { relationStats in
                 self.user?.stats = relationStats
@@ -82,7 +83,6 @@ class ProfileViewModel {
         UserService.shared.fetchUser(uid: user.uid) { user in
             self.user = user
             self.fetchDataForAnotherUser()
-
         }
     }
 }

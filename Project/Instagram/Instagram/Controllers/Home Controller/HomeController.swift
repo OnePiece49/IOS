@@ -15,10 +15,8 @@ class HomeController: UIViewController {
     var isPresenting: Bool = true
     let heightHeaderView: CGFloat = 60
     var currentYContentOffset: CGFloat = 0
-    var numberStatus = 0
     let refreshControl = UIRefreshControl()
-    var observer: NSObjectProtocol!
-    var isLikedTus: Bool = false
+    let loadingIndicator = UIActivityIndicatorView()
     
     private lazy var instagramHeaderView: InstagramHeaderView = {
         let header = InstagramHeaderView()
@@ -32,29 +30,21 @@ class HomeController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        fetchData()
         configureUI()
+        fetchData()
         configureProperties()
         configureRefreshControl()
-        setupNotification()
         self.navigationController?.navigationBar.isHidden = true
-        
-    }
-    
-    deinit {
-        NotificationCenter.default.removeObserver(observer!)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         self.isPresenting = true
-
         self.navigationController?.navigationBar.isHidden = true
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
         self.navigationController?.navigationBar.isHidden = true
     }
 
@@ -62,19 +52,18 @@ class HomeController: UIViewController {
         self.isPresenting = false
     }
     
-    //MARK: - Helpers
-    func fetchData() {
-        viewModel.fetchDataUsers()
-        viewModel.completion = {
-            self.collectionView.reloadData()
-        }
+    
+    deinit {
+        print("DEBUG: homeCOntroller Deinit")
     }
     
-    func setupNotification() {
-         observer = NotificationCenter.default.addObserver(forName: Notification.Name(NotificationConstant.commentVcDisappear),                                                     object: nil,
-                                                           queue: nil) { notification in
-             
-            self.tabBarController?.navigationController?.interactivePopGestureRecognizer?.isEnabled = false
+    //MARK: - Helpers
+    func fetchData() {
+        loadingIndicator.startAnimating()
+        viewModel.fetchDataUsers()
+        viewModel.completion = { [weak self] in
+            self?.loadingIndicator.stopAnimating()
+            self?.collectionView.reloadData()
         }
     }
     
@@ -87,8 +76,10 @@ class HomeController: UIViewController {
         
         view.addSubview(instagramHeaderView)
         view.addSubview(collectionView)
+        view.addSubview(loadingIndicator)
         instagramHeaderView.backgroundColor = .systemBackground
         collectionView.translatesAutoresizingMaskIntoConstraints = false
+        loadingIndicator.center = view.center
         
         NSLayoutConstraint.activate([
             instagramHeaderView.topAnchor.constraint(equalTo: view.topAnchor, constant: insetTop),
@@ -110,7 +101,6 @@ class HomeController: UIViewController {
     
     func configureProperties() {
         instagramHeaderView.delegate = self
-        collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.collectionViewLayout = self.createLayoutCollectionView()
         collectionView.refreshControl = refreshControl
@@ -148,11 +138,17 @@ class HomeController: UIViewController {
     }
     
     func createFeedSection() -> NSCollectionLayoutSection {
-        let item = ComposionalLayout.createItem(layoutSize: .init(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(600)))
+        let itemSize: NSCollectionLayoutSize = .init(widthDimension: .fractionalWidth(1.0),
+                                                     heightDimension: .estimated(600))
+        let item = ComposionalLayout.createItem(layoutSize: itemSize)
+        
+        let groupSize: NSCollectionLayoutSize = .init(widthDimension: .fractionalWidth(1.0),
+                                                      heightDimension: .estimated(600))
         let group = ComposionalLayout.createGroup(axis: .horizontal,
-                                                  layoutSize: .init(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(600)),
+                                                  layoutSize: groupSize,
                                                   item: item,
                                                   count: 1)
+        
         let section = ComposionalLayout.createSectionWithouHeader(group: group)
         section.interGroupSpacing = 22
         return section
@@ -161,6 +157,7 @@ class HomeController: UIViewController {
     func createLayoutCollectionView() -> UICollectionViewLayout {
         let configuration = UICollectionViewCompositionalLayoutConfiguration()
         configuration.interSectionSpacing = 11
+        
         let layout = UICollectionViewCompositionalLayout (sectionProvider: { section, env in
             if section == 0 {
                 return self.createStorySection()
@@ -188,6 +185,7 @@ extension HomeController: UICollectionViewDataSource {
             cell.plusStoryImageView.isHidden = true
             cell.imageStory = UIImage(named: "aqua\(indexPath.row)")
             return cell
+            
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HomeFeedCollectionViewCell.identifier,
                                                           for: indexPath) as! HomeFeedCollectionViewCell
@@ -227,9 +225,9 @@ extension HomeController: HomeFeedCollectionViewCellDelegate {
     
     func didSelectCommentButton(cell: HomeFeedCollectionViewCell, status: InstaStatus) {
         let commentVC = CommentController(status: status, currentUser: viewModel.currentUser)
-        commentVC.modalPresentationStyle = .overFullScreen
         commentVC.delegate = cell.self
-        self.tabBarController?.navigationController?.pushViewController(commentVC, animated: true)
+        commentVC.hidesBottomBarWhenPushed = true
+        self.navigationController?.pushViewController(commentVC, animated: true)
     }
     
     func didSelectAvatar(status: InstaStatus) {
@@ -237,17 +235,10 @@ extension HomeController: HomeFeedCollectionViewCellDelegate {
 
         self.navigationController?.pushViewController(profileVC, animated: true)
     }
-    
-    
-}
-
-
-extension HomeController: UICollectionViewDelegate {
-
 }
 
 extension HomeController: InstagramHeaderViewDelegate {
     func didSelectInstagramLabel() {
-//        self.navigationController?.pushViewController(CommentController(), animated: true)
+
     }
 }

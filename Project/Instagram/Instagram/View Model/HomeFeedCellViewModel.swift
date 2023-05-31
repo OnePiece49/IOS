@@ -21,6 +21,10 @@ class HomeFeedCellViewModel {
         return attributes
     }
     
+    var haveCaption: Bool {
+        return status.caption != ""
+    }
+    
     var dateString: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "h:mm a • MM/dd/yyyy"

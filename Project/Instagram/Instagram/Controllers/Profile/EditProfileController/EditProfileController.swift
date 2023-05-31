@@ -84,6 +84,7 @@ class EditProfileController: UIViewController {
         print("DEBUG: EditProfileController deinit")
     }
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -100,7 +101,7 @@ class EditProfileController: UIViewController {
         view.backgroundColor = .systemBackground
         let attributeLeftButton = AttibutesButton(tilte: "Cancel",
                                                   font: UIFont.systemFont(ofSize: 16)) { [weak self] in
-            self?.navigationController?.popViewController(animated: true)
+            self?.dismiss(animated: true, completion: .none)
         }
 
         let attributeRightButton = AttibutesButton(tilte: "Done",
@@ -182,6 +183,7 @@ class EditProfileController: UIViewController {
         let selectedVC = SelectTypePhotoController()
         selectedVC.modalPresentationStyle = .overFullScreen
         selectedVC.delegate = self
+        selectedVC.avatarImage = self.avatarImageView.image
         
         UIView.animate(withDuration: 0.23) {
             self.shadowView.alpha = 0.8
@@ -202,7 +204,7 @@ class EditProfileController: UIViewController {
         return false
     }
     
-    func hasChangeAvatar() -> Bool {
+    func hasChangedAvatar() -> Bool {
         if self.oldImage != self.avatarImageView.image {
             return true
         }
@@ -211,30 +213,47 @@ class EditProfileController: UIViewController {
     }
     
     func updateInfo() {
-        if !hasChangeAvatar() && !hasChangeOtherInfo() {
-            navigationController?.popViewController(animated: true)
+        if !hasChangedAvatar() && !hasChangeOtherInfo() {
+            self.dismiss(animated: true, completion: .none)
             return
         }
         
-        if hasChangeAvatar() {
-            self.loadingIndicator.startAnimating()
-            self.navigationBar.rightButtons[0].isHidden = true
-            UserService.shared.updateInfoUser(user: user, image: avatarImageView.image) {
-                self.delegate?.didUpdateProfile(user: self.user, image: self.avatarImageView.image)
+        self.navigationBar.leftButtons[0].alpha = 0.3
+        self.navigationBar.leftButtons[0].isUserInteractionEnabled = false
+        self.loadingIndicator.startAnimating()
+        self.navigationBar.rightButtons[0].isHidden = true
+        if hasChangedAvatar() {
+   
+            UserService.shared.updateInfoUser(user: user, image: avatarImageView.image) { success in
                 self.loadingIndicator.stopAnimating()
-                self.navigationController?.popViewController(animated: true)
+                if success {
+                    self.delegate?.didUpdateProfile(user: self.user, image: self.avatarImageView.image)
+                    self.dismiss(animated: true, completion: .none)
+                } else {
+                    self.navigationBar.leftButtons[0].isUserInteractionEnabled = true
+                    self.loadingIndicator.stopAnimating()
+                    self.navigationBar.rightButtons[0].isHidden = false
+                    self.navigationBar.leftButtons[0].alpha = 1
+                }
                 return
+                
             }
         }
         
-        if !hasChangeAvatar() && hasChangeOtherInfo() {
+        if !hasChangedAvatar() && hasChangeOtherInfo() {
             self.loadingIndicator.startAnimating()
             self.navigationBar.rightButtons[0].isHidden = true
-            UserService.shared.updateInfoUser(user: user, image: nil) {
-                self.delegate?.didUpdateProfile(user: self.user, image: self.avatarImageView.image)
-                self.navigationController?.popViewController(animated: true)
+            UserService.shared.updateInfoUser(user: user, image: nil) { success in
                 self.loadingIndicator.stopAnimating()
-                return
+                if success {
+                    self.delegate?.didUpdateProfile(user: self.user, image: self.avatarImageView.image)
+                    self.dismiss(animated: true, completion: .none)
+                } else {
+                    self.navigationBar.leftButtons[0].isUserInteractionEnabled = true
+                    self.loadingIndicator.stopAnimating()
+                    self.navigationBar.rightButtons[0].isHidden = false
+                    self.navigationBar.leftButtons[0].alpha = 1
+                }
             }
         }
     }
