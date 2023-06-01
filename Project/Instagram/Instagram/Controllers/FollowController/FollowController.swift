@@ -16,11 +16,23 @@ enum BeginFollowController: Int {
 class FollowController: UIViewController {
     //MARK: - Properties
     var navigationbar: NavigationCustomView!
-    let beginPage: BeginFollowController 
+    let beginPage: BeginFollowController
+    let user: User
+    let currentUser: User
+    var followersController: BottomFollowersController!
+    var followingController: BottomFollowingController!
+    var bottomTapTripController: BottomTapTripController!
+    let fromType: ProfileControllerType
 
     //MARK: - View Lifecycle
-    init(begin: BeginFollowController) {
+    init(user: User,
+         currentUser: User,
+         begin: BeginFollowController,
+         type: ProfileControllerType) {
         self.beginPage = begin
+        self.user = user
+        self.currentUser = currentUser
+        self.fromType = type
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -58,26 +70,30 @@ class FollowController: UIViewController {
                                               notSelectedBarColor: .systemGray,
                                               selectedBackgroundColor: .systemBackground)
                                               
+        followersController = BottomFollowersController(titleBottom: TitleTabStripBottom(titleString: TitleLabel(title: "\(user.stats.followers) people followers")))
+        followingController = BottomFollowingController(titleBottom: TitleTabStripBottom(titleString: TitleLabel(title: "\(user.stats.followings) people following")))
+
         
-        let followersController = BottomFollowersController(titleBottom: TitleTabStripBottom(titleString: TitleLabel(title: "48 people followers")))
-        let followingController = BottomFollowingController(titleBottom: TitleTabStripBottom(titleString: TitleLabel(title: "56 people following")))
-        let bottomTapTrip = BottomTapTripController(controllers: [followersController,
+        bottomTapTripController  = BottomTapTripController(controllers: [followersController,
                                                                   followingController],
                                                     configureTapBar: configureTabBar,
                                                     beginPage: self.beginPage.rawValue)
+        followersController.viewModel = FollowerViewModel(user: self.user, currentUser: self.currentUser)
+        followingController.viewModel = FollowingViewModel(user: self.user, currentUser: self.currentUser)
+        followingController.delegate = self
+        followersController.delegate = self
                                                                       
-        addChild(bottomTapTrip)
-        view.addSubview(bottomTapTrip.view)
+        addChild(bottomTapTripController)
+        view.addSubview(bottomTapTripController.view)
         didMove(toParent: self)
-        
-        guard let viewBottom = bottomTapTrip.view else {return}
+        guard let viewBottom = bottomTapTripController.view else {return}
         viewBottom.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             navigationbar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             navigationbar.leftAnchor.constraint(equalTo: view.leftAnchor),
             navigationbar.rightAnchor.constraint(equalTo: view.rightAnchor),
-            navigationbar.heightAnchor.constraint(equalToConstant: 50),
+            navigationbar.heightAnchor.constraint(equalToConstant: 40),
             
             viewBottom.topAnchor.constraint(equalTo: navigationbar.bottomAnchor),
             viewBottom.leftAnchor.constraint(equalTo: view.leftAnchor),
@@ -85,6 +101,7 @@ class FollowController: UIViewController {
             viewBottom.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
         view.layoutIfNeeded()
+
     }
     
     func setupNavigationBar() {
@@ -95,12 +112,33 @@ class FollowController: UIViewController {
                                                 
                                                    
         self.navigationbar = NavigationCustomView(centerTitle: "m.d.garp.49",
-                                              attributeLeftButtons: [attributeFirstLeftButton],
-                                              attributeRightBarButtons: [],
-                                              beginSpaceLeftButton: 15)
+                                                  attributeLeftButtons: [attributeFirstLeftButton],
+                                                  attributeRightBarButtons: [],
+                                                  isHiddenDivider: true,
+                                                  beginSpaceLeftButton: 15)
     }
 
     //MARK: - Selectors
 
-    //MARK: - delegate
+}
+//MARK: - delegate
+extension FollowController: BottomFollowDelegate {
+    func didSelectFollowButton(user: User) {
+        if self.fromType == .other {return}
+        self.followingController.titleBottom.titleString.title = "\(user.stats.followings) people followings"
+        self.bottomTapTripController.reloadNavigationBar()
+    }
+    
+    func didTapRemoveButton(user: User) {
+        if self.fromType == .other {return}
+        self.followersController.titleBottom.titleString.title = "\(user.stats.followers) people followers"
+        self.bottomTapTripController.reloadNavigationBar()
+    }
+    
+    func didSelectUser(user: User) {
+        let profileVc = ProfileController(user: user, type: .other)
+        self.navigationController?.pushViewController(profileVc, animated: true)
+    }
+    
+    
 }

@@ -132,7 +132,7 @@ extension LikesController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: UserLikedTableViewCell.identifier,
                                                  for: indexPath) as! UserLikedTableViewCell
-        cell.viewModel = LikesTableViweCellViewModel(user: viewModel.userAtIndexPath(indexPath: indexPath))
+        cell.viewModel = LikesTableViewCellViewModel(user: viewModel.userAtIndexPath(indexPath: indexPath))
         cell.delegate = self
         return cell
     }

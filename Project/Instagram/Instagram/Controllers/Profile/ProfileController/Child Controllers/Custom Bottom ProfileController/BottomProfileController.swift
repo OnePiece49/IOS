@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol BottomControllerDelegate: AnyObject {
+protocol BottomProfileControllerDelegate: AnyObject {
     func didSelectStatus(status: InstaStatus)
 }
 
@@ -18,7 +18,7 @@ class BottomProfileController: BottomController {
         return collectionView
     }
     var statuses: [InstaStatus] = []
-    weak var delegate: BottomControllerDelegate?
+    weak var delegate: BottomProfileControllerDelegate?
     var user: User? {
         didSet {
             guard let user = user else {

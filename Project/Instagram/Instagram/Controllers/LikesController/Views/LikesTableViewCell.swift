@@ -17,7 +17,7 @@ class UserLikedTableViewCell: UITableViewCell {
     static let identifier = "UserLikedTableViewCell"
     weak var delegate: UserLikedTableViewDelegate?
     
-    var viewModel: LikesTableViweCellViewModel? {
+    var viewModel: LikesTableViewCellViewModel? {
         didSet {updateUI()}
     }
     

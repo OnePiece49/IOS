@@ -269,6 +269,10 @@ class BottomTapTripController: UIViewController {
         return layout
     }
     
+    func reloadNavigationBar() {
+        self.collectionView.reloadData()
+    }
+    
 }
 //MARK: - delegate
 extension BottomTapTripController: UIScrollViewDelegate {

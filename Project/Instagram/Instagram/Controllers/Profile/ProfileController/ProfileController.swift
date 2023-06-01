@@ -100,16 +100,6 @@ class ProfileController: UIViewController {
         self.hidesBottomBarWhenPushed = false
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        self.tabBarController?.tabBar.isHidden = false
-        self.navigationController?.navigationBar.isHidden = true
-
-    }
-
-    override func viewWillDisappear(_ animated: Bool) {
-        self.tabBarController?.tabBar.isHidden = false
-    }
-    
     //MARK: - Helpers
     func configureUI() {
         self.view.backgroundColor = .systemBackground
@@ -290,16 +280,26 @@ extension ProfileController: BottomTapTripControllerDelegate {
 
 extension ProfileController: HeaderProfileDelegate {
     func didSelectPostsLabel() {
-        
+        self.overlayScrollView.setContentOffset(CGPoint(x: 0, y: self.heightHeaderView), animated: true)
     }
     
     func didSelectFollowersLabel() {
-        let followVc = FollowController(begin: .follower)
+        guard let user = viewModel.user, let currentUser = viewModel.currentUser else {return}
+        let followVc = FollowController(user: user,
+                                        currentUser: currentUser,
+                                        begin: .follower,
+                                        type: self.type)
+        
         self.navigationController?.pushViewController(followVc, animated: true)
     }
     
     func didSelectFollowingsLabel() {
-        let followVc = FollowController(begin: .Following)
+        guard let user = viewModel.user, let currentUser = viewModel.currentUser else {return}
+
+        let followVc = FollowController(user: user,
+                                        currentUser: currentUser,
+                                        begin: .Following,
+                                        type: self.type)
         self.navigationController?.pushViewController(followVc, animated: true)
     }
     
@@ -376,21 +376,18 @@ extension ProfileController: EditProfileDelegate {
     func didUpdateProfile(user: User, image: UIImage?) {
         self.viewModel.user = user
         self.headerViewController.updateDataAfterEdit(image: image, user: user)
-        
     }
-
 }
 
-extension ProfileController: BottomControllerDelegate {
+extension ProfileController: BottomProfileControllerDelegate {
     func didSelectStatus(status: InstaStatus) {
         guard let user = viewModel.currentUser else {return}
         
         let attributedString = NSMutableAttributedString(attributedString: NSAttributedString(string: user.username.uppercased(), attributes: [.font : UIFont.systemFont(ofSize: 13, weight: .semibold), .foregroundColor: UIColor.systemGray]))
         attributedString.append(NSAttributedString(string: "\nPosts", attributes: [.font: UIFont.systemFont(ofSize: 16, weight: .bold), .foregroundColor: UIColor.label]))
         let statusDetailVC = StatusController(status: status,
-                                                    user: user,
-                                                    attributedTitle: attributedString)
+                                              user: user,
+                                              attributedTitle: attributedString)
         self.navigationController?.pushViewController(statusDetailVC, animated: true)
     }
 }
-

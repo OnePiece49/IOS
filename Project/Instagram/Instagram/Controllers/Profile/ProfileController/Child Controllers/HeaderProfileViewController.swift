@@ -384,6 +384,22 @@ class HeaderProfileViewController: UIViewController {
     func getAvatarImage() -> UIImage? {
         self.avartImageView.image
     }
+    
+    func updateFollowersLabel(numberFollowers: Int) {
+        guard let viewModel = viewModel else {
+            return
+        }
+
+        self.followersLabel.attributedText = viewModel.updateAttributedFollowers(numberFollowers: numberFollowers)
+    }
+    
+    func updateFollowingssLabel(numberFollowings: Int) {
+        guard let viewModel = viewModel else {
+            return
+        }
+
+        self.followersLabel.attributedText = viewModel.updateAttributedFollowings(numberFollowing: numberFollowings)
+    }
 
     
     //MARK: - Selectors

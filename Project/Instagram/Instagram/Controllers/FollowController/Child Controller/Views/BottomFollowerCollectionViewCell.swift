@@ -7,10 +7,20 @@
 
 import UIKit
 
+protocol BottomFollowerCellDelehgate: AnyObject {
+    func didSelectFollowButton(cell: BottomFollowerCollectionViewCell, user: User)
+    func didSelectRemmoveButton(cell: BottomFollowerCollectionViewCell, user: User)
+}
+
 class BottomFollowerCollectionViewCell: UICollectionViewCell {
     //MARK: - Properties
     static let identifier = "BottomFollowerCollectionViewCell"
+    weak var delegate: BottomFollowerCellDelehgate?
+    
     var centerYUsernameConstraint: NSLayoutConstraint!
+    var viewModel: FollowCellViewModel? {
+        didSet {updateUI()}
+    }
     
     private lazy var avatarImageView: UIImageView = {
         let iv = UIImageView(image: UIImage(named: "jisoo"))
@@ -18,7 +28,6 @@ class BottomFollowerCollectionViewCell: UICollectionViewCell {
         iv.clipsToBounds = true
         iv.layer.cornerRadius = 56 / 2
         iv.isUserInteractionEnabled = true
-//        iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleInfoUserTapped)))
         return iv
     }()
     
@@ -30,7 +39,6 @@ class BottomFollowerCollectionViewCell: UICollectionViewCell {
         label.textAlignment = .left
         label.text = "b_lackBink"
         label.isUserInteractionEnabled = true
-//        label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleInfoUserTapped)))
         return label
     }()
     
@@ -42,27 +50,28 @@ class BottomFollowerCollectionViewCell: UICollectionViewCell {
         label.textAlignment = .left
         label.text = "b_lackBink"
         label.isUserInteractionEnabled = true
-//        label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleInfoUserTapped)))
         return label
     }()
     
     private lazy var followButton: UIButton = {
-        let button = UIButton(type: .system)
+        let button = UIButton()
         button.setTitle("follow", for: .normal)
         button.setTitleColor(.systemBlue, for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.titleLabel?.font  = UIFont.systemFont(ofSize: 14, weight: .semibold)
+        button.isHidden = true
+        button.addTarget(self, action: #selector(handleFollowButtonTapped), for: .touchUpInside)
         return button
     }()
     
     private lazy var removeButton: UIButton = {
-        let button = UIButton(type: .system)
+        let button = UIButton()
         button.setTitle("Remove", for: .normal)
         button.setTitleColor(.label, for: .normal)
         button.backgroundColor = .systemGray5
         button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
         button.translatesAutoresizingMaskIntoConstraints = false
-
+        button.addTarget(self, action: #selector(handleRemoveButtonTapped), for: .touchUpInside)
         return button
     }()
     
@@ -100,7 +109,7 @@ class BottomFollowerCollectionViewCell: UICollectionViewCell {
             fullnameLabel.rightAnchor.constraint(equalTo: removeButton.leftAnchor, constant: -15),
             
             followButton.centerYAnchor.constraint(equalTo: usernameLabel.centerYAnchor),
-            followButton.leftAnchor.constraint(equalTo: usernameLabel.rightAnchor, constant: 13),
+            followButton.leftAnchor.constraint(equalTo: usernameLabel.rightAnchor),
             
             removeButton.centerYAnchor.constraint(equalTo: centerYAnchor),
             removeButton.rightAnchor.constraint(equalTo: rightAnchor, constant: -15),
@@ -110,8 +119,47 @@ class BottomFollowerCollectionViewCell: UICollectionViewCell {
         removeButton.layer.cornerRadius = 13
     }
     
-    //MARK: - Selectors
+    func updateUI() {
+        guard let viewModel = viewModel else {
+            return
+        }
+        
+        self.avatarImageView.sd_setImage(with: viewModel.avatarUrl,
+                                        placeholderImage: UIImage(systemName: "person.circle"))
+        self.usernameLabel.text = viewModel.username
+        self.fullnameLabel.text = viewModel.fullname
+        if viewModel.hasFollowed {
+            self.followButton.isHidden = true
+        } else {
+            self.followButton.isHidden = false
+        }
+    }
     
+    func updateFollowButtonAfterTapped() {
+        guard let hasFollowed = viewModel?.hasFollowed else {return}
+        if hasFollowed {
+            followButton.setTitle("following", for: .normal)
+            followButton.setTitleColor(.label, for: .normal)
+
+        } else {
+            followButton.setTitle("follow", for: .normal)
+            followButton.setTitleColor(.systemBlue, for: .normal)
+        }
+    }
+    
+    //MARK: - Selectors
+    @objc func handleFollowButtonTapped() {
+        guard let viewModel = viewModel else {
+            return
+        }
+
+        self.delegate?.didSelectFollowButton(cell: self, user: viewModel.user)
+    }
+    
+    @objc func handleRemoveButtonTapped() {
+        guard let user = viewModel?.user else {return}
+        self.delegate?.didSelectRemmoveButton(cell: self, user: user)
+    }
 }
 //MARK: - delegate
 

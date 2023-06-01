@@ -47,7 +47,6 @@ class UserService {
             }
             
             completion(users)
-            
         }
     }
     
@@ -94,8 +93,25 @@ class UserService {
                     }
                 }
             }
+        }
+    }
+    
+    func fetchFollowerUsers(uid: String, completion: @escaping ([User]) -> Void) {
+        var users: [User] = []
+        var numberUser = 0
+        FirebaseRef.ref_followUser.document(uid).getDocument { documentSnap, _ in
+            guard let documentsData = documentSnap?.data() else {return}
             
-
+            for document in documentsData {
+                self.fetchUser(uid: document.key) { user in
+                    users.append(user)
+                    numberUser += 1
+                    
+                    if numberUser == documentsData.count {
+                        completion(users)
+                    }
+                }
+            }
         }
     }
     
@@ -181,8 +197,19 @@ class UserService {
                 completion(relationStats)
             }
         }
+    }
+    
+    func removeFollower(uid: String, completion: @escaping () -> Void) {
+        guard let currentUid = Auth.auth().currentUser?.uid else {
+            completion()
+            return
+        }
         
-        
+        FirebaseRef.ref_followUser.document(currentUid).updateData([uid: FieldValue.delete()]) { _ in
+            FirebaseRef.ref_followingUser.document(uid).updateData([currentUid: FieldValue.delete()]) { _ in
+                completion()
+            }
+        }
     }
     
     

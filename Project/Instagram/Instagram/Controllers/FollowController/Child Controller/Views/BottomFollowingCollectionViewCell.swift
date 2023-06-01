@@ -6,11 +6,21 @@
 //
 
 import UIKit
+import SDWebImage
+
+protocol BottomFollowingCellDelegate: AnyObject {
+    func didSelectFollowButton(cell: BottomFollowingCollectionViewCell, user: User)
+}
 
 class BottomFollowingCollectionViewCell: UICollectionViewCell {
     //MARK: - Properties
     static let identifier = "BottomFollowingCollectionViewCell"
     var centerYUsernameConstraint: NSLayoutConstraint!
+    weak var delegate: BottomFollowingCellDelegate?
+
+    var viewModel: FollowCellViewModel? {
+        didSet {updateUI()}
+    }
     
     private lazy var avatarImageView: UIImageView = {
         let iv = UIImageView(image: UIImage(named: "jisoo"))
@@ -18,7 +28,6 @@ class BottomFollowingCollectionViewCell: UICollectionViewCell {
         iv.clipsToBounds = true
         iv.layer.cornerRadius = 56 / 2
         iv.isUserInteractionEnabled = true
-//        iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleInfoUserTapped)))
         return iv
     }()
     
@@ -30,7 +39,6 @@ class BottomFollowingCollectionViewCell: UICollectionViewCell {
         label.textAlignment = .left
         label.text = "b_lackBink"
         label.isUserInteractionEnabled = true
-//        label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleInfoUserTapped)))
         return label
     }()
     
@@ -42,12 +50,11 @@ class BottomFollowingCollectionViewCell: UICollectionViewCell {
         label.textAlignment = .left
         label.text = "b_lackBink"
         label.isUserInteractionEnabled = true
-//        label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleInfoUserTapped)))
         return label
     }()
     
     private lazy var followButton: UIButton = {
-        let button = UIButton(type: .system)
+        let button = UIButton()
         button.setTitle("follow", for: .normal)
         button.setTitleColor(.systemBlue, for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -55,6 +62,7 @@ class BottomFollowingCollectionViewCell: UICollectionViewCell {
         button.setTitle("Following", for: .normal)
         button.backgroundColor = .systemGray3
         button.setTitleColor(.label, for: .normal)
+        button.addTarget(self, action: #selector(handleFollowButtonTapped), for: .touchUpInside)
         return button
     }()
     
@@ -90,14 +98,51 @@ class BottomFollowingCollectionViewCell: UICollectionViewCell {
             fullnameLabel.topAnchor.constraint(equalTo: usernameLabel.bottomAnchor, constant: 3),
             
             followButton.centerYAnchor.constraint(equalTo: centerYAnchor),
-            followButton.rightAnchor.constraint(equalTo: rightAnchor, constant: -20),
+            followButton.rightAnchor.constraint(equalTo: rightAnchor, constant: -15),
         ])
         avatarImageView.setDimensions(width: 56, height: 56)
         followButton.setDimensions(width: 105, height: 33)
         followButton.layer.cornerRadius = 15
     }
     
+    func updateUI() {
+        guard let viewModel = viewModel else {
+            return
+        }
+        
+        self.avatarImageView.sd_setImage(with: viewModel.avatarUrl,
+                                        placeholderImage: UIImage(systemName: "person.circle"))
+        self.usernameLabel.text = viewModel.username
+        self.fullnameLabel.text = viewModel.fullname
+        if viewModel.isCurrentUser {
+            self.followButton.isHidden = true
+        } else {
+            self.followButton.isHidden = false
+        }
+    }
+    
+    func updateFollowButtonAfterTapped() {
+        guard let hasFollowed = viewModel?.hasFollowed else {return}
+        if hasFollowed {
+            followButton.setTitle("following", for: .normal)
+            followButton.backgroundColor = .systemGray3
+            followButton.setTitleColor(.label, for: .normal)
+        } else {
+            followButton.setTitle("follow", for: .normal)
+            followButton.backgroundColor = .systemBlue
+            followButton.setTitleColor(.white, for: .normal)
+        }
+    }
+    
     //MARK: - Selectors
+    @objc func handleFollowButtonTapped() {
+        guard let viewModel = viewModel else {
+            return
+        }
+
+        self.delegate?.didSelectFollowButton(cell: self, user: viewModel.user)
+    }
+    
     
 }
 //MARK: - delegate

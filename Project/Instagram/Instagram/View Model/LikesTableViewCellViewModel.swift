@@ -7,7 +7,7 @@
 
 import UIKit
  
-class LikesTableViweCellViewModel {
+class LikesTableViewCellViewModel {
     var user: User
     
     var avatarImageUrl: URL? {

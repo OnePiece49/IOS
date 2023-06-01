@@ -21,8 +21,8 @@ class User {
     var profileImage: String?
     var bio: String?
     var link: String?
-    var isFollowed: Bool = false
-    var stats: UserRelationStats?
+    var isFollowed: Bool = true
+    var stats: UserRelationStats = UserRelationStats(followers: 0, followings: 0)
     var numberStatus: Int = 0
     var isCurrentUser: Bool {
         return Auth.auth().currentUser?.uid == uid

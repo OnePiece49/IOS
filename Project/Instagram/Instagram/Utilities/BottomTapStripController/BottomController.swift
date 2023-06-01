@@ -8,9 +8,9 @@
 import UIKit
 
 struct TitleLabel {
-    let font: UIFont
-    let titleColor: UIColor
-    let title: String
+    var font: UIFont
+    var titleColor: UIColor
+    var title: String
     
     init(title: String,
          font: UIFont = .systemFont(ofSize: 14, weight: .semibold),
@@ -23,8 +23,8 @@ struct TitleLabel {
 
 struct TitleImage {
     var image: UIImage?
-    let tinColor: UIColor
-    let size: CGSize
+    var tinColor: UIColor
+    var size: CGSize
     
     init(image: UIImage?,
          size: CGSize = CGSize(width: 25, height: 25),
@@ -51,10 +51,10 @@ struct TitleTabStripBottom {
 class BottomController: UIViewController {
     //MARK: - Properties
     var bottomTabTripCollectionView: UICollectionView {
-        fatalError("User must override this property")
+        fatalError("User must override bottomTabTripCollectionView this property")
     }
     
-    let titleBottom: TitleTabStripBottom
+    var titleBottom: TitleTabStripBottom
     
     init(titleBottom: TitleTabStripBottom) {
         self.titleBottom = titleBottom
@@ -76,27 +76,6 @@ class BottomController: UIViewController {
     }
 }
 
-
-
-extension BottomFollowersController: UICollectionViewDataSource, UICollectionViewDelegate {
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 10
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BottomFollowerCollectionViewCell.identifier, for: indexPath) as! BottomFollowerCollectionViewCell
-
-        return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-    
-    }
-}
 
 
 
