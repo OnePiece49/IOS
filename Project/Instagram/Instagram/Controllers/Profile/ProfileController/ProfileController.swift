@@ -166,11 +166,11 @@ class ProfileController: UIViewController {
         bottomVC2.delegate = self
         bottomVC3.delegate = self
         
-        let configureTabBar = ConfigureTabBar(backgroundColor: .white,
+        let configureTabBar = ConfigureTabBar(backgroundColor: .systemBackground,
                                               dividerColor: .black,
                                               selectedBarColor: .label,
                                               notSelectedBarColor: .systemGray,
-                                              selectedBackgroundColor: .white)
+                                              selectedBackgroundColor: .systemBackground)
         bottomTabTripController = BottomTapTripController(controllers: [bottomVC1,
                                                                         bottomVC2,
                                                                         bottomVC3],

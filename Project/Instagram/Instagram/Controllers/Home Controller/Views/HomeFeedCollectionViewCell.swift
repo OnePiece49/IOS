@@ -88,7 +88,7 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
 
     
     private let numberLikesButton: UIButton = {
-        let button = UIButton(type: .system)
+        let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setTitle("0 like", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
@@ -102,7 +102,7 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
                                                                            status: "")
     
     private lazy var allCommentsButton: UIButton = {
-        let button = UIButton(type: .system)
+        let button = UIButton()
         button.setTitle("Xem 1311 bình luận", for: .normal)
         button.tintColor = .label
         button.addTarget(self, action: #selector(handelAllCommentButtonTapped), for: .touchUpInside)
@@ -113,9 +113,9 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         return button
     }()
     
-    private lazy var likesButtonAndCaptionStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [statusLabel, allCommentsButton])
-        stackView.spacing = 3
+    private lazy var actionStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [numberLikesButton, statusLabel, allCommentsButton])
+        stackView.spacing = 1
         stackView.axis = .vertical
         stackView.alignment = .leading
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -150,8 +150,7 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         addSubview(usernameLabel)
         addSubview(photoImageView)
         addSubview(actionBar)
-        addSubview(numberLikesButton)
-        addSubview(likesButtonAndCaptionStackView)
+        addSubview(actionStackView)
         addSubview(timePostTusLabel)
         
         heightImageConstraint = photoImageView.heightAnchor.constraint(equalToConstant: 500)
@@ -174,13 +173,10 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
             actionBar.rightAnchor.constraint(equalTo: rightAnchor),
             actionBar.heightAnchor.constraint(equalToConstant: 35),
             
-            numberLikesButton.topAnchor.constraint(equalTo: actionBar.bottomAnchor, constant: 2),
-            numberLikesButton.leftAnchor.constraint(equalTo: leftAnchor, constant: 15),
-            
-            likesButtonAndCaptionStackView.topAnchor.constraint(equalTo: numberLikesButton.bottomAnchor, constant: 0),
-            likesButtonAndCaptionStackView.leftAnchor.constraint(equalTo: leftAnchor, constant: 15),
+            actionStackView.topAnchor.constraint(equalTo: actionBar.bottomAnchor, constant: 2),
+            actionStackView.leftAnchor.constraint(equalTo: leftAnchor, constant: 15),
 
-            timePostTusLabel.topAnchor.constraint(equalTo: likesButtonAndCaptionStackView.bottomAnchor),
+            timePostTusLabel.topAnchor.constraint(equalTo: actionStackView.bottomAnchor),
             timePostTusLabel.leftAnchor.constraint(equalTo: leftAnchor, constant: 15),
             timePostTusLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -15),
             bottomAnchor,
@@ -222,6 +218,7 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         
         self.viewModel?.completionFetchNumberLikes = {
             self.numberLikesButton.setTitle(self.viewModel?.numberLikesString, for: .normal)
+            self.numberLikesButton.isHidden = self.viewModel?.isHiddedNumberLike ?? false
 
         }
         
@@ -285,6 +282,7 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         }
         
         let fakeNumberLikes = viewModel.numberLikesInt
+        
         self.numberLikesButton.setTitle("\(fakeNumberLikes) likes ", for: .normal)
 
         let transform = CGAffineTransform(scaleX: 1.2, y: 1.2)

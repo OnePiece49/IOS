@@ -161,6 +161,7 @@ class BottomTapTripController: UIViewController {
     
     func addConstraintChildController(index: Int) {
         if index > self.newestControllerContrainted && index < controllers.count {
+            print("DEBUG: \(index)")
             for i in (self.newestControllerContrainted + 1)...index {
                 addChild(controllers[i])
                 scrollView.addSubview(controllers[i].view)
@@ -187,7 +188,6 @@ class BottomTapTripController: UIViewController {
             }
             self.newestControllerContrainted = index
         }
-
     }
     
     func addFirstChildController() {
@@ -279,7 +279,7 @@ extension BottomTapTripController: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
     
         let temp = Float(scrollView.contentOffset.x.truncatingRemainder(dividingBy: view.frame.width).truncatingRemainder(dividingBy: self.spacingControllers))
-        if scrollView.contentOffset.x > self.currentXContentOffset {
+        if scrollView.contentOffset.x > self.currentXContentOffset && (temp != 0 || spacingControllers == 1) {
             self.addConstraintChildController(index: self.currentIndex + 1)
         }
         
@@ -437,6 +437,7 @@ extension BottomTapTripController: UICollectionViewDelegate, UICollectionViewDat
         if indexPath.row == beginPaging {
             cell.titleButton.tintColor = self.configureTabBar.selectedBarColor
             cell.titleButton.setTitleColor(self.configureTabBar.selectedBarColor, for: .normal)
+        
         } else {
             cell.titleButton.tintColor = self.configureTabBar.notSelectedBarColor
             cell.titleButton.setTitleColor(self.configureTabBar.notSelectedBarColor, for: .normal)

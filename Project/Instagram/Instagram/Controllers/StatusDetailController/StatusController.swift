@@ -123,16 +123,12 @@ extension StatusController: HomeFeedCollectionViewCellDelegate {
     
     func didSelectCommentButton(cell: HomeFeedCollectionViewCell, status: InstaStatus) {
         let commentVC = CommentController(status: status, currentUser: currentUser)
-        commentVC.modalPresentationStyle = .overFullScreen
         commentVC.delegate = cell.self
-        self.tabBarController?.navigationController?.pushViewController(commentVC, animated: true)
+        self.navigationController?.pushViewController(commentVC, animated: true)
     }
     
     func didSelectAvatar(status: InstaStatus) {
         let profileVC = ProfileController(user: status.user, type: .other)
-
         self.navigationController?.pushViewController(profileVC, animated: true)
     }
-    
-    
 }

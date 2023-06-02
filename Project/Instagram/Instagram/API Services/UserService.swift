@@ -80,8 +80,11 @@ class UserService {
     func fetchFollowingUsers(uid: String, completion: @escaping ([User]) -> Void) {
         var users: [User] = []
         var numberUser = 0
-        FirebaseRef.ref_followingUser.document(uid).getDocument { documentSnap, _ in
-            guard let documentsData = documentSnap?.data() else {return}
+        FirebaseRef.ref_followingUser.document(uid).getDocument { documentSnap, error in
+            guard let documentsData = documentSnap?.data(), error == nil, documentsData.count != 0 else {
+                completion(users)
+                return
+            }
             
             for document in documentsData {
                 self.fetchUser(uid: document.key) { user in
@@ -99,8 +102,11 @@ class UserService {
     func fetchFollowerUsers(uid: String, completion: @escaping ([User]) -> Void) {
         var users: [User] = []
         var numberUser = 0
-        FirebaseRef.ref_followUser.document(uid).getDocument { documentSnap, _ in
-            guard let documentsData = documentSnap?.data() else {return}
+        FirebaseRef.ref_followUser.document(uid).getDocument { documentSnap, error in
+            guard let documentsData = documentSnap?.data(), error == nil, documentsData.count != 0 else {
+                completion(users)
+                return
+            }
             
             for document in documentsData {
                 self.fetchUser(uid: document.key) { user in

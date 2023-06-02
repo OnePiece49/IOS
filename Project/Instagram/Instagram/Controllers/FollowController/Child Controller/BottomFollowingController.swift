@@ -19,6 +19,8 @@ extension BottomFollowDelegate {
 
 class BottomFollowingController: BottomController {
     //MARK: - Properties
+    let refreshControl = UIRefreshControl()
+    let loadingIndicator = UIActivityIndicatorView()
     weak var delegate: BottomFollowDelegate?
     var viewModel: FollowingViewModel? {
         didSet {
@@ -46,9 +48,12 @@ class BottomFollowingController: BottomController {
     
     //MARK: - Helpers
     func fetchData() {
+        self.loadingIndicator.startAnimating()
         self.viewModel?.fetchData()
         self.viewModel?.completionFecthData = { [weak self] in
             self?.collectionView.reloadData()
+            self?.loadingIndicator.stopAnimating()
+            self?.refreshControl.endRefreshing()
         }
     }
     
@@ -72,6 +77,10 @@ class BottomFollowingController: BottomController {
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                 withReuseIdentifier: HeaderFollowView.identifier)
         collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 50, right: 0)
+        collectionView.refreshControl = refreshControl
+        view.addSubview(loadingIndicator)
+        loadingIndicator.center = view.center
+        refreshControl.addTarget(self, action: #selector(handleRefreshControl), for: .valueChanged)
     }
     
     func createLayoutCollectionView() -> UICollectionViewLayout {
@@ -92,6 +101,9 @@ class BottomFollowingController: BottomController {
     }
     
     //MARK: - Selectors
+    @objc func handleRefreshControl() {
+        viewModel?.reloadData()
+    }
     
 }
 //MARK: - delegate

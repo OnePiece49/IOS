@@ -52,11 +52,19 @@ class HomeFeedCellViewModel {
     }
     
     var numberLikesString: String {
+        let numberLikes = status.numberLikes
+        if numberLikes == 1 {
+            return "1 like"
+        }
         return "\(status.numberLikes) likes"
     }
     
     var numberLikesInt: Int {
         return status.numberLikes
+    }
+    
+    var isHiddedNumberLike: Bool {
+        return status.numberLikes == 0
     }
     
     var numberCommmentsString: String {

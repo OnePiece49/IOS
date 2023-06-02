@@ -11,19 +11,14 @@ import FirebaseAuth
 class MainTabBarController: UITabBarController {
     //MARK: - Properties
     private var homeNaVc: UINavigationController!
+    private var firstCheck = true
 
     //MARK: - View Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        configureUI()
     }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        self.navigationController?.navigationBar.isHidden = true
 
-        checkUserSignedIn()
-    }
 
     deinit {
         print("DEBUG: maintabBar deinit")

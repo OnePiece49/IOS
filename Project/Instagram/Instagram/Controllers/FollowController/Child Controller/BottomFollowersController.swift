@@ -9,6 +9,8 @@ import UIKit
 
 class BottomFollowersController: BottomController {
     //MARK: - Properties
+    let refreshControl = UIRefreshControl()
+    let loadingIndicator = UIActivityIndicatorView()
     let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     weak var delegate: BottomFollowDelegate?
     
@@ -38,9 +40,12 @@ class BottomFollowersController: BottomController {
     
     //MARK: - Helpers
     func fetchData() {
+        self.loadingIndicator.startAnimating()
         self.viewModel?.fetchData()
         self.viewModel?.completionFecthData = { [weak self] in
             self?.collectionView.reloadData()
+            self?.loadingIndicator.stopAnimating()
+            self?.refreshControl.endRefreshing()
         }
     }
     
@@ -65,7 +70,10 @@ class BottomFollowersController: BottomController {
                                 withReuseIdentifier: HeaderFollowView.identifier)
         collectionView.layoutIfNeeded()
         collectionView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: 50, right: 0)
-
+        collectionView.refreshControl = refreshControl
+        view.addSubview(loadingIndicator)
+        loadingIndicator.center = view.center
+        refreshControl.addTarget(self, action: #selector(handleRefreshControl), for: .valueChanged)
     }
     
     func createLayoutCollectionView() -> UICollectionViewLayout {
@@ -86,6 +94,9 @@ class BottomFollowersController: BottomController {
     }
     
     //MARK: - Selectors
+    @objc func handleRefreshControl() {
+        viewModel?.reloadData()
+    }
     
 }
 //MARK: - delegate

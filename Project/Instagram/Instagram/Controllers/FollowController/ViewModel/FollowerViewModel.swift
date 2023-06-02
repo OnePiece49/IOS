@@ -69,12 +69,16 @@ class FollowerViewModel {
         }
     }
     
+    func reloadData() {
+        self.fetchData()
+    }
+    
     func followUser(user: User) {
         for i in 0..<followerUsers.count {
             if followerUsers[i].uid == user.uid {
+                self.followerUsers[i].isFollowed = true
+                self.user.stats.followings += 1
                 UserService.shared.followUser(uid: user.uid) {
-                    self.followerUsers[i].isFollowed = true
-                    self.user.stats.followings += 1
                     self.completionUpdateFollowUser?()
                 }
                 return
@@ -85,11 +89,10 @@ class FollowerViewModel {
     func unfollowUser(user: User) {
         for i in 0..<followerUsers.count {
             if followerUsers[i].uid == user.uid {
+                self.followerUsers[i].isFollowed = false
+                self.user.stats.followings -= 1
                 UserService.shared.unfollowUser(uid: user.uid) {
-                    self.followerUsers[i].isFollowed = false
-                    self.user.stats.followings -= 1
                     self.completionUpdateFollowUser?()
-
                 }
                 return
             }
@@ -99,8 +102,8 @@ class FollowerViewModel {
     func removeFollowerUser(user: User) {
         for i in 0..<followerUsers.count {
             if followerUsers[i].uid == user.uid {
+                self.user.stats.followers -= 1
                 UserService.shared.removeFollower(uid: user.uid) {
-                    self.user.stats.followers -= 1
                     self.completionRemoveFollower?()
                     self.followerUsers.remove(at: i)
 

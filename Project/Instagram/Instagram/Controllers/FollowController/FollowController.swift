@@ -110,7 +110,7 @@ class FollowController: UIViewController {
             self?.navigationController?.popViewController(animated: true)
         }
                                                 
-        self.navigationbar = NavigationCustomView(centerTitle: "m.d.garp.49",
+        self.navigationbar = NavigationCustomView(centerTitle: user.username,
                                                   attributeLeftButtons: [attributeFirstLeftButton],
                                                   attributeRightBarButtons: [],
                                                   isHiddenDivider: true,

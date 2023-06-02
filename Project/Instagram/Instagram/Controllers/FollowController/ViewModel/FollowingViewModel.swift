@@ -64,9 +64,9 @@ class FollowingViewModel {
     func followUser(user: User) {
         for i in 0..<followingUsers.count {
             if followingUsers[i].uid == user.uid {
+                self.followingUsers[i].isFollowed = true
+                self.user.stats.followings += 1
                 UserService.shared.followUser(uid: user.uid) {
-                    self.followingUsers[i].isFollowed = true
-                    self.user.stats.followings += 1
                     self.completionUpdateFollowUser?()
                 }
                 return
@@ -77,15 +77,18 @@ class FollowingViewModel {
     func unfollowUser(user: User) {
         for i in 0..<followingUsers.count {
             if followingUsers[i].uid == user.uid {
+                self.followingUsers[i].isFollowed = false
+                self.user.stats.followings -= 1
                 UserService.shared.unfollowUser(uid: user.uid) {
-                    self.followingUsers[i].isFollowed = false
-                    self.user.stats.followings -= 1
                     self.completionUpdateFollowUser?()
-
                 }
                 return
             }
         }
+    }
+    
+    func reloadData() {
+        self.fetchData()
     }
     
     init(user: User, currentUser: User, fromType: ProfileControllerType) {

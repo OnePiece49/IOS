@@ -33,7 +33,10 @@ class HomeViewModel {
     }
     
     private func fetchFollowingUsers() {
-        guard let uid = Auth.auth().currentUser?.uid else {return}
+        guard let uid = Auth.auth().currentUser?.uid else {
+            return
+            
+        }
         UserService.shared.fetchFollowingUsers(uid: uid) { users in
             self.users = [self.currentUser]
             self.users.append(contentsOf: users)

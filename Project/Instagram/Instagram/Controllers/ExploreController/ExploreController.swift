@@ -43,10 +43,11 @@ class ExploreController: UIViewController {
         view.addSubview(collectionView)
         view.addSubview(searchTableView)
         view.addSubview(loadingIndicator)
+        loadingIndicator.center = view.center
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         searchTableView.translatesAutoresizingMaskIntoConstraints = false
-        loadingIndicator.center = view.center
+
         
         NSLayoutConstraint.activate([
             searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
