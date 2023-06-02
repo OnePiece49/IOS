@@ -107,7 +107,7 @@ extension BottomFollowingController: UICollectionViewDataSource, UICollectionVie
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BottomFollowingCollectionViewCell.identifier, for: indexPath) as! BottomFollowingCollectionViewCell
         guard let viewModel = viewModel else {return cell}
-        cell.viewModel = FollowCellViewModel(user: viewModel.userAtIndexPath(indexPath: indexPath), type: .following)
+        cell.viewModel = FollowCellViewModel(user: viewModel.userAtIndexPath(indexPath: indexPath), type: .following, fromType: viewModel.fromType)
         cell.delegate = self
         return cell
     }

@@ -12,6 +12,7 @@ class FollowingViewModel {
     var user: User
     var followingUsers: [User] = []
     private var tempUsers: [User] = []
+    let fromType: ProfileControllerType
     
     var completionFecthData: (() -> Void)?
     var duringReloadData: (() -> Void)?
@@ -41,10 +42,23 @@ class FollowingViewModel {
     
     func fetchData() {
         self.followingUsers = []
+        var numberUsers = 0
         UserService.shared.fetchFollowingUsers(uid: user.uid) { users in
-            self.followingUsers = users
+            self.followingUsers = users.sorted { $0.username > $1.username }
             self.completionFecthData?()
+            for user in users {
+                UserService.shared.hasFollowedUser(uid: user.uid) { hasFollowed in
+                    user.isFollowed = hasFollowed
+                    numberUsers += 1
+                    if numberUsers == users.count {
+                        self.completionFecthData?()
+                        self.completionUpdateFollowUser?()
+                    }
+                }
+            }
+        
         }
+            
     }
     
     func followUser(user: User) {
@@ -74,9 +88,10 @@ class FollowingViewModel {
         }
     }
     
-    init(user: User, currentUser: User) {
+    init(user: User, currentUser: User, fromType: ProfileControllerType) {
         self.user = user
         self.currentUser = currentUser
+        self.fromType = fromType
     }
     
     

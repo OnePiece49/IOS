@@ -19,7 +19,7 @@ class BottomFollowerCollectionViewCell: UICollectionViewCell {
     
     var centerYUsernameConstraint: NSLayoutConstraint!
     var viewModel: FollowCellViewModel? {
-        didSet {updateUI()}
+        didSet {configureUI()}
     }
     
     private lazy var avatarImageView: UIImageView = {
@@ -71,7 +71,6 @@ class BottomFollowerCollectionViewCell: UICollectionViewCell {
         button.backgroundColor = .systemGray5
         button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(handleRemoveButtonTapped), for: .touchUpInside)
         return button
     }()
     
@@ -89,12 +88,19 @@ class BottomFollowerCollectionViewCell: UICollectionViewCell {
     
     //MARK: - Helpers
     func configureUI() {
+        guard let viewModel = viewModel else {
+            return
+        }
+        
         addSubview(avatarImageView)
         addSubview(usernameLabel)
         addSubview(fullnameLabel)
-        addSubview(followButton)
         addSubview(removeButton)
         
+        self.avatarImageView.sd_setImage(with: viewModel.avatarUrl,
+                                        placeholderImage: UIImage(systemName: "person.circle"))
+        self.usernameLabel.text = viewModel.username
+        self.fullnameLabel.text = viewModel.fullname
         self.centerYUsernameConstraint = self.usernameLabel.centerYAnchor.constraint(equalTo: centerYAnchor, constant: -9)
         NSLayoutConstraint.activate([
             avatarImageView.centerYAnchor.constraint(equalTo: centerYAnchor),
@@ -108,42 +114,70 @@ class BottomFollowerCollectionViewCell: UICollectionViewCell {
             fullnameLabel.topAnchor.constraint(equalTo: usernameLabel.bottomAnchor, constant: 3),
             fullnameLabel.rightAnchor.constraint(equalTo: removeButton.leftAnchor, constant: -15),
             
-            followButton.centerYAnchor.constraint(equalTo: usernameLabel.centerYAnchor),
-            followButton.leftAnchor.constraint(equalTo: usernameLabel.rightAnchor),
-            
             removeButton.centerYAnchor.constraint(equalTo: centerYAnchor),
             removeButton.rightAnchor.constraint(equalTo: rightAnchor, constant: -15),
         ])
         avatarImageView.setDimensions(width: 56, height: 56)
-        removeButton.setDimensions(width: 80, height: 35)
-        removeButton.layer.cornerRadius = 13
-    }
-    
-    func updateUI() {
-        guard let viewModel = viewModel else {
-            return
+
+        if viewModel.fromType == .mainTabBar {
+            addSubview(followButton)
+            
+            NSLayoutConstraint.activate([
+                followButton.centerYAnchor.constraint(equalTo: usernameLabel.centerYAnchor),
+                followButton.leftAnchor.constraint(equalTo: usernameLabel.rightAnchor),
+            ])
+            removeButton.setDimensions(width: 80, height: 35)
+            removeButton.layer.cornerRadius = 13
+            removeButton.addTarget(self, action: #selector(handleRemoveButtonTapped), for: .touchUpInside)
+
+            if viewModel.hasFollowed {
+                self.followButton.isHidden = true
+            } else {
+                self.followButton.isHidden = false
+            }
         }
         
-        self.avatarImageView.sd_setImage(with: viewModel.avatarUrl,
-                                        placeholderImage: UIImage(systemName: "person.circle"))
-        self.usernameLabel.text = viewModel.username
-        self.fullnameLabel.text = viewModel.fullname
-        if viewModel.hasFollowed {
-            self.followButton.isHidden = true
-        } else {
-            self.followButton.isHidden = false
+        if viewModel.fromType == .other {
+            removeButton.setDimensions(width: 105, height: 33)
+            removeButton.layer.cornerRadius = 15
+            removeButton.isHidden = viewModel.isCurrentUser
+            removeButton.addTarget(self, action: #selector(handleFollowButtonTapped), for: .touchUpInside)
+            let hasFollowed = viewModel.hasFollowed
+            
+            if hasFollowed {
+                removeButton.setTitle("following", for: .normal)
+                removeButton.backgroundColor = .systemGray3
+                removeButton.setTitleColor(.label, for: .normal)
+            } else {
+                removeButton.setTitle("follow", for: .normal)
+                removeButton.backgroundColor = .systemBlue
+                removeButton.setTitleColor(.white, for: .normal)
+            }
         }
+        
     }
     
     func updateFollowButtonAfterTapped() {
-        guard let hasFollowed = viewModel?.hasFollowed else {return}
-        if hasFollowed {
-            followButton.setTitle("following", for: .normal)
-            followButton.setTitleColor(.label, for: .normal)
+        guard let hasFollowed = viewModel?.hasFollowed, let fromType = viewModel?.fromType else {return}
+        if fromType == .mainTabBar {
+            if hasFollowed {
+                followButton.setTitle("following", for: .normal)
+                followButton.setTitleColor(.label, for: .normal)
 
+            } else {
+                followButton.setTitle("follow", for: .normal)
+                followButton.setTitleColor(.systemBlue, for: .normal)
+            }
         } else {
-            followButton.setTitle("follow", for: .normal)
-            followButton.setTitleColor(.systemBlue, for: .normal)
+            if hasFollowed {
+                removeButton.setTitle("following", for: .normal)
+                removeButton.backgroundColor = .systemGray3
+                removeButton.setTitleColor(.label, for: .normal)
+            } else {
+                removeButton.setTitle("follow", for: .normal)
+                removeButton.backgroundColor = .systemBlue
+                removeButton.setTitleColor(.white, for: .normal)
+            }
         }
     }
     

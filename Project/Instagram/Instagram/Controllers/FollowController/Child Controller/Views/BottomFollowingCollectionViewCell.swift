@@ -19,7 +19,7 @@ class BottomFollowingCollectionViewCell: UICollectionViewCell {
     weak var delegate: BottomFollowingCellDelegate?
 
     var viewModel: FollowCellViewModel? {
-        didSet {updateUI()}
+        didSet {configureUI()}
     }
     
     private lazy var avatarImageView: UIImageView = {
@@ -103,21 +103,32 @@ class BottomFollowingCollectionViewCell: UICollectionViewCell {
         avatarImageView.setDimensions(width: 56, height: 56)
         followButton.setDimensions(width: 105, height: 33)
         followButton.layer.cornerRadius = 15
-    }
-    
-    func updateUI() {
+        
         guard let viewModel = viewModel else {
             return
         }
+        let hasFollowed = viewModel.hasFollowed
+
         
         self.avatarImageView.sd_setImage(with: viewModel.avatarUrl,
                                         placeholderImage: UIImage(systemName: "person.circle"))
         self.usernameLabel.text = viewModel.username
         self.fullnameLabel.text = viewModel.fullname
+        
         if viewModel.isCurrentUser {
             self.followButton.isHidden = true
         } else {
             self.followButton.isHidden = false
+        }
+        
+        if hasFollowed {
+            followButton.setTitle("following", for: .normal)
+            followButton.backgroundColor = .systemGray3
+            followButton.setTitleColor(.label, for: .normal)
+        } else {
+            followButton.setTitle("follow", for: .normal)
+            followButton.backgroundColor = .systemBlue
+            followButton.setTitleColor(.white, for: .normal)
         }
     }
     

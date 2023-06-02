@@ -11,6 +11,7 @@ import FirebaseAuth
 class FollowCellViewModel {
     let user: User
     let type: HeaderFollowViewType
+    let fromType: ProfileControllerType
     
     var avatarUrl: URL? {
         let url = URL(string: user.profileImage ?? "")
@@ -18,6 +19,10 @@ class FollowCellViewModel {
     }
     
     var username: String? {
+        if fromType == .other {
+            return user.username
+        }
+        
         if type == .follower {
             if hasFollowed {
                 return user.username
@@ -40,9 +45,10 @@ class FollowCellViewModel {
         return user.isFollowed
     }
     
-    init(user: User, type: HeaderFollowViewType) {
+    init(user: User, type: HeaderFollowViewType, fromType: ProfileControllerType) {
         self.user = user
         self.type = type
+        self.fromType = fromType
     }
     
     

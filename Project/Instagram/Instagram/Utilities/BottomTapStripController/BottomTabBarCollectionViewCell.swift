@@ -18,7 +18,7 @@ class BottomTabBarCollectionViewCell: UICollectionViewCell {
     }
     
     lazy var titleButton: UIButton = {
-        let button = UIButton(type: .system)
+        let button = UIButton()
         button.contentMode = .scaleToFill
         button.tintColor = .label
         button.translatesAutoresizingMaskIntoConstraints = false

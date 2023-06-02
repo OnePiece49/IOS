@@ -78,8 +78,8 @@ class FollowController: UIViewController {
                                                                   followingController],
                                                     configureTapBar: configureTabBar,
                                                     beginPage: self.beginPage.rawValue)
-        followersController.viewModel = FollowerViewModel(user: self.user, currentUser: self.currentUser)
-        followingController.viewModel = FollowingViewModel(user: self.user, currentUser: self.currentUser)
+        followersController.viewModel = FollowerViewModel(user: self.user, currentUser: self.currentUser, fromType: fromType)
+        followingController.viewModel = FollowingViewModel(user: self.user, currentUser: self.currentUser, fromType: fromType)
         followingController.delegate = self
         followersController.delegate = self
                                                                       
@@ -110,7 +110,6 @@ class FollowController: UIViewController {
             self?.navigationController?.popViewController(animated: true)
         }
                                                 
-                                                   
         self.navigationbar = NavigationCustomView(centerTitle: "m.d.garp.49",
                                                   attributeLeftButtons: [attributeFirstLeftButton],
                                                   attributeRightBarButtons: [],

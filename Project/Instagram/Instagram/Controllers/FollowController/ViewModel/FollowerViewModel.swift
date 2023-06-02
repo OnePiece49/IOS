@@ -12,6 +12,7 @@ class FollowerViewModel {
     var currentUser: User
     var followerUsers: [User] = []
     private var tempUsers: [User] = []
+    let fromType: ProfileControllerType
     
     var completionFecthData: (() -> Void)?
     var duringReloadData: (() -> Void)?
@@ -73,8 +74,8 @@ class FollowerViewModel {
             if followerUsers[i].uid == user.uid {
                 UserService.shared.followUser(uid: user.uid) {
                     self.followerUsers[i].isFollowed = true
-                    self.completionUpdateFollowUser?()
                     self.user.stats.followings += 1
+                    self.completionUpdateFollowUser?()
                 }
                 return
             }
@@ -109,9 +110,10 @@ class FollowerViewModel {
         }
     }
     
-    init(user: User, currentUser: User) {
+    init(user: User, currentUser: User, fromType: ProfileControllerType) {
         self.user = user
         self.currentUser = currentUser
+        self.fromType = fromType
     }
     
     
