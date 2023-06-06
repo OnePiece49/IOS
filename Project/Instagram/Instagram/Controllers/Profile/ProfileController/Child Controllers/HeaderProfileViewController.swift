@@ -334,7 +334,7 @@ class HeaderProfileViewController: UIViewController {
         }
     }
     
-    func updateDataAfterEdit(image: UIImage?, user: User) {
+    func updateDataAfterEdit(image: UIImage?, user: UserModel) {
         self.navigationBar.leftButtons[1].setTitle(viewModel?.username, for: .normal)
         self.viewModel = HeaderProfileViewModel(user: user)
         self.fullnameLabel.text = viewModel?.fullname   

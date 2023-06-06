@@ -11,15 +11,14 @@ import UIKit
 class StatusController: UIViewController {
     //MARK: - Properties
     var collectionView: UICollectionView!
-    let refreshControl = UIRefreshControl()
     var navigationbar: NavigationCustomView!
-    let status: InstaStatus
-    let currentUser: User
+    let status: StatusModel
+    let currentUser: UserModel
     var attributedTitle: NSAttributedString?
     
     //MARK: - View Lifecycle
-    init(status: InstaStatus,
-         user: User,
+    init(status: StatusModel,
+         user: UserModel,
          attributedTitle: NSAttributedString? = nil) {
         self.status = status
         self.currentUser = user
@@ -64,7 +63,6 @@ class StatusController: UIViewController {
         
         collectionView.delegate = self
         collectionView.dataSource = self
-        collectionView.refreshControl = refreshControl
         collectionView.register(HomeFeedCollectionViewCell.self,
                                 forCellWithReuseIdentifier: HomeFeedCollectionViewCell.identifier)
     }
@@ -116,18 +114,18 @@ extension StatusController: UICollectionViewDelegate, UICollectionViewDataSource
 }
 
 extension StatusController: HomeFeedCollectionViewCellDelegate {
-    func didSelectNumberLikesButton(status: InstaStatus) {
+    func didSelectNumberLikesButton(status: StatusModel) {
         let userLikedVc = LikesController(status: status)
         self.navigationController?.pushViewController(userLikedVc, animated: true)
     }
     
-    func didSelectCommentButton(cell: HomeFeedCollectionViewCell, status: InstaStatus) {
+    func didSelectCommentButton(cell: HomeFeedCollectionViewCell, status: StatusModel) {
         let commentVC = CommentController(status: status, currentUser: currentUser)
         commentVC.delegate = cell.self
         self.navigationController?.pushViewController(commentVC, animated: true)
     }
     
-    func didSelectAvatar(status: InstaStatus) {
+    func didSelectAvatar(status: StatusModel) {
         let profileVC = ProfileController(user: status.user, type: .other)
         self.navigationController?.pushViewController(profileVC, animated: true)
     }

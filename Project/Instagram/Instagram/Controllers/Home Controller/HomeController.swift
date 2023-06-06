@@ -24,7 +24,7 @@ class HomeController: UIViewController {
         return header
     }()
     
-    let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+    var collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     
     //MARK: - View Lifecycle
     override func viewDidLoad() {
@@ -54,7 +54,7 @@ class HomeController: UIViewController {
     
     
     deinit {
-        print("DEBUG: homeCOntroller Deinit")
+        print("DEBUG: homeController Deinit")
     }
     
     //MARK: - Helpers
@@ -73,6 +73,7 @@ class HomeController: UIViewController {
         appearTabBar.backgroundColor = .white
         tabBarController?.tabBar.standardAppearance = appearTabBar
         tabBarController?.tabBar.scrollEdgeAppearance = appearTabBar
+        collectionView.collectionViewLayout = self.createLayoutCollectionView()
         
         view.addSubview(instagramHeaderView)
         view.addSubview(collectionView)
@@ -80,13 +81,13 @@ class HomeController: UIViewController {
         instagramHeaderView.backgroundColor = .systemBackground
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         loadingIndicator.center = view.center
-        
+
         NSLayoutConstraint.activate([
             instagramHeaderView.topAnchor.constraint(equalTo: view.topAnchor, constant: insetTop),
             instagramHeaderView.leftAnchor.constraint(equalTo: view.leftAnchor),
         ])
         instagramHeaderView.setDimensions(width: view.frame.width, height: self.heightHeaderView)
-        
+
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: instagramHeaderView.bottomAnchor, constant: -5),
             collectionView.leftAnchor.constraint(equalTo: view.leftAnchor),
@@ -102,7 +103,7 @@ class HomeController: UIViewController {
     func configureProperties() {
         instagramHeaderView.delegate = self
         collectionView.dataSource = self
-        collectionView.collectionViewLayout = self.createLayoutCollectionView()
+        
         collectionView.refreshControl = refreshControl
         collectionView.register(StoryHomeCollectionViewCell.self,
                                 forCellWithReuseIdentifier: StoryHomeCollectionViewCell.identifier)
@@ -122,7 +123,8 @@ class HomeController: UIViewController {
                                                       heightDimension: .absolute(100))
         let group = ComposionalLayout.createGroup(axis: .horizontal,
                                                   layoutSize: sizeGroup,
-                                                  item: item, count: 1)
+                                                  item: item,
+                                                  count: 1)
         
         let section = ComposionalLayout.createSectionWithouHeader(group: group)
         section.interGroupSpacing = 2
@@ -158,11 +160,11 @@ class HomeController: UIViewController {
         let configuration = UICollectionViewCompositionalLayoutConfiguration()
         configuration.interSectionSpacing = 11
         
-        let layout = UICollectionViewCompositionalLayout (sectionProvider: { section, env in
+        let layout = UICollectionViewCompositionalLayout (sectionProvider: { [weak self] section, env in
             if section == 0 {
-                return self.createStorySection()
+                return self?.createStorySection()
             } else  {
-                return self.createFeedSection()
+                return self?.createFeedSection()
             }
         }, configuration: configuration)
         
@@ -191,6 +193,7 @@ extension HomeController: UICollectionViewDataSource {
                                                           for: indexPath) as! HomeFeedCollectionViewCell
             cell.viewModel = HomeFeedCellViewModel(status: self.viewModel.statusAtIndexPath(indexPath: indexPath))
             cell.delegate = self
+            cell.indexPath = indexPath
             return cell
         }
     }
@@ -218,19 +221,29 @@ extension HomeController: UICollectionViewDataSource {
 
 
 extension HomeController: HomeFeedCollectionViewCellDelegate {
-    func didSelectNumberLikesButton(status: InstaStatus) {
+    func updateCell(indexPath: IndexPath?) {
+        guard let indexPath = indexPath else {
+            return
+        }
+
+        collectionView.reloadItems(at: [indexPath])
+    }
+    
+
+    
+    func didSelectNumberLikesButton(status: StatusModel) {
         let userLikedVc = LikesController(status: status)
         self.navigationController?.pushViewController(userLikedVc, animated: true)
     }
     
-    func didSelectCommentButton(cell: HomeFeedCollectionViewCell, status: InstaStatus) {
+    func didSelectCommentButton(cell: HomeFeedCollectionViewCell, status: StatusModel) {
         let commentVC = CommentController(status: status, currentUser: viewModel.currentUser)
         commentVC.delegate = cell.self
         commentVC.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(commentVC, animated: true)
     }
     
-    func didSelectAvatar(status: InstaStatus) {
+    func didSelectAvatar(status: StatusModel) {
         let profileVC = ProfileController(user: status.user, type: .other)
 
         self.navigationController?.pushViewController(profileVC, animated: true)

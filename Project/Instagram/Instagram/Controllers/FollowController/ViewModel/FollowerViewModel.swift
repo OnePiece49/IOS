@@ -8,10 +8,10 @@
 import UIKit
 
 class FollowerViewModel {
-    var user: User
-    var currentUser: User
-    var followerUsers: [User] = []
-    private var tempUsers: [User] = []
+    var user: UserModel
+    var currentUser: UserModel
+    var followerUsers: [UserModel] = []
+    private var tempUsers: [UserModel] = []
     let fromType: ProfileControllerType
     
     var completionFecthData: (() -> Void)?
@@ -19,7 +19,7 @@ class FollowerViewModel {
     var completionUpdateFollowUser: (() -> Void)?
     var completionRemoveFollower: (() -> Void)?
     
-    func userAtIndexPath(indexPath: IndexPath) -> User {
+    func userAtIndexPath(indexPath: IndexPath) -> UserModel {
         return followerUsers[indexPath.row]
     }
     
@@ -27,7 +27,7 @@ class FollowerViewModel {
         return followerUsers.count
     }
     
-    func getIndexPath(user: User) -> IndexPath? {
+    func getIndexPath(user: UserModel) -> IndexPath? {
         for i in 0..<followerUsers.count {
             if followerUsers[i].uid == user.uid {
                 return IndexPath(row: i, section: 0)
@@ -37,7 +37,7 @@ class FollowerViewModel {
     }
     
     func searchUser(name: String) {
-        var expectedUsers: [User] = []
+        var expectedUsers: [UserModel] = []
         self.tempUsers = followerUsers
 
         for user in tempUsers {
@@ -73,7 +73,7 @@ class FollowerViewModel {
         self.fetchData()
     }
     
-    func followUser(user: User) {
+    func followUser(user: UserModel) {
         for i in 0..<followerUsers.count {
             if followerUsers[i].uid == user.uid {
                 self.followerUsers[i].isFollowed = true
@@ -86,7 +86,7 @@ class FollowerViewModel {
         }
     }
     
-    func unfollowUser(user: User) {
+    func unfollowUser(user: UserModel) {
         for i in 0..<followerUsers.count {
             if followerUsers[i].uid == user.uid {
                 self.followerUsers[i].isFollowed = false
@@ -99,7 +99,7 @@ class FollowerViewModel {
         }
     }
     
-    func removeFollowerUser(user: User) {
+    func removeFollowerUser(user: UserModel) {
         for i in 0..<followerUsers.count {
             if followerUsers[i].uid == user.uid {
                 self.user.stats.followers -= 1
@@ -113,7 +113,7 @@ class FollowerViewModel {
         }
     }
     
-    init(user: User, currentUser: User, fromType: ProfileControllerType) {
+    init(user: UserModel, currentUser: UserModel, fromType: ProfileControllerType) {
         self.user = user
         self.currentUser = currentUser
         self.fromType = fromType

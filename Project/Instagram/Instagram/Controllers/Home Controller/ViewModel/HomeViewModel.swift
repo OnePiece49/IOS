@@ -9,9 +9,9 @@ import UIKit
 import FirebaseAuth
 
 class HomeViewModel {
-    var currentUser: User!
-    var users: [User] = []
-    var statuses: [InstaStatus] = []
+    var currentUser: UserModel!
+    var users: [UserModel] = []
+    var statuses: [StatusModel] = []
 
     func fetchDataUsers() {
         guard let uid = Auth.auth().currentUser?.uid else {return}
@@ -28,7 +28,7 @@ class HomeViewModel {
         return statuses.count
     }
     
-    func statusAtIndexPath(indexPath: IndexPath) -> InstaStatus {
+    func statusAtIndexPath(indexPath: IndexPath) -> StatusModel {
         return statuses[indexPath.row]
     }
     

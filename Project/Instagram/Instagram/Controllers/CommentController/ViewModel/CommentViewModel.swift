@@ -9,9 +9,9 @@ import Foundation
 import FirebaseAuth
 
 class CommentViewModel {
-    var status: InstaStatus!
-    var currentUser: User!
-    var comments: [Comment] = []
+    var status: StatusModel!
+    var currentUser: UserModel!
+    var comments: [CommentModel] = []
     
     var numberComments: Int {
         return comments.count
@@ -25,7 +25,7 @@ class CommentViewModel {
     var completionFetchComment: (() -> Void)?
     var completionUploadComment: (() -> Void)?
     
-    func commentAtIndexPath(indexpath: IndexPath) -> Comment {
+    func commentAtIndexPath(indexpath: IndexPath) -> CommentModel {
         return comments[indexpath.row]
     }
     

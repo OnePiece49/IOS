@@ -41,8 +41,3 @@ struct FirebaseRef {
     static let ref_tusLiked = Firestore.firestore().collection("tus-usersLiked")                  // Tus đã được những user nào like
     static let ref_tusCommented = Firestore.firestore().collection("tus-usersCommented")            // Tus đã được những user nào comment
 }
-
-
-struct NotificationConstant {
-    static let commentVcDisappear = "CommentVC didDisappera"
-}

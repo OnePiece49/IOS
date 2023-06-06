@@ -9,7 +9,7 @@ import UIKit
 import FirebaseAuth
 
 class FollowCellViewModel {
-    let user: User
+    let user: UserModel
     let type: HeaderFollowViewType
     let fromType: ProfileControllerType
     
@@ -45,7 +45,7 @@ class FollowCellViewModel {
         return user.isFollowed
     }
     
-    init(user: User, type: HeaderFollowViewType, fromType: ProfileControllerType) {
+    init(user: UserModel, type: HeaderFollowViewType, fromType: ProfileControllerType) {
         self.user = user
         self.type = type
         self.fromType = fromType

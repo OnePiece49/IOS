@@ -9,7 +9,7 @@ import UIKit
 import FirebaseAuth
 
 class HomeFeedCellViewModel {
-    var status: InstaStatus
+    var status: StatusModel
     
     var attributedCaptionLabel:  NSAttributedString {
         let attributes = NSMutableAttributedString(string: status.user.username,
@@ -51,10 +51,14 @@ class HomeFeedCellViewModel {
         return status.user.username
     }
     
+    var shouldHiddentLikesBotton: Bool {
+        return numberLikesInt == 0
+    }
+    
     var numberLikesString: String {
         let numberLikes = status.numberLikes
-        if numberLikes == 1 {
-            return "1 like"
+        if numberLikes <= 1 {
+            return "\(numberLikes) like"
         }
         return "\(status.numberLikes) likes"
     }
@@ -130,7 +134,7 @@ class HomeFeedCellViewModel {
     var completionFetchNumberLikes: (() -> Void)?
     var completionFetchNumberUserCommented: (() -> Void)?
     
-    init(status: InstaStatus) {
+    init(status: StatusModel) {
         self.status = status
     }
 }

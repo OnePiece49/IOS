@@ -15,10 +15,10 @@ class CommentStatusService {
     static let shared = CommentStatusService()
     private let db = Firestore.firestore()
     
-    func uploadCommentStatus(status: InstaStatus,
+    func uploadCommentStatus(status: StatusModel,
                        caption: String,
-                       user: User,
-                       completion: @escaping(Comment) -> Void) {
+                       user: UserModel,
+                       completion: @escaping(CommentModel) -> Void) {
         let statusId = status.statusId
         guard let uid = Auth.auth().currentUser?.uid else {return}
         let timestamp = Double(NSDate().timeIntervalSince1970)
@@ -32,14 +32,14 @@ class CommentStatusService {
         let commentId = NSUUID().uuidString
         FirebaseRef.ref_comments.document(commentId).setData(dictionary) { _ in
             FirebaseRef.ref_tusCommented.document(statusId).setData([commentId: "1"], merge: true) { _ in
-                let comment = Comment(dictionary: dictionary, user: user)
+                let comment = CommentModel(dictionary: dictionary, user: user)
                 completion(comment)
             }
         }
     }
     
     
-    private func fetchComment(commentId: String, completion: @escaping (Comment?) -> Void) {
+    private func fetchComment(commentId: String, completion: @escaping (CommentModel?) -> Void) {
         let queue = DispatchQueue(label: "Queue")
         queue.async {
             FirebaseRef.ref_comments.document(commentId).getDocument { documentSnap, _ in
@@ -53,7 +53,7 @@ class CommentStatusService {
                 }
                 
                 UserService.shared.fetchUser(uid: userId) { user in
-                    let comment = Comment(dictionary: dictionary, user: user)
+                    let comment = CommentModel(dictionary: dictionary, user: user)
                     completion(comment)
                 }
             }
@@ -61,9 +61,9 @@ class CommentStatusService {
     }
     
     
-    func fetchCommentStatus(status: InstaStatus,
-                            completion: @escaping([Comment]) -> Void) {
-        var comments: [Comment] = []
+    func fetchCommentStatus(status: StatusModel,
+                            completion: @escaping([CommentModel]) -> Void) {
+        var comments: [CommentModel] = []
         let statusId = status.statusId
         var numberComments = 0
         
@@ -97,7 +97,7 @@ class CommentStatusService {
         }
     }
     
-    func fetchNumberUsersCommented(status: InstaStatus,
+    func fetchNumberUsersCommented(status: StatusModel,
                                    completion: @escaping (Int) -> Void) {
         let statusId = status.statusId
         let queue = DispatchQueue(label: "queue")

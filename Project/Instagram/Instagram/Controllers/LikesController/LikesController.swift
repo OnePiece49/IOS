@@ -18,7 +18,7 @@ class LikesController: UIViewController {
     var indexPathSelected: IndexPath?
 
     //MARK: - View Lifecycle
-    init(status: InstaStatus) {
+    init(status: StatusModel) {
         self.viewModel = LikesViewModel(status: status)
         super.init(nibName: nil, bundle: nil)
         self.fetchData()
@@ -46,9 +46,6 @@ class LikesController: UIViewController {
             self?.tableView.reloadData()
             self?.refreshControl.endRefreshing()
             self?.loadingIndicator.stopAnimating()
-        }
-        viewModel.duringReloadData = { [weak self] in
-            self?.loadingIndicator.startAnimating()
         }
     }
     
@@ -171,7 +168,7 @@ extension LikesController: CustomSearchBarDelegate {
 }
 
 extension LikesController: UserLikedTableViewDelegate {
-    func didTapFollowButton(cell: UserLikedTableViewCell, user: User) {
+    func didTapFollowButton(cell: UserLikedTableViewCell, user: UserModel) {
         if user.isFollowed {
             self.viewModel.unfollowUser(user: user)
             user.isFollowed = false

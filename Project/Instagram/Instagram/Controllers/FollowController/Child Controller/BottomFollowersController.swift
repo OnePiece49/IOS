@@ -133,7 +133,7 @@ extension BottomFollowersController: UICollectionViewDataSource, UICollectionVie
 }
 
 extension BottomFollowersController: BottomFollowerCellDelehgate {
-    func didSelectFollowButton(cell: BottomFollowerCollectionViewCell, user: User) {
+    func didSelectFollowButton(cell: BottomFollowerCollectionViewCell, user: UserModel) {
         viewModel?.completionUpdateFollowUser = {
             cell.updateFollowButtonAfterTapped()
         }
@@ -151,7 +151,7 @@ extension BottomFollowersController: BottomFollowerCellDelehgate {
         
     }
     
-    func didSelectRemmoveButton(cell: BottomFollowerCollectionViewCell, user: User) {
+    func didSelectRemmoveButton(cell: BottomFollowerCollectionViewCell, user: UserModel) {
         viewModel?.completionRemoveFollower = {
             guard let indexPath = self.viewModel?.getIndexPath(user: user) else {return}
             self.collectionView.deleteItems(at: [indexPath])

@@ -12,8 +12,8 @@ struct PostImage {
     let aspectRatio: Float  /// width / height
 }
 
-struct InstaStatus {
-    let user: User
+struct StatusModel {
+    let user: UserModel
     let caption: String
     let postImage: PostImage
     var timeStamp: Date!
@@ -22,7 +22,7 @@ struct InstaStatus {
     var numberComments: Int
     var likedStatus: Bool = false
     
-    init(user: User, statusId: String, dictionary: [String: Any]) {
+    init(user: UserModel, statusId: String, dictionary: [String: Any]) {
         self.user = user
         self.statusId = statusId
         self.caption = dictionary[UsersConstant.caption] as? String ?? ""

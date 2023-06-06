@@ -8,17 +8,17 @@
 import UIKit
 
 class FollowingViewModel {
-    var currentUser: User
-    var user: User
-    var followingUsers: [User] = []
-    private var tempUsers: [User] = []
+    var currentUser: UserModel
+    var user: UserModel
+    var followingUsers: [UserModel] = []
+    private var tempUsers: [UserModel] = []
     let fromType: ProfileControllerType
     
     var completionFecthData: (() -> Void)?
     var duringReloadData: (() -> Void)?
     var completionUpdateFollowUser: (() -> Void)?
     
-    func userAtIndexPath(indexPath: IndexPath) -> User {
+    func userAtIndexPath(indexPath: IndexPath) -> UserModel {
         return followingUsers[indexPath.row]
     }
     
@@ -27,7 +27,7 @@ class FollowingViewModel {
     }
     
     func searchUser(name: String) {
-        var expectedUsers: [User] = []
+        var expectedUsers: [UserModel] = []
         self.tempUsers = followingUsers
 
         for user in tempUsers {
@@ -41,9 +41,10 @@ class FollowingViewModel {
     }
     
     func fetchData() {
-        self.followingUsers = []
         var numberUsers = 0
+
         UserService.shared.fetchFollowingUsers(uid: user.uid) { users in
+            self.followingUsers = []
             self.followingUsers = users.sorted { $0.username > $1.username }
             self.completionFecthData?()
             for user in users {
@@ -56,12 +57,10 @@ class FollowingViewModel {
                     }
                 }
             }
-        
         }
-            
     }
     
-    func followUser(user: User) {
+    func followUser(user: UserModel) {
         for i in 0..<followingUsers.count {
             if followingUsers[i].uid == user.uid {
                 self.followingUsers[i].isFollowed = true
@@ -74,7 +73,7 @@ class FollowingViewModel {
         }
     }
     
-    func unfollowUser(user: User) {
+    func unfollowUser(user: UserModel) {
         for i in 0..<followingUsers.count {
             if followingUsers[i].uid == user.uid {
                 self.followingUsers[i].isFollowed = false
@@ -91,7 +90,7 @@ class FollowingViewModel {
         self.fetchData()
     }
     
-    init(user: User, currentUser: User, fromType: ProfileControllerType) {
+    init(user: UserModel, currentUser: UserModel, fromType: ProfileControllerType) {
         self.user = user
         self.currentUser = currentUser
         self.fromType = fromType

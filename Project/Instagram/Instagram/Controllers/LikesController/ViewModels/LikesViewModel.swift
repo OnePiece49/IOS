@@ -8,14 +8,14 @@
 import UIKit
 
 class LikesViewModel {
-    let status: InstaStatus
-    var users: [User] = []
-    private var tempUsers: [User] = []
+    let status: StatusModel
+    var users: [UserModel] = []
+    private var tempUsers: [UserModel] = []
     
     var completionFecthData: (() -> Void)?
     var duringReloadData: (() -> Void)?
     
-    func userAtIndexPath(indexPath: IndexPath) -> User {
+    func userAtIndexPath(indexPath: IndexPath) -> UserModel {
         return users[indexPath.row]
     }
     
@@ -24,7 +24,7 @@ class LikesViewModel {
     }
     
     func searchUser(name: String) {
-        var expectedUsers: [User] = []
+        var expectedUsers: [UserModel] = []
         self.tempUsers = users
 
         for user in tempUsers {
@@ -58,7 +58,7 @@ class LikesViewModel {
     
     func reloadData() {
         var numberUser = 0
-        var tempUsers: [User] = []
+        var tempUsers: [UserModel] = []
         StatusService.shared.fetchUsersLikeStatus(status: status) { users in
             self.duringReloadData?()
             users.forEach { user in
@@ -77,7 +77,7 @@ class LikesViewModel {
         }
     }
     
-    func followUser(user: User) {
+    func followUser(user: UserModel) {
         for i in 0..<users.count {
             if users[i].uid == user.uid {
                 UserService.shared.followUser(uid: user.uid) {
@@ -88,7 +88,7 @@ class LikesViewModel {
         }
     }
     
-    func unfollowUser(user: User) {
+    func unfollowUser(user: UserModel) {
         for i in 0..<users.count {
             if users[i].uid == user.uid {
                 UserService.shared.unfollowUser(uid: user.uid) {
@@ -99,7 +99,7 @@ class LikesViewModel {
         }
     }
     
-    init(status: InstaStatus) {
+    init(status: StatusModel) {
         self.status = status
     }
 }

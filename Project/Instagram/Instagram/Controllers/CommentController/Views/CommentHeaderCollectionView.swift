@@ -10,7 +10,7 @@ import SDWebImage
 
 class CommentHeaderCollectionView: UICollectionReusableView {
     //MARK: - Properties
-    var status: InstaStatus? {
+    var status: StatusModel? {
         didSet {updateUI()}
     }
     static let identifier = "CommentHeaderCollectionView"
@@ -65,7 +65,6 @@ class CommentHeaderCollectionView: UICollectionReusableView {
     //MARK: - View Lifecycle
     override init(frame: CGRect) {
         super.init(frame: frame)
-        translatesAutoresizingMaskIntoConstraints = false
         configureUI()
     }
     

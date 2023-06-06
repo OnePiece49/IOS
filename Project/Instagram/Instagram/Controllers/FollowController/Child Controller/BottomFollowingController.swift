@@ -8,13 +8,13 @@
 import UIKit
 
 protocol BottomFollowDelegate: AnyObject {
-    func didSelectUser(user: User)
-    func didTapRemoveButton(user: User)
-    func didSelectFollowButton(user: User)
+    func didSelectUser(user: UserModel)
+    func didTapRemoveButton(user: UserModel)
+    func didSelectFollowButton(user: UserModel)
 }
 
 extension BottomFollowDelegate {
-    func didSelectUser(user: User) {}
+    func didSelectUser(user: UserModel) {}
 }
 
 class BottomFollowingController: BottomController {
@@ -141,7 +141,7 @@ extension BottomFollowingController: UICollectionViewDataSource, UICollectionVie
 
 
 extension BottomFollowingController: BottomFollowingCellDelegate {
-    func didSelectFollowButton(cell: BottomFollowingCollectionViewCell, user: User) {
+    func didSelectFollowButton(cell: BottomFollowingCollectionViewCell, user: UserModel) {
         viewModel?.completionUpdateFollowUser = {
             cell.updateFollowButtonAfterTapped()
             self.delegate?.didSelectFollowButton(user: self.viewModel!.user)

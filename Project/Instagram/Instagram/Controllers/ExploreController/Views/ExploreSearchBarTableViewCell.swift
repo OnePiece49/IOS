@@ -12,7 +12,7 @@ import SDWebImage
 class ExploreSearchBarTableViewCell: UITableViewCell {
     //MARK: - Properties
     static let identifier = "ExploreSearchBarTableViewCell"
-    var user: User? {
+    var user: UserModel? {
         didSet {updateUI()}
     }
     

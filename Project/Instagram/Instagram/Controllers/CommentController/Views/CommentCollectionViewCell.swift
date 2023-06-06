@@ -10,7 +10,7 @@ import UIKit
 import SDWebImage
 
 protocol CommentCollectionViewDelegate: AnyObject {
-    func didSelectAvatarOrUsername(user: User)
+    func didSelectAvatarOrUsername(user: UserModel)
 }
 
 
@@ -28,7 +28,7 @@ class CommentCollectionViewCell: UICollectionViewCell {
         iv.clipsToBounds = true
         iv.layer.cornerRadius = 36 / 2
         iv.isUserInteractionEnabled = true
-//        iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleInfoUserTapped)))
+        iv.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleInfoUserTapped)))
         return iv
     }()
     
@@ -40,7 +40,7 @@ class CommentCollectionViewCell: UICollectionViewCell {
         label.textAlignment = .left
         label.text = "b_lackBink"
         label.isUserInteractionEnabled = true
-//        label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleInfoUserTapped)))
+        label.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleInfoUserTapped)))
         return label
     }()
     
@@ -69,7 +69,6 @@ class CommentCollectionViewCell: UICollectionViewCell {
     //MARK: - View Lifecycle
     override init(frame: CGRect) {
         super.init(frame: frame)
-        translatesAutoresizingMaskIntoConstraints = false
         configureUI()
     }
     

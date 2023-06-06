@@ -9,8 +9,8 @@ import UIKit
 import FirebaseAuth
 
 class ProfileViewModel {
-    var user: User?
-    var currentUser: User?
+    var user: UserModel?
+    var currentUser: UserModel?
     
     func fetchDataForCurrentUser() {
         guard let uid = Auth.auth().currentUser?.uid else {return}

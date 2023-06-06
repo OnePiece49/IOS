@@ -13,7 +13,7 @@ struct UserRelationStats {
     var followings: Int
 }
 
-class User {
+class UserModel {
     let email: String
     var username: String
     var fullname: String

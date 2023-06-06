@@ -29,7 +29,7 @@ class BottomTabBarCollectionViewCell: UICollectionViewCell {
     //MARK: - View Lifecycle
     override init(frame: CGRect) {
         super.init(frame: frame)
-        translatesAutoresizingMaskIntoConstraints = false
+        
         configureUI()
     }
 
@@ -44,8 +44,8 @@ class BottomTabBarCollectionViewCell: UICollectionViewCell {
         backgroundColor = .systemBackground
         NSLayoutConstraint.activate([
             titleButton.centerYAnchor.constraint(equalTo: centerYAnchor),
-            titleButton.leftAnchor.constraint(equalTo: leftAnchor, constant: 5),
-            titleButton.rightAnchor.constraint(equalTo: rightAnchor, constant: -5),
+            titleButton.centerXAnchor.constraint(equalTo: centerXAnchor),
+            
             
         ])
     }

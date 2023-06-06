@@ -23,7 +23,7 @@ class BottomProfileCollectionViewCell: UICollectionViewCell {
     //MARK: - View Lifecycle
     override init(frame: CGRect) {
         super.init(frame: frame)
-        translatesAutoresizingMaskIntoConstraints = false
+        
         configureUI()
     }
     

@@ -9,11 +9,11 @@ import UIKit
 import FirebaseAuth
 
 class ExploreViewModel {
-    private var users: [User] = []
-    var foundedUsers: [User] = []
-    var statuses: [InstaStatus] = []
+    private var users: [UserModel] = []
+    var foundedUsers: [UserModel] = []
+    var statuses: [StatusModel] = []
     var completion: (() -> Void)?
-    var currentUser: User?
+    var currentUser: UserModel?
     
     var numberUserFounded: Int {
         return foundedUsers.count
@@ -36,11 +36,11 @@ class ExploreViewModel {
         return statuses.count
     }
     
-    func statusAtIndexPath(indexPath: IndexPath) -> InstaStatus {
+    func statusAtIndexPath(indexPath: IndexPath) -> StatusModel {
         return statuses[indexPath.row]
     }
     
-    func userAtIndexPath(indexPath: IndexPath) -> User {
+    func userAtIndexPath(indexPath: IndexPath) -> UserModel {
         return foundedUsers[indexPath.row]
     }
     
@@ -51,12 +51,13 @@ class ExploreViewModel {
     
     private func fetchStatuses() {
         var numberUser = 0
-        self.statuses = []
+        var tempStatues: [StatusModel] = []
         for user in users {
             StatusService.shared.fetchStatusUser(uid: user.uid) { userStatues in
                 numberUser += 1
-                self.statuses.append(contentsOf: userStatues)
+                tempStatues.append(contentsOf: userStatues)
                 if numberUser == self.users.count {
+                    self.statuses = tempStatues
                     self.statuses.shuffle()
                     self.completion?()
                 }
@@ -73,7 +74,7 @@ class ExploreViewModel {
     }
     
     func searchUsers(name: String)  {
-        var expectedUsers: [User] = []
+        var expectedUsers: [UserModel] = []
         for user in users {
             if user.fullname.lowercased().contains(name.lowercased()) || user.username.lowercased().contains(name.lowercased()) {
                 expectedUsers.append(user)

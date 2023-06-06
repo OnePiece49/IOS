@@ -8,7 +8,7 @@
 import Foundation
 
 class CommentCollectionViewCellViewModel {
-    let comment: Comment
+    let comment: CommentModel
     
     var dateCommentString: String {
         let formatter = DateComponentsFormatter()
@@ -19,7 +19,7 @@ class CommentCollectionViewCellViewModel {
         return formatter.string(from: comment.timestamp, to: now) ?? "1m"
     }
     
-    var user: User {
+    var user: UserModel {
         return comment.user
     }
     
@@ -36,7 +36,7 @@ class CommentCollectionViewCellViewModel {
         return url
     }
     
-    init(comment: Comment) {
+    init(comment: CommentModel) {
         self.comment = comment
     }
     

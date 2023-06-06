@@ -33,7 +33,7 @@ class EditDetailProfileViewController: UIViewController {
     var naviationBar: NavigationCustomView!
     let typeEdit: EđitDetailProfileType
     weak var delegate: EditDetailDelegate?
-    let user: User
+    let user: UserModel
     
     var infoUser: String? {
         switch typeEdit {
@@ -72,7 +72,7 @@ class EditDetailProfileViewController: UIViewController {
     }()
     
     //MARK: - View Lifecycle
-    init(type: EđitDetailProfileType, user: User) {
+    init(type: EđitDetailProfileType, user: UserModel) {
         self.typeEdit = type
         self.user = user
         super.init(nibName: nil, bundle: nil)

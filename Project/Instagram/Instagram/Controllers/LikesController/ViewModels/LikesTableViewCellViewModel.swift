@@ -8,7 +8,7 @@
 import UIKit
  
 class LikesTableViewCellViewModel {
-    var user: User
+    var user: UserModel
     
     var avatarImageUrl: URL? {
         return URL(string: self.user.profileImage ?? "")
@@ -30,7 +30,7 @@ class LikesTableViewCellViewModel {
     
     var completion: (() -> Void)?
     
-    init(user: User) {
+    init(user: UserModel) {
         self.user = user
     }
     

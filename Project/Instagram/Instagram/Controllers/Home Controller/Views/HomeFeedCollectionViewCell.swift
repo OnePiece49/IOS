@@ -10,9 +10,14 @@ import UIKit
 import SDWebImage
 
 protocol HomeFeedCollectionViewCellDelegate: AnyObject {
-    func didSelectAvatar(status: InstaStatus)
-    func didSelectNumberLikesButton(status: InstaStatus)
-    func didSelectCommentButton(cell: HomeFeedCollectionViewCell, status: InstaStatus)
+    func didSelectAvatar(status: StatusModel)
+    func didSelectNumberLikesButton(status: StatusModel)
+    func didSelectCommentButton(cell: HomeFeedCollectionViewCell, status: StatusModel)
+    func updateCell(indexPath: IndexPath?)
+}
+
+extension HomeFeedCollectionViewCellDelegate {
+    func updateCell(indexPath: IndexPath?) {}
 }
 
 class HomeFeedCollectionViewCell: UICollectionViewCell {
@@ -21,13 +26,14 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
     static let identifier = "HomeFeedCollectionViewCell"
     private var actionBar: NavigationCustomView!
     weak var delegate: HomeFeedCollectionViewCellDelegate?
+    var indexPath: IndexPath?
     var viewModel: HomeFeedCellViewModel? {
         didSet {
             updateUI()
             viewModel?.hasLikedStatus()
             viewModel?.fetchNumberUsersLikedStatus()
             viewModel?.fetchNumberUsersCommented()
-            configureProperties()
+            updateLikeAndCommentButton()
         }
     }
     
@@ -50,7 +56,7 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         label.textColor = .label
         label.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
         label.addGestureRecognizer(UITapGestureRecognizer(target: self,
-                                                       action: #selector(handleAvatarImageTapped)))
+                                                          action: #selector(handleAvatarImageTapped)))
         label.isUserInteractionEnabled = true
         
         return label
@@ -85,12 +91,10 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         iv.tintColor = .white
         return iv
     }()
-
     
-    private let numberLikesButton: UIButton = {
+    private lazy var numberLikesButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.setTitle("0 like", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
         button.setTitleColor(.label, for: .normal)
         button.addTarget(self, action: #selector(handleNumberLikeButtonTapped), for: .touchUpInside)
@@ -103,7 +107,6 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
     
     private lazy var allCommentsButton: UIButton = {
         let button = UIButton()
-        button.setTitle("Xem 1311 bình luận", for: .normal)
         button.tintColor = .label
         button.addTarget(self, action: #selector(handelAllCommentButtonTapped), for: .touchUpInside)
         button.setTitleColor(.gray, for: .normal)
@@ -125,7 +128,6 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
     private let timePostTusLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "27 minutes ago"
         label.font = .systemFont(ofSize: 12, weight: .regular)
         label.textColor = .gray
         return label
@@ -134,8 +136,11 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
     //MARK: - View Lifecycle
     override init(frame: CGRect) {
         super.init(frame: frame)
-        translatesAutoresizingMaskIntoConstraints = false
         configureUI()
+    }
+    
+    deinit {
+        SDImageCache.shared.clearMemory()
     }
     
     required init?(coder: NSCoder) {
@@ -156,6 +161,7 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         heightImageConstraint = photoImageView.heightAnchor.constraint(equalToConstant: 500)
         let bottomAnchor =  timePostTusLabel.bottomAnchor.constraint(equalTo: bottomAnchor)
         bottomAnchor.priority = UILayoutPriority(999)
+
         NSLayoutConstraint.activate([
             avatarUserUpTusImageView.topAnchor.constraint(equalTo: topAnchor),
             avatarUserUpTusImageView.leftAnchor.constraint(equalTo: leftAnchor, constant: 11),
@@ -182,6 +188,10 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
             bottomAnchor,
         ])
         avatarUserUpTusImageView.setDimensions(width: 36, height: 36)
+        actionStackView.setContentHuggingPriority(UILayoutPriority(751), for: .vertical)
+        actionStackView.setContentCompressionResistancePriority(UILayoutPriority(751), for: .vertical)
+        timePostTusLabel.setContentHuggingPriority(UILayoutPriority(752), for: .vertical)
+        timePostTusLabel.setContentCompressionResistancePriority(UILayoutPriority(752), for: .vertical)
     }
     
     func setupNavigationBar() {
@@ -211,19 +221,18 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
                                               continueSpaceleft: 15)
     }
     
-    func configureProperties() {
-        self.viewModel?.completionLike = {
-            self.updateLikeButton()
+    func updateLikeAndCommentButton() {
+        self.viewModel?.completionLike = { [weak self] in
+            self?.updateLikeButton()
         }
         
-        self.viewModel?.completionFetchNumberLikes = {
-            self.numberLikesButton.setTitle(self.viewModel?.numberLikesString, for: .normal)
-            self.numberLikesButton.isHidden = self.viewModel?.isHiddedNumberLike ?? false
-
+        self.viewModel?.completionFetchNumberLikes = { [weak self] in
+            self?.numberLikesButton.setTitle(self?.viewModel?.numberLikesString, for: .normal)
+//            self?.numberLikesButton.isHidden = self?.viewModel?.isHiddedNumberLike ?? false
         }
         
-        self.viewModel?.completionFetchNumberUserCommented = {
-            self.allCommentsButton.setTitle(self.viewModel?.numberCommmentsString, for: .normal)
+        self.viewModel?.completionFetchNumberUserCommented = { [weak self] in
+            self?.allCommentsButton.setTitle(self?.viewModel?.numberCommmentsString, for: .normal)
         }
     }
     
@@ -232,6 +241,8 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         guard let viewModel = viewModel else {
             return
         }
+        numberLikesButton.isHidden = false
+        allCommentsButton.isHidden = false
 
         let ratio: CGFloat = viewModel.ratioImage
         heightImageConstraint = self.photoImageView.heightAnchor.constraint(equalTo: self.photoImageView.widthAnchor, multiplier: ratio)
@@ -239,26 +250,32 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
             heightImageConstraint,
         ])
         
-        avatarUserUpTusImageView.sd_setImage(with: viewModel.avatarURL, placeholderImage: UIImage(systemName: "person.circle"))
+        avatarUserUpTusImageView.sd_setImage(with: viewModel.avatarURL,
+                                             placeholderImage: UIImage(systemName: "person.circle"))
         photoImageView.sd_setImage(with: viewModel.photoURL)
         usernameLabel.text = viewModel.username
         
         if viewModel.haveCaption {
             statusLabel.attributedText = viewModel.attributedCaptionLabel
             statusLabel.isHidden = false
-            statusLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handelAllCommentButtonTapped)))
+            statusLabel.addGestureRecognizer(UITapGestureRecognizer(target: self,
+                                                                    action: #selector(handelAllCommentButtonTapped)))
             statusLabel.isUserInteractionEnabled = true
         } else {
             statusLabel.isHidden = true
         }
+        
+        
         self.timePostTusLabel.text = viewModel.dateString
+        actionStackView.reloadInputViews()
         layoutIfNeeded()
     }
     
     
     func updateLikeButton() {
         guard let hasLiked = viewModel?.likedStatus else {return}
-        
+        self.setNeedsLayout()
+        self.layoutIfNeeded()
         if hasLiked {
             self.actionBar.leftButtons[0].setImage(UIImage(named: "heart-red"), for: .normal)
             self.actionBar.leftButtons[0].tintColor = .red
@@ -283,7 +300,18 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
         
         let fakeNumberLikes = viewModel.numberLikesInt
         
-        self.numberLikesButton.setTitle("\(fakeNumberLikes) likes ", for: .normal)
+        if fakeNumberLikes == 0 {
+//            self.numberLikesButton.isHidden = true
+//            self.delegate?.updateCell(indexPath: self.indexPath)
+        } else {
+//            self.numberLikesButton.isHidden = false
+        }
+        
+        if fakeNumberLikes <= 1 {
+            self.numberLikesButton.setTitle("\(fakeNumberLikes) like ", for: .normal)
+        } else {
+            self.numberLikesButton.setTitle("\(fakeNumberLikes) likes ", for: .normal)
+        }
 
         let transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
         UIView.animate(withDuration: 0.15) {
@@ -316,7 +344,6 @@ class HomeFeedCollectionViewCell: UICollectionViewCell {
                 self.heardLikemageView.transform = .identity
                 self.heardLikemageView.isHidden = true
             }
-
         }
     }
     

@@ -8,7 +8,7 @@
 import UIKit
 
 protocol BottomProfileControllerDelegate: AnyObject {
-    func didSelectStatus(status: InstaStatus)
+    func didSelectStatus(status: StatusModel)
 }
 
 class BottomProfileController: BottomController {
@@ -17,9 +17,9 @@ class BottomProfileController: BottomController {
     override var bottomTabTripCollectionView: UICollectionView {
         return collectionView
     }
-    var statuses: [InstaStatus] = []
+    var statuses: [StatusModel] = []
     weak var delegate: BottomProfileControllerDelegate?
-    var user: User? {
+    var user: UserModel? {
         didSet {
             guard let user = user else {
                 return

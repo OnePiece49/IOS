@@ -8,8 +8,8 @@
 import UIKit
 
 protocol BottomFollowerCellDelehgate: AnyObject {
-    func didSelectFollowButton(cell: BottomFollowerCollectionViewCell, user: User)
-    func didSelectRemmoveButton(cell: BottomFollowerCollectionViewCell, user: User)
+    func didSelectFollowButton(cell: BottomFollowerCollectionViewCell, user: UserModel)
+    func didSelectRemmoveButton(cell: BottomFollowerCollectionViewCell, user: UserModel)
 }
 
 class BottomFollowerCollectionViewCell: UICollectionViewCell {
@@ -77,7 +77,6 @@ class BottomFollowerCollectionViewCell: UICollectionViewCell {
     //MARK: - View Lifecycle
     override init(frame: CGRect) {
         super.init(frame: frame)
-        translatesAutoresizingMaskIntoConstraints = false
         configureUI()
     }
     

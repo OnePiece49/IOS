@@ -73,7 +73,7 @@ class CommentController: UIViewController {
     }()
     
     //MARK: - View Lifecycle
-    init(status: InstaStatus, currentUser: User) {
+    init(status: StatusModel, currentUser: UserModel) {
         super.init(nibName: nil, bundle: nil)
         self.viewModel.status = status
         self.viewModel.currentUser = currentUser
@@ -308,12 +308,10 @@ extension CommentController: ContainerInputDelegate {
 }
 
 extension CommentController: CommentCollectionViewDelegate {
-    func didSelectAvatarOrUsername(user: User) {
+    func didSelectAvatarOrUsername(user: UserModel) {
         let profileVC = ProfileController(user: user, type: .other)
         profileVC.hidesBottomBarWhenPushed = false
         
         navigationController?.pushViewController(profileVC, animated: true)
     }
-    
-    
 }

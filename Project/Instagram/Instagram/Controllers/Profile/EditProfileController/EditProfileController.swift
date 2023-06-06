@@ -9,12 +9,12 @@ import UIKit
 import SDWebImage
 
 protocol EditProfileDelegate: AnyObject {
-    func didUpdateProfile(user: User, image: UIImage?)
+    func didUpdateProfile(user: UserModel, image: UIImage?)
 }
 
 class EditProfileController: UIViewController {
     //MARK: - Properties
-    var user: User
+    var user: UserModel
     let loadingIndicator = UIActivityIndicatorView()
     private let tableView = UITableView(frame: .zero, style: .plain)
     let selectController = SelectTypePhotoController()
@@ -22,7 +22,7 @@ class EditProfileController: UIViewController {
     var navigationBar: NavigationCustomView!
     weak var delegate: EditProfileDelegate?
     var oldImage: UIImage?
-    let oldUser: User
+    let oldUser: UserModel
     
     private lazy var avatarImageView: UIImageView = {
         let iv = UIImageView()
@@ -66,7 +66,7 @@ class EditProfileController: UIViewController {
     }()
 
     //MARK: - View Lifecycle
-    init(user: User, image: UIImage?) {
+    init(user: UserModel, image: UIImage?) {
         self.user = user
         self.oldUser = user
         

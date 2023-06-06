@@ -9,7 +9,7 @@ import UIKit
 import FirebaseAuth
 
 class HeaderProfileViewModel {
-    var user: User
+    var user: UserModel
     
     var attributedFollowers: NSAttributedString {
         let attributedText = NSMutableAttributedString(attributedString: NSAttributedString(string: "\(user.stats.followers)\n",
@@ -105,7 +105,7 @@ class HeaderProfileViewModel {
     
     var completionFetchRelations: (() -> Void)?
     
-    init(user: User) {
+    init(user: UserModel) {
         self.user = user
     }
 }

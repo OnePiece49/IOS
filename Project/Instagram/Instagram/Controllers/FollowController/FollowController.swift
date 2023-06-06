@@ -17,16 +17,16 @@ class FollowController: UIViewController {
     //MARK: - Properties
     var navigationbar: NavigationCustomView!
     let beginPage: BeginFollowController
-    let user: User
-    let currentUser: User
+    let user: UserModel
+    let currentUser: UserModel
     var followersController: BottomFollowersController!
     var followingController: BottomFollowingController!
     var bottomTapTripController: BottomTapTripController!
     let fromType: ProfileControllerType
 
     //MARK: - View Lifecycle
-    init(user: User,
-         currentUser: User,
+    init(user: UserModel,
+         currentUser: UserModel,
          begin: BeginFollowController,
          type: ProfileControllerType) {
         self.beginPage = begin
@@ -122,19 +122,19 @@ class FollowController: UIViewController {
 }
 //MARK: - delegate
 extension FollowController: BottomFollowDelegate {
-    func didSelectFollowButton(user: User) {
+    func didSelectFollowButton(user: UserModel) {
         if self.fromType == .other {return}
         self.followingController.titleBottom.titleString.title = "\(user.stats.followings) people followings"
         self.bottomTapTripController.reloadNavigationBar()
     }
     
-    func didTapRemoveButton(user: User) {
+    func didTapRemoveButton(user: UserModel) {
         if self.fromType == .other {return}
         self.followersController.titleBottom.titleString.title = "\(user.stats.followers) people followers"
         self.bottomTapTripController.reloadNavigationBar()
     }
     
-    func didSelectUser(user: User) {
+    func didSelectUser(user: UserModel) {
         let profileVc = ProfileController(user: user, type: .other)
         self.navigationController?.pushViewController(profileVc, animated: true)
     }

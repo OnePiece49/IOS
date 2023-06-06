@@ -25,7 +25,7 @@ class PickPhotoController: UIViewController {
     var collectionView: UICollectionView!
     var headerPhotoView = PickPhotoHeaderView(frame: .zero)
     var numberItem = 0
-    var shouldInsetCell = true
+    var shouldInsertCell = true
     let requestImageQueue = DispatchQueue(label: "Request Image Queue", attributes: .concurrent)
     var widthCropViewConstraint: NSLayoutConstraint!
     var latestYCropView: CGFloat = 0
@@ -68,7 +68,7 @@ class PickPhotoController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         self.tabBarController?.tabBar.isHidden = true
-        shouldInsetCell = true
+        shouldInsertCell = true
         configureUI()
         configureProperties()
         requestAuthorization()
@@ -79,9 +79,17 @@ class PickPhotoController: UIViewController {
         self.tabBarController?.tabBar.isHidden = false
         
         requestImageQueue.async {
-            self.shouldInsetCell = false
+            self.shouldInsertCell = false
         }
     }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        self.numberItem = 0
+        self.photoImages = []
+        self.collectionView.reloadData()
+    }
+    
+
     
     
     //MARK: - Helpers
@@ -180,14 +188,13 @@ class PickPhotoController: UIViewController {
                                     targetSize: CGSize(width: Int(200 * ratio), height: 200),
                                     contentMode: .aspectFill,
                                     options: self.requestOption()) { imagePhoto, error in
-                    if self.shouldInsetCell {
+                    if self.shouldInsertCell {
                         self.photoImages.append(imagePhoto)
                         DispatchQueue.main.async {
                             self.insertCell()
                         }
                     } else {
                         DispatchQueue.main.async {
-                            print("DEBUG: End")
                             self.numberItem = 0
                             self.photoImages = []
                             self.collectionView.reloadData()
@@ -195,7 +202,7 @@ class PickPhotoController: UIViewController {
                     }
                 }
                 
-                if !self.shouldInsetCell {
+                if !self.shouldInsertCell {
                     break
                 }
             }
@@ -216,7 +223,7 @@ class PickPhotoController: UIViewController {
     }
     
     func insertCell() {
-        if shouldInsetCell {
+        if shouldInsertCell {
             self.numberItem = collectionView.numberOfItems(inSection: 0)
             let indexPath = IndexPath(item: self.numberItem, section: 0)
             numberItem += 1
@@ -253,7 +260,6 @@ class PickPhotoController: UIViewController {
                                         y: latestYCropView + transition.y,
                                         width: cropView.frame.width,
                                         height: cropView.frame.height)
-                
             }
         }
     }

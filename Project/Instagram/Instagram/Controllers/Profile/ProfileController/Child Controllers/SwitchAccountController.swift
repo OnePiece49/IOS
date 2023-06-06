@@ -86,7 +86,7 @@ class SwitchAccountController: BottomSheetViewCustomController {
     }()
     
     override var heightBottomSheetView: CGFloat {
-        return 255
+        return 290
     }
     
     override var maxHeightScrollTop: CGFloat {

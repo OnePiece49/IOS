@@ -85,7 +85,7 @@ class InstagramHeaderView: UIView {
     //MARK: - View Lifecycle
     override init(frame: CGRect) {
         super.init(frame: frame)
-        translatesAutoresizingMaskIntoConstraints = false
+        
         configureUI()
     }
     

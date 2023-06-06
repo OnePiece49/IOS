@@ -63,19 +63,17 @@ class ProfileController: UIViewController {
     }()
     
     //MARK: - View Lifecycle
-    init(user: User, type: ProfileControllerType) {
+    init(user: UserModel, type: ProfileControllerType) {
         self.type = type
         self.headerViewController = HeaderProfileViewController(type: type)
         super.init(nibName: nil, bundle: nil)
         self.viewModel.user = user
-        self.fetchDataForAnotherUser()
     }
     
     init(type: ProfileControllerType) {
         self.type = type
         self.headerViewController = HeaderProfileViewController(type: type)
         super.init(nibName: nil, bundle: nil)
-        fetchDataForCurrentUser()
     }
     
     required init?(coder: NSCoder) {
@@ -90,6 +88,11 @@ class ProfileController: UIViewController {
         super.viewDidLoad()
         self.navigationController?.navigationBar.isHidden = true
         self.configureUI()
+        if self.type == .mainTabBar {
+            self.fetchDataForCurrentUser()
+        } else {
+            self.fetchDataForAnotherUser()
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -373,14 +376,14 @@ extension ProfileController: SwitchAccountDelegate {
 }
 
 extension ProfileController: EditProfileDelegate {
-    func didUpdateProfile(user: User, image: UIImage?) {
+    func didUpdateProfile(user: UserModel, image: UIImage?) {
         self.viewModel.user = user
         self.headerViewController.updateDataAfterEdit(image: image, user: user)
     }
 }
 
 extension ProfileController: BottomProfileControllerDelegate {
-    func didSelectStatus(status: InstaStatus) {
+    func didSelectStatus(status: StatusModel) {
         guard let user = viewModel.currentUser else {return}
         
         let attributedString = NSMutableAttributedString(attributedString: NSAttributedString(string: user.username.uppercased(), attributes: [.font : UIFont.systemFont(ofSize: 13, weight: .semibold), .foregroundColor: UIColor.systemGray]))

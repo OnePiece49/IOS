@@ -9,7 +9,7 @@ import UIKit
 import SDWebImage
 
 protocol BottomFollowingCellDelegate: AnyObject {
-    func didSelectFollowButton(cell: BottomFollowingCollectionViewCell, user: User)
+    func didSelectFollowButton(cell: BottomFollowingCollectionViewCell, user: UserModel)
 }
 
 class BottomFollowingCollectionViewCell: UICollectionViewCell {
@@ -69,7 +69,6 @@ class BottomFollowingCollectionViewCell: UICollectionViewCell {
     //MARK: - View Lifecycle
     override init(frame: CGRect) {
         super.init(frame: frame)
-        translatesAutoresizingMaskIntoConstraints = false
         configureUI()
     }
     

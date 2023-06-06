@@ -7,13 +7,13 @@
 
 import UIKit
 
-struct Comment {
+struct CommentModel {
     let content: String
     let statusID: String
-    let user: User
+    let user: UserModel
     var timestamp: Date!
     
-    init(dictionary: [String: Any], user: User) {
+    init(dictionary: [String: Any], user: UserModel) {
         self.content = dictionary[UsersConstant.comment] as? String ?? ""
         self.statusID = dictionary[UsersConstant.statusId] as? String ?? ""
         self.user = user

@@ -10,7 +10,7 @@ import SDWebImage
 import FirebaseAuth
 
 protocol UserLikedTableViewDelegate: AnyObject {
-    func didTapFollowButton(cell: UserLikedTableViewCell, user: User)
+    func didTapFollowButton(cell: UserLikedTableViewCell, user: UserModel)
 }
 
 class UserLikedTableViewCell: UITableViewCell {

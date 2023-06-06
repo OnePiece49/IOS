@@ -109,10 +109,10 @@ class ExploreController: UIViewController {
     func fetchData() {
         loadingIndicator.startAnimating()
         viewModel.fetchOtherUsers()
-        viewModel.completion = {
-            self.collectionView.reloadData()
-            self.loadingIndicator.stopAnimating()
-            self.refreshControl.endRefreshing()
+        viewModel.completion = { [weak self] in
+            self?.collectionView.reloadData()
+            self?.loadingIndicator.stopAnimating()
+            self?.refreshControl.endRefreshing()
         }
     }
     

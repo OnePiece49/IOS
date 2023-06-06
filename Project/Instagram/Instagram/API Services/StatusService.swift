@@ -53,7 +53,7 @@ class StatusService {
     }
     
     func fetchStatusUser(uid: String,
-                         completion: @escaping([InstaStatus]) -> Void) {
+                         completion: @escaping([StatusModel]) -> Void) {
         FirebaseRef.ref_userStatus.document(uid).getDocument { documentSnap, error in
             guard let documentSnap = documentSnap else {
                 completion([])
@@ -64,7 +64,7 @@ class StatusService {
                 return
             }
             
-            var statuses: [InstaStatus] = []
+            var statuses: [StatusModel] = []
             let dispathGroup = DispatchGroup()
             
             for document in dictionary {
@@ -76,7 +76,7 @@ class StatusService {
                     guard let uid = dictionary[UsersConstant.uid] as? String else {return}
                     
                     UserService.shared.fetchUser(uid: uid) { user in
-                        let status = InstaStatus(user: user, statusId: statusID, dictionary: dictionary)
+                        let status = StatusModel(user: user, statusId: statusID, dictionary: dictionary)
                         statuses.append(status)
                         dispathGroup.leave()
                     }
@@ -90,10 +90,10 @@ class StatusService {
         }
     }
     
-    func fetchStatusUserAndFollowing(users: [User],
-                                     completion: @escaping([InstaStatus]) -> Void) {
+    func fetchStatusUserAndFollowing(users: [UserModel],
+                                     completion: @escaping([StatusModel]) -> Void) {
         var numberUsers = 0
-        var statues: [InstaStatus] = []
+        var statues: [StatusModel] = []
 
         for user in users {
             self.fetchStatusUser(uid: user.uid) { userStatuses in
@@ -108,7 +108,7 @@ class StatusService {
         }
     }
     
-    func likeStatus(status: InstaStatus,
+    func likeStatus(status: StatusModel,
                     completion: @escaping() -> Void) {
         let statusId = status.statusId
         guard let currentUid = Auth.auth().currentUser?.uid else {return}
@@ -126,7 +126,7 @@ class StatusService {
 
     }
     
-    func unlikeStatus(status: InstaStatus,
+    func unlikeStatus(status: StatusModel,
                     completion: @escaping() -> Void) {
         let statusId = status.statusId
         guard let currentUid = Auth.auth().currentUser?.uid else {return}
@@ -144,7 +144,7 @@ class StatusService {
  
     }
     
-    func hasUserLikedTus(status: InstaStatus,
+    func hasUserLikedTus(status: StatusModel,
                          uid: String,
                          completion: @escaping(Bool) -> Void) {
         let queue = DispatchQueue(label: "Queue")
@@ -168,13 +168,16 @@ class StatusService {
         }
     }
     
-    func fetchNumberUsersLikedStatus(status: InstaStatus,
+    func fetchNumberUsersLikedStatus(status: StatusModel,
                                      completion: @escaping(Int) -> Void) {
         let statusId = status.statusId
         let queue = DispatchQueue(label: "Queue")
         queue.async {
             FirebaseRef.ref_tusLiked.document(statusId).getDocument { documentSnap, _ in
-                guard let data = documentSnap?.data() else {return}
+                guard let data = documentSnap?.data() else {
+                    completion(0)
+                    return
+                }
                 
                 DispatchQueue.main.async {
                     completion(data.count)
@@ -183,15 +186,18 @@ class StatusService {
         }
     }
     
-    func fetchUsersLikeStatus(status: InstaStatus,
-                              completion: @escaping([User]) -> Void) {
-        var users: [User] = []
+    func fetchUsersLikeStatus(status: StatusModel,
+                              completion: @escaping([UserModel]) -> Void) {
+        var users: [UserModel] = []
         let statusId = status.statusId
         let queue = DispatchQueue(label: "Queue")
         var numberUser = 0
         queue.async {
             FirebaseRef.ref_tusLiked.document(statusId).getDocument { documentSnap, _ in
-                guard let documents = documentSnap?.data() else {return}
+                guard let documents = documentSnap?.data() else {
+                    completion(users)
+                    return
+                }
                 
                 for document in documents {
                     let uid = document.key

@@ -15,7 +15,7 @@ class UserService {
     static let shared = UserService()
     private let db = Firestore.firestore()
     
-    func fetchUser(uid: String, completion: @escaping (User) -> Void) {
+    func fetchUser(uid: String, completion: @escaping (UserModel) -> Void) {
         let queue = DispatchQueue(label: "fetching user")
         queue.async {
             FirebaseRef.ref_user.document(uid).getDocument { documentSnap, error in
@@ -23,7 +23,7 @@ class UserService {
 
                 guard let dictionary = documentSnap?.data() else {return}
                 
-                let user = User(uid: uid, dictionary: dictionary)
+                let user = UserModel(uid: uid, dictionary: dictionary)
                 DispatchQueue.main.async {
                     completion(user)
                 }
@@ -31,9 +31,9 @@ class UserService {
         }
     }
     
-    func fetchOtherUsers(completion: @escaping ([User]) -> Void) {
+    func fetchOtherUsers(completion: @escaping ([UserModel]) -> Void) {
         guard let currentUid = Auth.auth().currentUser?.uid else {return}
-        var users: [User] = []
+        var users: [UserModel] = []
         
         FirebaseRef.ref_user.getDocuments { querySnap, _ in
             guard let documents = querySnap?.documents else { return }
@@ -42,7 +42,7 @@ class UserService {
                 let dictionary = document.data()
                 let uid = document.documentID
                 if uid == currentUid {continue}
-                let user = User(uid: uid, dictionary: dictionary)
+                let user = UserModel(uid: uid, dictionary: dictionary)
                 users.append(user)
             }
             
@@ -57,10 +57,12 @@ class UserService {
         
         FirebaseRef.ref_followUser.document(uid).setData([currentUid: "1"], merge: true) { error in
             if let error = error {
+                completion()
                 print("DEBUG: \(error.localizedDescription)")
             }
             FirebaseRef.ref_followingUser.document(currentUid).setData([uid: "1"], merge: true) {error in
                 if let error = error {
+                    completion()
                     print("DEBUG: \(error.localizedDescription)")
                 }
                 completion()
@@ -77,8 +79,8 @@ class UserService {
         }
     }
     
-    func fetchFollowingUsers(uid: String, completion: @escaping ([User]) -> Void) {
-        var users: [User] = []
+    func fetchFollowingUsers(uid: String, completion: @escaping ([UserModel]) -> Void) {
+        var users: [UserModel] = []
         var numberUser = 0
         FirebaseRef.ref_followingUser.document(uid).getDocument { documentSnap, error in
             guard let documentsData = documentSnap?.data(), error == nil, documentsData.count != 0 else {
@@ -99,8 +101,8 @@ class UserService {
         }
     }
     
-    func fetchFollowerUsers(uid: String, completion: @escaping ([User]) -> Void) {
-        var users: [User] = []
+    func fetchFollowerUsers(uid: String, completion: @escaping ([UserModel]) -> Void) {
+        var users: [UserModel] = []
         var numberUser = 0
         FirebaseRef.ref_followUser.document(uid).getDocument { documentSnap, error in
             guard let documentsData = documentSnap?.data(), error == nil, documentsData.count != 0 else {
@@ -142,7 +144,7 @@ class UserService {
         }
     }
     
-    func updateInfoUser(user: User, image: UIImage?, completion: @escaping (Bool) -> Void) {
+    func updateInfoUser(user: UserModel, image: UIImage?, completion: @escaping (Bool) -> Void) {
         guard let image = image else {
             self.updateUser(user: user) {
                 completion(true)
@@ -219,7 +221,7 @@ class UserService {
     }
     
     
-    private func updateUser(user: User,  imageUrl: String? = nil, completion: @escaping () -> Void) {
+    private func updateUser(user: UserModel,  imageUrl: String? = nil, completion: @escaping () -> Void) {
         let dictionary: [String: Any]
         
         if let imageUrl = imageUrl {
