@@ -3,8 +3,8 @@
 
 Nếu đã đọc rồi, thì đọc tới các bướcsau:
 <p align="right">(<a href="#buoc7">Bước 7</a>)</p>
-<p align="right">(<a href="#buoc7">Bước 8</a>)</p>
-<p align="right">(<a href="#buoc7">Bước 9</a>)</p>
+<p align="right">(<a href="#buoc8">Bước 8</a>)</p>
+<p align="right">(<a href="#buoc9">Bước 9</a>)</p>
 
 
 In iOS, displaying images and playing audio files are easy thanks to UIImage and **AVAudioPlayer**. But how about the videos? Have you ever think about playing video in the app with Swift? If yes, you can start with the **AVPlayerViewController**, which provides some basic controls so that you can work with the player easily and quickly.
@@ -106,6 +106,7 @@ let cursor = CMTime(value: 90, timescale: 30)
 
 ```
 <a name="buoc7"></a>
+
 7. Tổng kết
 Để có thể playVideo, lấy các thông tin creationDate, duration,... ta cần có 1 biến asset thuộc kiểu AVAsset
 Sau khi có được biến asset rồi, ta sẽ cần 1 biến playItem thuộc kiểu AVPlayItem, biến này se đại diện cho 1 media item và có thể được play bởi player.
@@ -235,7 +236,9 @@ func getTimeString(time: CMTime) -> String? {
 }
 
 <a name="buoc9"></a>
+
 9. CropVideo
+
 Để có thể CropVideo ta sẽ sử dụng AVAssetExportSession()
 AVAssetExportSession là 1 class của AVFoundation mà cho phép ta export AVAsset(Như là Video hoặc image) sang một dạng format hoặc configuration mới.
 Ta khởi tạo AVAsset như sau:
@@ -246,7 +249,6 @@ AVAssetExportSession(asset:presetName:)
 outputURL: URL?(Ta muốn export file đó ra đâu)
 outputFileType: AVFileType? (Kiểu đầu ra của file đó)
 timeRange: CMTimeRange(Optional)
-
 
 ```php
 @objc func handleExportButtonTapped() {
