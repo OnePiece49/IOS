@@ -340,7 +340,6 @@ extension BottomTapTripController: UIScrollViewDelegate {
                 cell?.backgroundColor = self.configureTabBar.backgroundColor
             } else {
                 cell?.backgroundColor = self.configureTabBar.selectedBarColor
-                cell.ima
             }
         }
     }

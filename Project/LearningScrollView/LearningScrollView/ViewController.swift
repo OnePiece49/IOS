@@ -42,13 +42,14 @@ class ViewController: UIViewController {
         view.backgroundColor = .white
         view.addSubview(overlayScrollView)
         view.addSubview(containerScrollView)
+
+
         containerScrollView.addSubview(headerView)
         
-        containerScrollView.backgroundColor = .systemCyan
         containerScrollView.contentInsetAdjustmentBehavior = .never
-        overlayScrollView.backgroundColor = .red
         overlayScrollView.contentInsetAdjustmentBehavior = .never
         containerScrollView.addGestureRecognizer(overlayScrollView.panGestureRecognizer)
+//        containerScrollView.removeGestureRecognizer(containerScrollView.panGestureRecognizer)
         
         containerScrollView.translatesAutoresizingMaskIntoConstraints = false
         overlayScrollView.translatesAutoresizingMaskIntoConstraints = false
@@ -126,7 +127,7 @@ extension ViewController: UIScrollViewDelegate, BottomTapTripControllerDelegate 
                     controller.tableView.contentOffset = CGPoint(x: 0, y: 0)
                 }
                 self.contentOffset.removeAll()
-                
+
             } else {
                 bottomVC.currentTabelView.contentOffset = CGPoint(x: contentOffset.x,
                                                                   y: contentOffset.y - self.heightHeaderView + self.insetTop)
