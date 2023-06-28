@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5C1B55712A4BCA6A00F3AA16 /* CoreAnimationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C1B55702A4BCA6A00F3AA16 /* CoreAnimationController.swift */; };
+		5C1B55732A4C219B00F3AA16 /* DrawGradientController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C1B55722A4C219B00F3AA16 /* DrawGradientController.swift */; };
+		5C1B55752A4C220400F3AA16 /* DrawGradient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C1B55742A4C220400F3AA16 /* DrawGradient.swift */; };
+		5C40C3502A49367E0038BB6E /* DrawView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C40C34F2A49367E0038BB6E /* DrawView.swift */; };
 		6EC81C482A45AD940088EEB0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EC81C472A45AD940088EEB0 /* AppDelegate.swift */; };
 		6EC81C4A2A45AD940088EEB0 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EC81C492A45AD940088EEB0 /* SceneDelegate.swift */; };
 		6EC81C4C2A45AD940088EEB0 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EC81C4B2A45AD940088EEB0 /* ViewController.swift */; };
@@ -16,6 +20,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5C1B55702A4BCA6A00F3AA16 /* CoreAnimationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreAnimationController.swift; sourceTree = "<group>"; };
+		5C1B55722A4C219B00F3AA16 /* DrawGradientController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawGradientController.swift; sourceTree = "<group>"; };
+		5C1B55742A4C220400F3AA16 /* DrawGradient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawGradient.swift; sourceTree = "<group>"; };
+		5C40C34F2A49367E0038BB6E /* DrawView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawView.swift; sourceTree = "<group>"; };
 		6EC81C442A45AD940088EEB0 /* LearningCoreGraphic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LearningCoreGraphic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6EC81C472A45AD940088EEB0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6EC81C492A45AD940088EEB0 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -59,10 +67,14 @@
 				6EC81C472A45AD940088EEB0 /* AppDelegate.swift */,
 				6EC81C492A45AD940088EEB0 /* SceneDelegate.swift */,
 				6EC81C4B2A45AD940088EEB0 /* ViewController.swift */,
+				5C40C34F2A49367E0038BB6E /* DrawView.swift */,
 				6EC81C4D2A45AD940088EEB0 /* Main.storyboard */,
 				6EC81C502A45AD950088EEB0 /* Assets.xcassets */,
 				6EC81C522A45AD950088EEB0 /* LaunchScreen.storyboard */,
 				6EC81C552A45AD950088EEB0 /* Info.plist */,
+				5C1B55702A4BCA6A00F3AA16 /* CoreAnimationController.swift */,
+				5C1B55722A4C219B00F3AA16 /* DrawGradientController.swift */,
+				5C1B55742A4C220400F3AA16 /* DrawGradient.swift */,
 			);
 			path = LearningCoreGraphic;
 			sourceTree = "<group>";
@@ -138,9 +150,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5C1B55712A4BCA6A00F3AA16 /* CoreAnimationController.swift in Sources */,
+				5C1B55752A4C220400F3AA16 /* DrawGradient.swift in Sources */,
 				6EC81C4C2A45AD940088EEB0 /* ViewController.swift in Sources */,
 				6EC81C482A45AD940088EEB0 /* AppDelegate.swift in Sources */,
+				5C40C3502A49367E0038BB6E /* DrawView.swift in Sources */,
 				6EC81C4A2A45AD940088EEB0 /* SceneDelegate.swift in Sources */,
+				5C1B55732A4C219B00F3AA16 /* DrawGradientController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
