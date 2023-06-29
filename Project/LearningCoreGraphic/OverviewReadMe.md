@@ -3,12 +3,13 @@
 ![](images/overView.png)
 
 Khi ta khởi tạo 1 View, UIView cũng tự động khởi tạo 1 đối tượng CALayer cho view đó. Layer là 1 phần của CoreAnimation, chịu trách nhiệm cho việc render visual content cho chính view đó. 
-Các vai trò của View, layer, CoreGraphic
-CALayer: Có nhiệm vụ render, hiển thị content, tạo animation.
-UIView: Có nhiệm vụ nhận input người dùng.
-CoreGraphic: Có nhiệm vụ create và render 2D Graphic như draw lines, rectangles,... Image Manipulation như resizing, scalling, scropping image. Coordinate Transformations như translate, rotate, scale,...
 
-- Mối quan hệ Layer và CoreGraphic:
+Các vai trò của View, layer, CoreGraphic
+- CALayer: Có nhiệm vụ render, hiển thị content, tạo animation.
+- UIView: Có nhiệm vụ nhận input người dùng.
+- CoreGraphic: Có nhiệm vụ create và render 2D Graphic như draw lines, rectangles,... Image Manipulation như resizing, scalling, scropping image. Coordinate Transformations như translate, rotate, scale,...
+
+Mối quan hệ Layer và CoreGraphic:
   
 Ta biết rằng, layer có nhiệm vụ render và hiển thị content. Nhưng sâu xa hơn, layer sử dụng Core Graphic để thực hiện các chức năng đó. VD khi ta update các properties như backgroundColor, borderColor, shadowColor hoặc contents của layer,... hoặc là khi ta rotate, translate,... thì layer sử dụng CoreGraphic để update và render các thay đổi đó. Ta có thể tương tác trực tiếp với CoreGraphic như việc triển khải **draw(_ rect: CGRect)** method of a UIView subclass or using **draw(in ctx: CGContext)** method of a **CALayerDelegate.**
 
