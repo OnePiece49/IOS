@@ -259,11 +259,9 @@ override func draw(_ rect: CGRect) {
     context?.drawPath(using: .stroke)
 }
   ```
+ Output:
 
-  Output:
-
-![](/images/trueLineWidth.png)
-
+![](images/trueLineWidth.png)
 
 - Bài toán 2: Vẽ Graphic với Gradient
 
