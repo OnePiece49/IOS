@@ -3,17 +3,68 @@
 ![](images/overView.png)
 
 Khi ta khởi tạo 1 View, UIView cũng tự động khởi tạo 1 đối tượng CALayer cho view đó. Layer là 1 phần của CoreAnimation, chịu trách nhiệm cho việc render visual content cho chính view đó. 
-
 Các vai trò của View, layer, CoreGraphic
-- CALayer: Có nhiệm vụ render, hiển thị content, tạo animation.
-- UIView: Có nhiệm vụ nhận input người dùng.
-- CoreGraphic: Có nhiệm vụ create và render 2D Graphic như draw lines, rectangles,... Image Manipulation như resizing, scalling, scropping image. Coordinate Transformations như translate, rotate, scale,...
+CALayer: Có nhiệm vụ render, hiển thị content, tạo animation.
+UIView: Có nhiệm vụ nhận input người dùng.
+CoreGraphic: Có nhiệm vụ create và render 2D Graphic như draw lines, rectangles,... Image Manipulation như resizing, scalling, scropping image. Coordinate Transformations như translate, rotate, scale,...
 
-Mối quan hệ Layer và CoreGraphic:
+- Mối quan hệ Layer và CoreGraphic:
   
 Ta biết rằng, layer có nhiệm vụ render và hiển thị content. Nhưng sâu xa hơn, layer sử dụng Core Graphic để thực hiện các chức năng đó. VD khi ta update các properties như backgroundColor, borderColor, shadowColor hoặc contents của layer,... hoặc là khi ta rotate, translate,... thì layer sử dụng CoreGraphic để update và render các thay đổi đó. Ta có thể tương tác trực tiếp với CoreGraphic như việc triển khải **draw(_ rect: CGRect)** method of a UIView subclass or using **draw(in ctx: CGContext)** method of a **CALayerDelegate.**
 
 # II. CALayer
+![](images/subclassLayer.png)
+
+Như đã nêu trên, layer có nhiệm vụ render ra content, để chứng minh điều đó, từ layer ta sẽ add text, image.
+
+- Add image:
+
+```php
+view.backgroundColor = .white
+let redView = UIView(frame: .init(x: 100, y: 300, width: 300, height: 300))
+view.addSubview(redView)
+let imageLayer = CALayer()
+imageLayer.frame = redView.bounds
+imageLayer.contents = UIImage(named: "bp")?.cgImage
+imageLayer.contentsGravity = .topLeft
+
+imageLayer.isGeometryFlipped = true  // Xét true để không bị lộn ngược top và bottom
+print("DEBUG: \(imageLayer.contentsAreFlipped())")
+
+redView.layer.addSublayer(imageLayer)
+
+redView.layer.borderColor = UIColor.blue.cgColor
+redView.layer.backgroundColor = UIColor.red.cgColor
+```
+
+Output:
+
+![](images/layer_image1.png)
+
+Ta xét contentMode cho content của layer như UIImageView thông qua property **contentsGravity:** Với imageLayer.contentsGravity = .resizeAspectFill
+
+![](images/imageLayer2.png)
+
+- Add Text: CATextLayer
+
+```php
+func addTextLayer (){
+    let textLayer = CATextLayer()
+    textLayer.string = "Hellooooooooo \n Siuuuuu \n 1231321"
+    textLayer.foregroundColor = UIColor.white.cgColor
+    textLayer.alignmentMode = .left
+    textLayer.fontSize = 17
+    textLayer.truncationMode = .none
+    textLayer.backgroundColor = UIColor.red.cgColor
+    textLayer.frame = CGRect(origin: CGPoint.zero, size: .init(width: 100, height: 60))
+    redView.layer.addSublayer(textLayer)
+}
+```
+
+Output:
+
+![](images/textLayer.png)
+
 ## 2.1. CAShapeLayer
 ![](images/circle_radius.png)
 CAShapeLayer là 1 subClass của CALayer, được sử dụng để drawing và animate shapes.
@@ -87,6 +138,19 @@ Vì sau khi xoay 360 độ thì vị trí view vẫn thế nên sẽ không có 
 - Nhiều animation được add vào layer sẽ được thực thi cùng lúc.
 
 ### 2.3.0 Giới thiệu
+Ta có thể animation những properties này:
+- backgroundColor
+- rotation
+- translation
+- scale
+- opacity
+- size
+- borderWidth
+- cornelRadius
+- shadowOffset
+- shadowOpacity
+- shadowColor
+
 **Anchor Point**: Là điểm mà layer sẽ animate xung quanh. Giá trị default là: (0.5, 0.5) ứng với tâm của layer.
 
 ![](images/AnchorPoint.png)
