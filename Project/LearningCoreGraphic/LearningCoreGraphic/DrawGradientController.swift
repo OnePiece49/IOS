@@ -25,7 +25,10 @@ class DrawGradientController: UIViewController {
     func configureUI() {
         view.backgroundColor = .white
         view.addSubview(draw)
-        draw.backgroundColor = .white
+        view.backgroundColor = .white
+
+        draw.layer.backgroundColor = UIColor.white.cgColor
+        draw.backgroundColor = .red
     }
     
     //MARK: - Selectors

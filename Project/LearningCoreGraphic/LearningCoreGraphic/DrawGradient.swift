@@ -23,6 +23,9 @@ class DrawGradient: UIView {
           byRoundingCorners: .allCorners,
           cornerRadii: Constants.cornerRadiusSize
         )
+        UIColor.white.setFill()
+        UIColor.white.setStroke()
+        cornelpath.stroke()
         cornelpath.addClip()
 
         guard let context = UIGraphicsGetCurrentContext() else {return}
@@ -60,9 +63,6 @@ class DrawGradient: UIView {
         path.lineWidth = 3
         path.stroke()
         context.saveGState()
-
-
-        
         
         guard let clippingPath = path.copy() as? UIBezierPath else {return}
         clippingPath.addLine(to: CGPoint(x: clippingPath.currentPoint.x, y: rect.height))
@@ -80,7 +80,7 @@ class DrawGradient: UIView {
                                    end: CGPoint(x: 220, y: rect.height),
                                    options: [])
         
-//        context.restoreGState()
+        context.restoreGState()
 
         points.forEach { point in
             let path = UIBezierPath(arcCenter: point,

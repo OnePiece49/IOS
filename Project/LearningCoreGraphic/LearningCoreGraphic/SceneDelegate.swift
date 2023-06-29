@@ -16,7 +16,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let scence = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: scence)
         self.window = window
-        window.rootViewController = DrawGradientController()
+        window.rootViewController = LayerController()
         window.makeKeyAndVisible()
     }
 
